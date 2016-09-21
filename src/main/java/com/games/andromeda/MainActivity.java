@@ -1,6 +1,7 @@
 package com.games.andromeda;
 
 import android.graphics.PointF;
+import android.util.Log;
 
 import com.games.andromeda.graph.Edge;
 import com.games.andromeda.graph.MyGraph;
@@ -29,6 +30,7 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.color.Color;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -86,7 +88,14 @@ public class MainActivity extends SimpleBaseGameActivity {
         //scene.setTouchAreaBindingOnActionDownEnabled(true);//Без этого не будет работать нормально перетаскивание спрайтов
         scene.setOnAreaTouchTraversalFrontToBack();//Сначала получает фокус верхний спрайт
 
-        MyGraph graph = LevelLoader.createLevel();
+        MyGraph graph = null;
+        try {
+            graph = LevelLoader.loadMap(this, "testmap");
+        } catch (IOException e) {
+            Log.wtf("loadMap: opening csv error", e.toString());
+        } catch (LevelLoader.MapFormatException e) {
+            Log.wtf("loadMap: csv content error", e.toString());
+        }
 
         //Создание слоя с ребрами
         Rectangle lineLayer = new Rectangle(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT,
