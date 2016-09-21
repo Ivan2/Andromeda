@@ -31,9 +31,7 @@ public class LevelLoader {
     private void addEdge(float fromX, float fromY, float toX, float toY, int weight){
         PointF first = new PointF(fromX, fromY);
         PointF second = new PointF(toX, toY);
-        //result.addEdge(new Edge(testmap.get(first), testmap.get(second), weight)); // TODO: uncomment after merge
-        result.addEdge(new Edge(map.get(first), map.get(second)));
-
+        result.addEdge(new Edge(map.get(first), map.get(second), weight));
     }
 
 

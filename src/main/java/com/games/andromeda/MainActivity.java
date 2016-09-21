@@ -1,6 +1,7 @@
 package com.games.andromeda;
 
 import android.graphics.PointF;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.games.andromeda.graph.Edge;
@@ -13,7 +14,7 @@ import com.games.andromeda.texture.TextureLoader;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
-import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
+import org.andengine.engine.options.resolutionpolicy.FixedResolutionPolicy;
 import org.andengine.entity.primitive.Line;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
@@ -38,8 +39,8 @@ import java.util.LinkedList;
 
 public class MainActivity extends SimpleBaseGameActivity {
 
-    private static final int CAMERA_WIDTH = 480;
-    private static final int CAMERA_HEIGHT = 320;
+    private static int CAMERA_WIDTH = 700;
+    private static int CAMERA_HEIGHT = 700;
 
     private Camera camera;
     private HashMap<Node.SystemType, ITextureRegion> systemTexures;
@@ -52,9 +53,14 @@ public class MainActivity extends SimpleBaseGameActivity {
 
     @Override
     public EngineOptions onCreateEngineOptions() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        CAMERA_WIDTH = metrics.widthPixels;//Получаем ширину экрана устройства
+        CAMERA_HEIGHT = metrics.heightPixels;//Получаем высоту экрана устройства
+
         camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
         return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED,
-                new FillResolutionPolicy(), camera);
+                new FixedResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
     }
 
     @Override
@@ -62,6 +68,8 @@ public class MainActivity extends SimpleBaseGameActivity {
         BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
         systemTexures = new HashMap<>();
         systemTexures.put(Node.SystemType.EMPTY, TextureLoader.loadSystemTexture(getTextureManager(),
+                Node.SystemType.EMPTY));
+        systemTexures.put(Node.SystemType.MINI, TextureLoader.loadSystemTexture(getTextureManager(),
                 Node.SystemType.EMPTY));
         systemTexures.put(Node.SystemType.FRIENDLY, TextureLoader.loadSystemTexture(getTextureManager(),
                 Node.SystemType.FRIENDLY));
@@ -110,7 +118,7 @@ public class MainActivity extends SimpleBaseGameActivity {
             Edge edge = edgeIterator.next();
             PointF pos1 = getPos(edge.getNode1().getX(), edge.getNode1().getY());
             PointF pos2 = getPos(edge.getNode2().getX(), edge.getNode2().getY());
-            Line line = new Line(pos1.x, pos1.y, pos2.x, pos2.y, 20,
+            Line line = new Line(pos1.x, pos1.y, pos2.x, pos2.y, 1,
                     mEngine.getVertexBufferObjectManager());
             line.setColor(0, 0, 1);
             lineLayer.attachChild(line);
@@ -133,15 +141,18 @@ public class MainActivity extends SimpleBaseGameActivity {
         Iterator<Node> nodeIterator = nodes.iterator();
         while (nodeIterator.hasNext()) {
             Node node = nodeIterator.next();
+            float size = 48;
+            if (node.getSystemType() == Node.SystemType.MINI)
+                size *= 0.4f;
             PointF pos = getPos(node.getX(), node.getY());
             Sprite sprite = new SystemSprite(node, new Runnable() {
                 @Override
                 public void run() {
                     dialogSprite.setVisible(true);
                 }
-            }, pos.x - 16, pos.y - 16, systemTexures.get(node.getSystemType()),
+            }, pos.x - size/2, pos.y - size/2, systemTexures.get(node.getSystemType()),
                     mEngine.getVertexBufferObjectManager());
-            sprite.setSize(32, 32);
+            sprite.setSize(size, size);
             systemsLayer.attachChild(sprite);
             scene.registerTouchArea(sprite);
         }
