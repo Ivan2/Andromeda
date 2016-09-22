@@ -1,23 +1,41 @@
 package com.games.andromeda.texture;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import com.games.andromeda.PxDpConverter;
+import com.games.andromeda.R;
 import com.games.andromeda.graph.Node;
 
+import org.andengine.engine.Engine;
+import org.andengine.opengl.font.Font;
+import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.TextureManager;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.TextureRegionFactory;
+import org.andengine.ui.activity.BaseGameActivity;
 
 public class TextureLoader {
 
-    public static ITextureRegion loadSystemTexture(TextureManager textureManager, Node.SystemType systemType) {
+    private BaseGameActivity activity;
+    private TextureManager textureManager;
+    private Engine engine;
+
+    public TextureLoader(BaseGameActivity activity, Engine engine) {
+        this.activity = activity;
+        this.engine = engine;
+        textureManager = engine.getTextureManager();
+        BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
+    }
+
+    public ITextureRegion loadSystemTexture(Node.SystemType systemType) {
         Bitmap bitmap = android.graphics.Bitmap.createBitmap(128, 128,
                 android.graphics.Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -50,15 +68,15 @@ public class TextureLoader {
         return TextureRegionFactory.createFromSource(bitmapTextureAtlas, source, 0, 0);
     }
 
-    public static ITextureRegion loadQwertyTexture(TextureManager textureManager, Context context) {
-        BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(textureManager, 128, 128,
+    public ITextureRegion loadBackgroundTexture() {
+        BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(textureManager, 1024, 1024,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
         textureManager.loadTexture(bitmapTextureAtlas);
         return BitmapTextureAtlasTextureRegionFactory.createFromAsset
-                (bitmapTextureAtlas, context, "qwerty.png", 0, 0);
+                (bitmapTextureAtlas, activity, "background.png", 0, 0);
     }
 
-    public static ITextureRegion loadEmptyTexture(TextureManager textureManager) {
+    public ITextureRegion loadEmptyTexture() {
         Bitmap bitmap = android.graphics.Bitmap.createBitmap(128, 128,
                 android.graphics.Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -70,6 +88,17 @@ public class TextureLoader {
         bitmapTextureAtlas.addTextureAtlasSource(source, 0, 0);
         bitmapTextureAtlas.load();
         return TextureRegionFactory.createFromSource(bitmapTextureAtlas, source, 0, 0);
+    }
+
+    public Font loadTextTexture() {
+        BitmapTextureAtlas fontTexture = new BitmapTextureAtlas(textureManager,
+                128, 64, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        Font font = FontFactory.createFromAsset(activity.getFontManager(), fontTexture, activity.getAssets(),
+                "fonts/font.ttf", PxDpConverter.dpToPx(activity.getResources().getDimension(R.dimen.text_size)),
+                true, android.graphics.Color.WHITE);
+        textureManager.loadTexture(fontTexture);
+        engine.getFontManager().loadFont(font);
+        return font;
     }
 
 }

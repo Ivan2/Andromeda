@@ -11,17 +11,23 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
-public class SystemSprite extends ButtonSprite {
+public abstract class SystemSprite extends ButtonSprite {
+
+    public abstract void onClick();
+    public abstract void onMove();
+    public abstract void onUp();
 
     private Node node;
 
-    public SystemSprite(Node node, final Runnable runnable, float pX, float pY, ITextureRegion pTextureRegion, VertexBufferObjectManager pVertexBufferObjectManager) {
+    public SystemSprite(Node node, float pX, float pY, ITextureRegion pTextureRegion,
+                        VertexBufferObjectManager pVertexBufferObjectManager) {
         super(pX, pY, pTextureRegion, pVertexBufferObjectManager);
         this.node = node;
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                runnable.run();
+                SystemSprite.this.onClick();
+                //runnable.run();
             }
         });
     }
@@ -29,18 +35,20 @@ public class SystemSprite extends ButtonSprite {
     @Override
     public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
         switch (pSceneTouchEvent.getMotionEvent().getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                MainActivity.selectedNodes.clear();
-                MainActivity.selectedNodes.add(node);
-                break;
+            //case MotionEvent.ACTION_DOWN:
+                //MainActivity.selectedNodes.clear();
+                //MainActivity.selectedNodes.add(node);
+            //    break;
             case MotionEvent.ACTION_MOVE:
-                if (!MainActivity.selectedNodes.isEmpty())
+                onMove();
+                /*if (!MainActivity.selectedNodes.isEmpty())
                     if (MainActivity.selectedNodes.getLast().equals(node))
                         break;
-                MainActivity.selectedNodes.add(node);
+                MainActivity.selectedNodes.add(node);*/
                 break;
             case MotionEvent.ACTION_UP:
-                Log.wtf("nodes", MainActivity.selectedNodes.toString());
+                onUp();
+                //Log.wtf("nodes", MainActivity.selectedNodes.toString());
                 //TODO
                 break;
         }
