@@ -69,11 +69,19 @@ public class TextureLoader {
     }
 
     public ITextureRegion loadBackgroundTexture() {
-        BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(textureManager, 1024, 1024,
+         return loadFileTexture("background.png", 1024, 1024);
+    }
+
+    public ITextureRegion loadHyperTexture() {
+        return loadFileTexture("hyper.png", 128, 128);
+    }
+
+    private ITextureRegion loadFileTexture(String file, int sizeX, int sizeY){
+        BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(textureManager, sizeX, sizeY,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
         textureManager.loadTexture(bitmapTextureAtlas);
         return BitmapTextureAtlasTextureRegionFactory.createFromAsset
-                (bitmapTextureAtlas, activity, "background.png", 0, 0);
+                (bitmapTextureAtlas, activity, file, 0, 0);
     }
 
     public ITextureRegion loadEmptyTexture() {

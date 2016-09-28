@@ -5,6 +5,7 @@ import android.graphics.PointF;
 
 import com.games.andromeda.graph.Edge;
 import com.games.andromeda.graph.MyGraph;
+import com.games.andromeda.graph.Node;
 import com.games.andromeda.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
@@ -35,16 +36,16 @@ public class BackgroundLayer extends Layer {
     @Override
     public void repaint() {
         //TODO удалить все спрайты со слоя
-
-        Iterator<Edge> edgeIterator = graph.getEdges().iterator();
-        while (edgeIterator.hasNext()) {
-            Edge edge = edgeIterator.next();
+        for (Edge edge : graph.getEdges()) {
             PointF pos1 = getPos(edge.getNode1().getX(), edge.getNode1().getY());
             PointF pos2 = getPos(edge.getNode2().getX(), edge.getNode2().getY());
-            Line line = new Line(pos1.x, pos1.y, pos2.x, pos2.y, 1,
-                    vertexBufferObjectManager);
-            line.setColor(0, 0, 1);
-            layer.attachChild(line);
+            if (!(edge.getNode1().getSystemType() == Node.SystemType.HYPER &&
+                    edge.getNode2().getSystemType() == Node.SystemType.HYPER)) {
+                Line line = new Line(pos1.x, pos1.y, pos2.x, pos2.y, 1,
+                        vertexBufferObjectManager);
+                line.setColor(0, 0, 1);
+                layer.attachChild(line);
+            }
         }
     }
 

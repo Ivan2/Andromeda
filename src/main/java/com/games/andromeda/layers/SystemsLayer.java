@@ -48,6 +48,8 @@ public class SystemsLayer extends Layer {
                 textureLoader.loadSystemTexture(Node.SystemType.FRIENDLY));
         systemTextures.put(Node.SystemType.ENEMY,
                 textureLoader.loadSystemTexture(Node.SystemType.ENEMY));
+        systemTextures.put(Node.SystemType.HYPER,
+                textureLoader.loadHyperTexture());
 
         layer = new Rectangle(0, 0, camera.getWidth(), camera.getHeight(),
                 vertexBufferObjectManager);

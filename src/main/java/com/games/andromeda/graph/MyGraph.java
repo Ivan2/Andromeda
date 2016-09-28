@@ -7,6 +7,7 @@ import edu.uci.ics.jung.graph.SparseGraph;
 public class MyGraph {
 
     private SparseGraph<Node, Edge> graph;
+    private Node hyper;
 
     public MyGraph() {
         graph = new SparseGraph<>();
@@ -14,6 +15,14 @@ public class MyGraph {
 
     public void addNode(Node node) {
         graph.addVertex(node);
+        if (node.getSystemType() == Node.SystemType.HYPER) {
+            if (hyper == null) {
+                hyper = node;
+            } else {
+                graph.addEdge(new Edge(node, hyper, 0), node, hyper);
+                hyper = null;
+            }
+        }
     }
 
     public void addEdge(Edge edge) {

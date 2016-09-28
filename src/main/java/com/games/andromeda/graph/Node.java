@@ -9,7 +9,7 @@ import java.util.List;
 public class Node {
 
     //типы системы
-    public static enum SystemType {EMPTY, FRIENDLY, ENEMY, MINI}
+    public static enum SystemType {EMPTY, FRIENDLY, ENEMY, MINI, HYPER}
 
     //Относительные координаты 0..1
     private float x;

@@ -47,6 +47,13 @@ public class LevelLoader {
                         Integer.parseInt(line[2]),
                         Integer.parseInt(line[3]));
                 break;
+            case "H":
+                addVertex(
+                        Integer.parseInt(line[1]),
+                        Float.parseFloat(line[2]),
+                        Float.parseFloat(line[3]),
+                        Node.SystemType.HYPER);
+                break;
             default:
                 throw new MapFormatException();
         }
