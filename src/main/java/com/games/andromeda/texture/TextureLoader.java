@@ -72,6 +72,10 @@ public class TextureLoader {
          return loadFileTexture("background.png", 1024, 1024);
     }
 
+    public ITextureRegion loadColoredShipTextire(String color){
+        return loadFileTexture("ship/" + color + ".png", 128, 128);
+    }
+
     public ITextureRegion loadHyperTexture() {
         return loadFileTexture("hyper.png", 128, 128);
     }

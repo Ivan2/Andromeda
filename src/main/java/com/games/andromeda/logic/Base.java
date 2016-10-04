@@ -25,6 +25,7 @@ public class Base extends GameObject {
                 properties = new BasicFederationBaseProperties();
                 break;
         }
+        this.node = node;
         if (false){
             // TODO: проверка на корректность вершины
             throw new IncorrectNodeException();

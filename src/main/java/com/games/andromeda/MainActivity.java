@@ -8,8 +8,13 @@ import com.games.andromeda.graph.Node;
 import com.games.andromeda.layers.AskLayer;
 import com.games.andromeda.layers.BackgroundLayer;
 import com.games.andromeda.layers.MessageLayer;
+import com.games.andromeda.layers.ShipsLayer;
 import com.games.andromeda.layers.SystemsLayer;
 import com.games.andromeda.level.LevelLoader;
+import com.games.andromeda.logic.Base;
+import com.games.andromeda.logic.Fleet;
+import com.games.andromeda.logic.GameObject;
+import com.games.andromeda.logic.Pocket;
 import com.games.andromeda.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
@@ -22,6 +27,7 @@ import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.color.Color;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 public class MainActivity extends SimpleBaseGameActivity {
@@ -77,6 +83,32 @@ public class MainActivity extends SimpleBaseGameActivity {
         SystemsLayer systemsLayer = new SystemsLayer(scene, camera, textureLoader,
                 mEngine.getVertexBufferObjectManager(), graph);
         systemsLayer.repaint();
+
+
+
+
+
+        ///////////////////////////////////////////////shitcode on
+        /// демка корабля
+
+        Iterator<Node> iter = graph.getNodes().iterator();
+        iter.next();
+        iter.next();
+        iter.next();
+        Node node = iter.next();
+        ShipsLayer shipsLayer = new ShipsLayer(scene, camera, textureLoader, mEngine.getVertexBufferObjectManager());
+        Pocket pocket = new Pocket(GameObject.Side.EMPIRE);
+        pocket.increase(100500);
+        try {
+            Base base = new Base(GameObject.Side.EMPIRE, node);
+            Fleet fleet = Fleet.buy(5, base, pocket);
+            shipsLayer.addFleet(fleet, 1);
+        } catch (Exception e){
+            Log.wtf("my stupid exception: ", e.toString());
+        }
+        shipsLayer.repaint();
+
+        ///////////////////////////////////////////////shitcode off
 
         //слой с сообщением
         MessageLayer messageLayer = new MessageLayer(scene, camera, textureLoader,
