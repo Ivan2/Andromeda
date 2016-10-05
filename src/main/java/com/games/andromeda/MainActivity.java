@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;
+import com.games.andromeda.graph.PathManager;
 import com.games.andromeda.layers.AskLayer;
 import com.games.andromeda.layers.BackgroundLayer;
 import com.games.andromeda.layers.MessageLayer;
@@ -96,7 +97,8 @@ public class MainActivity extends SimpleBaseGameActivity {
         iter.next();
         iter.next();
         Node node = iter.next();
-        ShipsLayer shipsLayer = new ShipsLayer(scene, camera, textureLoader, mEngine.getVertexBufferObjectManager());
+        final PathManager manager = new PathManager();
+        ShipsLayer shipsLayer = new ShipsLayer(scene, camera, textureLoader, mEngine.getVertexBufferObjectManager(), manager);
         Pocket pocket = new Pocket(GameObject.Side.EMPIRE);
         pocket.increase(100500);
         try {
@@ -136,7 +138,7 @@ public class MainActivity extends SimpleBaseGameActivity {
 
             @Override
             public void onMove(Node node) {
-
+                manager.addNode(node);
             }
 
             @Override

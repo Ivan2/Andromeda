@@ -1,5 +1,7 @@
 package com.games.andromeda.logic;
 
+import android.util.Log;
+
 import com.games.andromeda.draw.Drawer;
 import com.games.andromeda.graph.Node;
 
@@ -19,6 +21,11 @@ public class Fleet extends GameObject {
     private static Random random = new Random();
     private float energy;  // 0..1
     private Node position;
+    private static float CURRENCY = 0.0000001f;
+
+    public void setEnergy(float energy) {
+        this.energy = energy;
+    }
 
     /**
      * Флоты сами по себе не появляются, поэтому конструктор deprecated.
@@ -43,6 +50,7 @@ public class Fleet extends GameObject {
             throw new TooMuchShipsException();
         }
         energy = 1;
+
 //        ships = Stream.generate(SpaceShip::new)
 //                .limit(shipCount).collect(Collectors.toList());
         ships = new ArrayList<>();
@@ -172,10 +180,13 @@ public class Fleet extends GameObject {
         if (path.size() == 0){
             return;
         }
-        float requiredEnergy = properties.getSpeed(ships.size())*energy / path.size();
-        if (requiredEnergy < energy){
+        float requiredEnergy =(float) (path.size()-1)/properties.getSpeed(ships.size()) - CURRENCY;
+        if (requiredEnergy > energy){
             throw new NotEnoughEnergyException();
         }
+        Log.wtf("path_len", String.valueOf(path.size()));
+        Log.wtf("required_energy", String.valueOf(requiredEnergy));
+        Log.wtf("energy", String.valueOf(energy));
         energy -= requiredEnergy;
         position = path.get(path.size()-1);
     }

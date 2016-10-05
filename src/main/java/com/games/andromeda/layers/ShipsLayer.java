@@ -1,10 +1,13 @@
 package com.games.andromeda.layers;
 
 import android.graphics.PointF;
+import android.util.Log;
 
 import com.games.andromeda.graph.Node;
+import com.games.andromeda.graph.PathManager;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
+import com.games.andromeda.sprites.ShipSprite;
 import com.games.andromeda.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
@@ -31,6 +34,20 @@ public class ShipsLayer extends Layer {
         "red", "green", "blue", "gray", "pink", "brown"
     };
 
+    private PointF[] deltas;  // запоминаем смещения
+    private ITextureRegion[] textures; // текстуры тоже не изменятся
+    private ShipSprite[] sprites; // спрайты просто прикрепляем/открепляем от слоя, их всегда 6
+//    private Fleet[] fleets;  // флоты - та часть, которая вносит изменения
+
+
+    private ShipSprite activeSprite;
+
+    private PathManager pathManager;
+
+    private Rectangle layer;
+
+    private LayerListener layerListener;
+
     /**
      * Получение координат смещения иконки
      * @param angle угол смещения
@@ -42,41 +59,39 @@ public class ShipsLayer extends Layer {
                 (float)(SHIP_MARGIN*Math.sin(angle)));
     }
 
-    private PointF[] deltas;  // запоминаем смещения
-    private ITextureRegion[] textures; // текстуры тоже не изменятся
-    private Sprite[] sprites; // спрайты просто прикрепляем/открепляем от слоя, их всегда 6
-    private Fleet[] fleets;  // флоты - та часть, которая вносит изменения
-
-    private Sprite activeSprite;
-
     public static abstract class LayerListener {
         public abstract void onClick(Node node);
         public abstract void onMove(Node node);
         public abstract void onUp(Node node);
     }
 
-    private Rectangle layer;
-
-    private LayerListener layerListener;
 
     public ShipsLayer(Scene scene, Camera camera, TextureLoader textureLoader,
-                      VertexBufferObjectManager vertexBufferObjectManager) {
+                      VertexBufferObjectManager vertexBufferObjectManager, final PathManager manager) {
         super(scene, camera, textureLoader, vertexBufferObjectManager);
+
+        pathManager = manager;
 
         // todo refacor this using magic layerListener ???
         layer = new Rectangle(0, 0, camera.getWidth(), camera.getHeight(),
                 vertexBufferObjectManager){
             @Override
             public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                if (pSceneTouchEvent.isActionMove()){
-                    if (activeSprite != null){
+                if (activeSprite != null) {
+                    if (pSceneTouchEvent.isActionMove()) {
                         activeSprite.setX(pSceneTouchEvent.getX() - activeSprite.getWidth() / 2);
                         activeSprite.setY(pSceneTouchEvent.getY() - activeSprite.getHeight() / 2);
+                    } else if (pSceneTouchEvent.isActionUp()) {
+                        // todo сделать ход, если возможно
+                        try {
+                            activeSprite.getFleet().makeMove(manager.getPath());
+                        } catch (Exception e) {
+                            Log.wtf("PATH", e.toString());
+                        }
+                        activeSprite = null;
+                        manager.reset();
+                        ShipsLayer.this.repaint();
                     }
-                } else if (pSceneTouchEvent.isActionUp()){
-                    // todo сделать ход, если возможно
-                    activeSprite = null;
-                    ShipsLayer.this.repaint();
                 }
                 return super.onAreaTouched(pSceneTouchEvent, pTouchAreaLocalX, pTouchAreaLocalY);
             }
@@ -87,16 +102,18 @@ public class ShipsLayer extends Layer {
 
         deltas = new PointF[6];
         textures = new ITextureRegion[6];
-        fleets = new Fleet[6];
-        sprites = new Sprite[6];
+//        fleets = new Fleet[6];
+        sprites = new ShipSprite[6];
         for(int i=0; i<6; ++i){
             deltas[i] = calc_delta(SHIP_ANGLES[i]);
             textures[i] = textureLoader.loadColoredShipTextire(SHIP_COLORS[i]);
-            sprites[i] = new Sprite(0, 0, textures[i],vertexBufferObjectManager){
+            sprites[i] = new ShipSprite(0, 0, textures[i],vertexBufferObjectManager){
                 @Override
                 public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
                     if (pSceneTouchEvent.isActionDown()){
                         activeSprite = this;
+//                        activeSprite.getFleet().setEnergy(100500);
+                        manager.start(this.getFleet());
                     }
                     return super.onAreaTouched(pSceneTouchEvent, pTouchAreaLocalX, pTouchAreaLocalY);
                 }
@@ -111,8 +128,8 @@ public class ShipsLayer extends Layer {
      * @param idx - индекс флота (0..5)
      */
     private void moveToPosition(int idx){
-        if ((fleets[idx] != null) && (activeSprite != sprites[idx]) ){
-            Node node = fleets[idx].getPosition();
+        if ((sprites[idx].getFleet() != null) && (activeSprite != sprites[idx]) ){
+            Node node = sprites[idx].getFleet().getPosition();
             PointF point = getPos(node.getX(), node.getY());
             float x = point.x + deltas[idx].x - sprites[idx].getWidth() / 2;
             float y = point.y + deltas[idx].y - sprites[idx].getHeight() / 2;
@@ -130,16 +147,16 @@ public class ShipsLayer extends Layer {
         // сначала хранятся имперские флоты, потом флоты федерации
         int idx = (fleet.getSide() == GameObject.Side.EMPIRE ? -1 : 2) + number;
         // todo бросить исключение при перезаписи или выходе за рамки 1..3
-        fleets[idx] = fleet;
+        sprites[idx].setFleet(fleet);
         moveToPosition(idx);
         layer.attachChild(sprites[idx]);
     }
 
     public void removeDeadFleets(){
         for(int i=0; i<6; ++i){
-            if (fleets[i] != null){
-                if (fleets[i].getShipCount() == 0){
-                    fleets[i] = null;
+            if (sprites[i].getFleet() != null){
+                if (sprites[i].getFleet().getShipCount() == 0){
+                    sprites[i].setFleet(null);
                     layer.detachChild(sprites[i]);
                 }
             }
