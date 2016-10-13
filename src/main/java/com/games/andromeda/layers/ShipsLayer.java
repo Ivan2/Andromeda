@@ -13,7 +13,6 @@ import com.games.andromeda.texture.TextureLoader;
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
-import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
@@ -176,4 +175,16 @@ public class ShipsLayer extends Layer {
         this.layerListener = layerListener;
     }
 
+    public boolean isShipMoves() {
+        return (activeSprite != null);
+    }
+
+    public PointF getPos() {
+        return new PointF(activeSprite.getX(), activeSprite.getY());
+    }
+
+    public void move(float x, float y) {
+        activeSprite.setX(x);
+        activeSprite.setY(y);
+    }
 }
