@@ -36,14 +36,18 @@ public class TextureLoader {
     }
 
     public ITextureRegion loadSystemTexture(Node.SystemType systemType) {
-        Bitmap bitmap = android.graphics.Bitmap.createBitmap(128, 128,
+        int size = 256;
+        float radius = 50;
+        Bitmap bitmap = android.graphics.Bitmap.createBitmap(size, size,
                 android.graphics.Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();
         paint.setStrokeWidth(16);
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        canvas.drawCircle(64, 64, 50, paint);
+        if (systemType == Node.SystemType.MINI)
+            radius *= 0.4;
+        canvas.drawCircle(bitmap.getWidth()/2, bitmap.getHeight()/2, radius, paint);
         switch (systemType) {
             case EMPTY:
                 paint.setColor(Color.GRAY);
@@ -58,10 +62,10 @@ public class TextureLoader {
                 paint.setColor(Color.GRAY);
         }
         paint.setStyle(Paint.Style.STROKE);
-        canvas.drawCircle(64, 64, 50, paint);
+        canvas.drawCircle(bitmap.getWidth()/2, bitmap.getHeight()/2, radius, paint);
 
-        BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(textureManager, 128, 128,
-                TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(textureManager,
+                bitmap.getWidth(), bitmap.getHeight(), TextureOptions.BILINEAR_PREMULTIPLYALPHA);
         BitmapTextureAtlasSource source = new BitmapTextureAtlasSource(bitmap);
         bitmapTextureAtlas.addTextureAtlasSource(source, 0, 0);
         bitmapTextureAtlas.load();

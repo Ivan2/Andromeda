@@ -146,7 +146,7 @@ public class MainActivity extends SimpleBaseGameActivity {
         systemsLayer.setLayerListener(new SystemsLayer.LayerListener() {
             @Override
             public void onClick(Node node) {
-                askLayer.show("fsdfasdfasfsdaf");
+                askLayer.show("dialog!");
             }
 
             @Override

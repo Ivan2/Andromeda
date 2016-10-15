@@ -1,8 +1,11 @@
 package com.games.andromeda.layers;
 
+import android.util.Log;
+
 import com.games.andromeda.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
+import org.andengine.entity.IEntity;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.ButtonSprite;
 import org.andengine.entity.text.Text;
@@ -29,6 +32,16 @@ public abstract class AskLayer extends DialogLayer {
 
     @Override
     public void repaint() {
+        try {
+            for (IEntity child = layer.getFirstChild(); child != null; child = layer.getFirstChild()) {
+                layer.detachChild(child);
+                //            scene.unregisterTouchArea();
+            }
+        }
+        catch (Exception e){
+            Log.wtf("layer deletion:", e.toString());
+        }
+
         Text text = new Text(0, 0, textureLoader.loadTextTexture(), msg, vertexBufferObjectManager);
         text.setColor(1, 1, 1);
         layer.attachChild(text);

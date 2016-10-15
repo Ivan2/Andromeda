@@ -43,7 +43,7 @@ public class SystemsLayer extends Layer {
         systemTextures.put(Node.SystemType.EMPTY,
                 textureLoader.loadSystemTexture(Node.SystemType.EMPTY));
         systemTextures.put(Node.SystemType.MINI,
-                textureLoader.loadSystemTexture(Node.SystemType.EMPTY));
+                textureLoader.loadSystemTexture(Node.SystemType.MINI));
         systemTextures.put(Node.SystemType.FRIENDLY,
                 textureLoader.loadSystemTexture(Node.SystemType.FRIENDLY));
         systemTextures.put(Node.SystemType.ENEMY,
@@ -65,9 +65,7 @@ public class SystemsLayer extends Layer {
         Iterator<Node> nodeIterator = nodes.iterator();
         while (nodeIterator.hasNext()) {
             final Node node = nodeIterator.next();
-            float size = 48;
-            if (node.getSystemType() == Node.SystemType.MINI)
-                size *= 0.4f;
+            float size = 100;
             PointF pos = getPos(node.getX(), node.getY());
             Sprite sprite = new SystemSprite(node, pos.x - size / 2, pos.y - size / 2,
                     systemTextures.get(node.getSystemType()), vertexBufferObjectManager) {
