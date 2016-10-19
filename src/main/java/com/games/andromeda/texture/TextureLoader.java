@@ -1,7 +1,5 @@
 package com.games.andromeda.texture;
 
-import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -106,15 +104,30 @@ public class TextureLoader {
         return TextureRegionFactory.createFromSource(bitmapTextureAtlas, source, 0, 0);
     }
 
-    public Font loadTextTexture() {
+    private Font loadTextTexture(float pixSize) {
         BitmapTextureAtlas fontTexture = new BitmapTextureAtlas(textureManager,
-                128, 64, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+                512, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
         Font font = FontFactory.createFromAsset(activity.getFontManager(), fontTexture, activity.getAssets(),
-                "fonts/font.ttf", PxDpConverter.dpToPx(activity.getResources().getDimension(R.dimen.text_size)),
-                true, android.graphics.Color.WHITE);
+                "fonts/font.ttf", pixSize, true, android.graphics.Color.WHITE);
         textureManager.loadTexture(fontTexture);
         engine.getFontManager().loadFont(font);
         return font;
+    }
+
+    public Font loadDialogTexture() {
+        return loadTextTexture(PxDpConverter.dpToPx(activity.getResources().getDimension(R.dimen.text_size)));
+    }
+
+    public Font loadPanelTexture() {
+        return loadTextTexture(PxDpConverter.dpToPx(activity.getResources().getDimension(R.dimen.panel_text_size)));
+    }
+
+    public ITextureRegion loadMoneyTexture() {
+        return loadFileTexture("score_icon.9.png", 64, 64);
+    }
+
+    public ITextureRegion loadEnergyTexture() {
+        return loadFileTexture("energy_icon.9.png", 64, 64);
     }
 
 }

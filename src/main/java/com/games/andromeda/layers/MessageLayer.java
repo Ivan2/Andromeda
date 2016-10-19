@@ -1,26 +1,12 @@
 package com.games.andromeda.layers;
 
-import android.graphics.PointF;
-import android.util.Log;
-
-import com.games.andromeda.graph.MyGraph;
-import com.games.andromeda.graph.Node;
-import com.games.andromeda.sprites.SystemSprite;
 import com.games.andromeda.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
-import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.ButtonSprite;
-import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
-import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
-import org.andengine.util.color.Color;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 
 public class MessageLayer extends DialogLayer {
 
@@ -46,7 +32,7 @@ public class MessageLayer extends DialogLayer {
 
     @Override
     public void repaint() {
-        Text text = new Text(0, 0, textureLoader.loadTextTexture(), msg, vertexBufferObjectManager);
+        Text text = new Text(0, 0, textureLoader.loadDialogTexture(), msg, vertexBufferObjectManager);
         text.setColor(1, 1, 1);
         layer.attachChild(text);
         text.setX(camera.getCenterX()-text.getWidth()/2);

@@ -42,7 +42,7 @@ public abstract class AskLayer extends DialogLayer {
             Log.wtf("layer deletion:", e.toString());
         }
 
-        Text text = new Text(0, 0, textureLoader.loadTextTexture(), msg, vertexBufferObjectManager);
+        Text text = new Text(0, 0, textureLoader.loadDialogTexture(), msg, vertexBufferObjectManager);
         text.setColor(1, 1, 1);
         layer.attachChild(text);
 
@@ -58,7 +58,7 @@ public abstract class AskLayer extends DialogLayer {
         layer.attachChild(okButtonSprite);
         scene.registerTouchArea(okButtonSprite);
 
-        Text okText = new Text(0, 0, textureLoader.loadTextTexture(), "Да", vertexBufferObjectManager);
+        Text okText = new Text(0, 0, textureLoader.loadDialogTexture(), "Да", vertexBufferObjectManager);
         okText.setColor(1, 1, 1);
         okText.setHorizontalAlign(HorizontalAlign.CENTER);
         okButtonSprite.attachChild(okText);
@@ -78,7 +78,7 @@ public abstract class AskLayer extends DialogLayer {
         layer.attachChild(cancelButtonSprite);
         scene.registerTouchArea(cancelButtonSprite);
 
-        Text cancelText = new Text(0, 0, textureLoader.loadTextTexture(), "Нет", vertexBufferObjectManager);
+        Text cancelText = new Text(0, 0, textureLoader.loadDialogTexture(), "Нет", vertexBufferObjectManager);
         cancelText.setColor(1, 1, 1);
         cancelText.setHorizontalAlign(HorizontalAlign.CENTER);
         cancelButtonSprite.attachChild(cancelText);

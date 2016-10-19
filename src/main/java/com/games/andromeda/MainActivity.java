@@ -6,6 +6,7 @@ import android.util.Log;
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.graph.PathManager;
+import com.games.andromeda.hud.PanelHUD;
 import com.games.andromeda.layers.AskLayer;
 import com.games.andromeda.layers.BackgroundLayer;
 import com.games.andromeda.layers.MessageLayer;
@@ -39,8 +40,8 @@ public class MainActivity extends SimpleBaseGameActivity {
     private static int CAMERA_WIDTH = 700;
     private static int CAMERA_HEIGHT = 700;
 
-    private static int SCREEN_WIDTH;
-    private static int SCREEN_HEIGHT;
+    public static int SCREEN_WIDTH;
+    public static int SCREEN_HEIGHT;
 
     private Camera camera;
     private TextureLoader textureLoader;
@@ -160,6 +161,31 @@ public class MainActivity extends SimpleBaseGameActivity {
             }
         });
 
+        final PanelHUD panel = new PanelHUD(camera, textureLoader, mEngine.getVertexBufferObjectManager());
+        Thread timeThread = new Thread(new Runnable() {
+            int time = 59;
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                    time--;
+                    if (time == -1)
+                        time = 59;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            panel.repaint(time);
+                        }
+                    });
+                }
+            }
+        });
+        timeThread.setDaemon(true);
+        timeThread.start();
 
         scrollEntity = new Entity(CAMERA_WIDTH/2, CAMERA_HEIGHT/2);
         camera.setChaseEntity(scrollEntity);
