@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Andromeda</string>
+    <string name="start">Start game</string>
+    <string name="join">Join game</string>
+    <string name="options">Options</string>
+    <string name="exit">Exit</string>
 </resources>
