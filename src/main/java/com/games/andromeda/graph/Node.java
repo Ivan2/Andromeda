@@ -41,6 +41,10 @@ public class Node {
         return systemType;
     }
 
+    public void setSystemType(SystemType systemType) {
+        this.systemType = systemType;
+    }
+
     @Override
     public int hashCode() {
         return (int)(x*1000000+y*1000000);
