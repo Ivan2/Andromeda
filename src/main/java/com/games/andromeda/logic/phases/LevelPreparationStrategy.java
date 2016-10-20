@@ -7,21 +7,14 @@ import com.games.andromeda.logic.GameObject;
 import java.util.LinkedList;
 import java.util.List;
 
-public class LevelPreparationStrategy implements HandlingStrategy<Node, Boolean>{
+public class LevelPreparationStrategy extends ListStrategy<Node, Boolean>{
 
-    private List<Node> results;
     private Integer maxSize;
-    private GameObject.Side side;
-
-    public LevelPreparationStrategy() {
-        this.results = new LinkedList<>();
-    }
 
     @Override
     public void startPhase(GameObject.Side side) {
-        this.side = side;
+        super.startPhase(side);
         maxSize = (side == GameObject.Side.EMPIRE) ? 10: 6;
-        results.clear();
     }
 
     @Override
