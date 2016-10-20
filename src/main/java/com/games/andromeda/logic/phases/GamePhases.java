@@ -25,15 +25,19 @@ public class GamePhases implements Iterable<HandlingStrategy>{
         FLEET_BATTLE,
     }
 
-
     private Map<PhaseType, HandlingStrategy> strategyMap;
     private boolean initialized = false;
 
     public GamePhases(){
+        iter = new PhaseIterator();
         strategyMap = new EnumMap<>(PhaseType.class);
         strategyMap.put(PhaseType.LEVEL_PREPARATION_BASES, new LevelPreparationStrategy());
-
-//        strategyMap.put(PhaseType.LEVEL_PREPARATION_FLEETS, )
+        strategyMap.put(PhaseType.LEVEL_PREPARATION_FLEETS, new FleetPreparationStrategy());
+        strategyMap.put(PhaseType.RANDOM_EVENTS, new RandomEventStrategy());
+        strategyMap.put(PhaseType.INCOME_EARNING, new IncomeEarningStrategy());
+        strategyMap.put(PhaseType.MONEY_SPENDING, new MoneySpendingStrategy());
+        strategyMap.put(PhaseType.FLEET_MOVING, new FleetMovingStrategy());
+        strategyMap.put(PhaseType.FLEET_BATTLE, new FleetBattleStrategy());
     }
 
     public GameObject.Side getSide(){
