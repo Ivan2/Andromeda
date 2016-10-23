@@ -2,14 +2,12 @@ package com.games.andromeda.logic.phases;
 
 
 import com.games.andromeda.logic.GameObject;
-import com.games.andromeda.logic.Purchase;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class ListStrategy<TParam, TOut> implements HandlingStrategy<TParam, TOut> {
+public abstract class ListStrategy<TParam, TOut> extends CommonHandlingStrategy<TParam, TOut>{
     protected List<TParam> results;
-    protected GameObject.Side side;
 
     public ListStrategy(){
         results = new LinkedList<>();
@@ -17,7 +15,7 @@ public abstract class ListStrategy<TParam, TOut> implements HandlingStrategy<TPa
 
     @Override
     public void startPhase(GameObject.Side side) {
-        this.side = side;
+        super.startPhase(side);
         results.clear();
     }
 }
