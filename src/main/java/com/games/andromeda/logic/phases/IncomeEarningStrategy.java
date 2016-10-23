@@ -1,19 +1,11 @@
 package com.games.andromeda.logic.phases;
 
-import com.games.andromeda.logic.GameObject;
 
-public class IncomeEarningStrategy implements HandlingStrategy<Void, Void>{
-    private GameObject.Side side;
-    @Override
-    public void startPhase(GameObject.Side side) {
-        this.side = side;
-    }
-
+public class IncomeEarningStrategy extends CommonHandlingStrategy<Void, Void>{
     @Override
     public Void handlePhaseEvent(Void input) { // пользователь не влияет на эту фазу
         return null;
     }
-
 
     @Override
     public boolean applyChanges() {
@@ -25,4 +17,5 @@ public class IncomeEarningStrategy implements HandlingStrategy<Void, Void>{
     public void autoApplyChanges() {
         applyChanges();
     }
+
 }

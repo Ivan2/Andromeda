@@ -8,11 +8,11 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class GamePhases implements Iterable<HandlingStrategy>{
-    private PhaseIterator iter;
-
+    private UnifiedPhaseIterator iterator;
+    
     @Override
     public Iterator<HandlingStrategy> iterator() {
-        return iter;
+        return iterator;
     }
 
     public enum PhaseType{
@@ -26,10 +26,9 @@ public class GamePhases implements Iterable<HandlingStrategy>{
     }
 
     private Map<PhaseType, HandlingStrategy> strategyMap;
-    private boolean initialized = false;
 
     public GamePhases(){
-        iter = new PhaseIterator();
+        iterator = new UnifiedPhaseIterator();
         strategyMap = new EnumMap<>(PhaseType.class);
         strategyMap.put(PhaseType.LEVEL_PREPARATION_BASES, new LevelPreparationStrategy());
         strategyMap.put(PhaseType.LEVEL_PREPARATION_FLEETS, new FleetPreparationStrategy());
@@ -40,34 +39,28 @@ public class GamePhases implements Iterable<HandlingStrategy>{
         strategyMap.put(PhaseType.FLEET_BATTLE, new FleetBattleStrategy());
     }
 
-    public GameObject.Side getSide(){
-        return iter.getSide();
-    }
+    
+    abstract class PhaseIterator implements Iterator<HandlingStrategy>{
+        protected int idx;
+        protected boolean firstPlayer;
 
-
-
-    class PhaseIterator implements Iterator<HandlingStrategy>{
-
-        private PhaseType[] order;
-        private int idx;
-        private int start_idx;
-
-        private boolean second;
-
-        public PhaseIterator(){
-            idx = start_idx = 0;
-            second = true;
-            order = PhaseType.values();
-        }
-
-
-        protected boolean nextTurn(){
-            second = !second;
-            return second;
+        public PhaseIterator() {
+            this.firstPlayer = true;
         }
 
         public GameObject.Side getSide(){
-            return second ? GameObject.Side.FEDERATION: GameObject.Side.EMPIRE;
+            return firstPlayer ? GameObject.Side.FEDERATION: GameObject.Side.EMPIRE;
+        }
+    }
+    
+    class UnifiedPhaseIterator implements Iterator<HandlingStrategy>{
+        private NormalPhaseIterator iter;
+        private ZeroPhaseIterator zeroIter;
+
+
+        public UnifiedPhaseIterator() {
+            this.zeroIter = new ZeroPhaseIterator();
+            this.iter = new NormalPhaseIterator();
         }
 
         @Override
@@ -77,12 +70,64 @@ public class GamePhases implements Iterable<HandlingStrategy>{
 
         @Override
         public HandlingStrategy next() {
-            if (nextTurn()){
-                idx++;
-                if (idx >= order.length){
-                    start_idx = 2;
-                    idx = start_idx;
-                }
+            return getIterator().next();
+        }
+
+        public PhaseIterator getIterator() {
+            if (zeroIter.hasNext())
+                return zeroIter;
+            return iter;
+        }
+    }
+
+    class ZeroPhaseIterator extends PhaseIterator{
+
+        public ZeroPhaseIterator() {
+            super();
+            idx = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return idx < 4;
+        }
+
+        @Override
+        public HandlingStrategy next() {
+            firstPlayer = !firstPlayer;
+            idx++;
+            HandlingStrategy phase = strategyMap.get(
+                    idx<=2 ? PhaseType.LEVEL_PREPARATION_BASES: PhaseType.LEVEL_PREPARATION_FLEETS);
+            phase.startPhase(getSide());
+            return phase;
+        }
+    }
+
+    class NormalPhaseIterator extends PhaseIterator{
+
+        private PhaseType[] order;
+        private int start_idx;
+
+
+        public NormalPhaseIterator() {
+            super();
+            idx = 1;
+            start_idx = 2;
+            order = PhaseType.values();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return true;
+        }
+
+        @Override
+        public HandlingStrategy next() {
+            idx++;
+            if (idx >= order.length){
+                start_idx = 2;
+                idx = start_idx;
+                firstPlayer = !firstPlayer;
             }
             HandlingStrategy result = strategyMap.get(order[idx]);
             result.startPhase(getSide());

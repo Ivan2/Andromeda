@@ -1,13 +1,6 @@
 package com.games.andromeda.logic.phases;
 
-
-import com.games.andromeda.logic.GameObject;
-
-public class RandomEventStrategy implements HandlingStrategy<Void, Void> {
-    @Override
-    public void startPhase(GameObject.Side side) {
-
-    }
+public class RandomEventStrategy extends CommonHandlingStrategy<Void, Void> {
 
     @Override
     public Void handlePhaseEvent(Void input) { // пользователь не влияет на эту фазу
