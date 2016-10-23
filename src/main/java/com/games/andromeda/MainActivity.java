@@ -1,5 +1,6 @@
 package com.games.andromeda;
 
+import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -30,12 +31,38 @@ import org.andengine.entity.scene.background.Background;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.color.Color;
-
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class MainActivity extends SimpleBaseGameActivity {
+
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+
+import org.andengine.entity.util.FPSLogger;
+import org.andengine.extension.multiplayer.protocol.adt.message.IMessage;
+import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
+import org.andengine.extension.multiplayer.protocol.adt.message.server.ServerMessage;
+import org.andengine.extension.multiplayer.protocol.adt.message.client.ClientMessage;
+import org.andengine.extension.multiplayer.protocol.client.IServerMessageHandler;
+import org.andengine.extension.multiplayer.protocol.client.connector.ServerConnector;
+import org.andengine.extension.multiplayer.protocol.client.connector.SocketConnectionServerConnector;
+import org.andengine.extension.multiplayer.protocol.client.connector.SocketConnectionServerConnector.ISocketConnectionServerConnectorListener;
+import org.andengine.extension.multiplayer.protocol.server.SocketServer;
+import org.andengine.extension.multiplayer.protocol.server.SocketServer.ISocketServerListener;
+import org.andengine.extension.multiplayer.protocol.server.connector.ClientConnector;
+import org.andengine.extension.multiplayer.protocol.server.connector.SocketConnectionClientConnector;
+import org.andengine.extension.multiplayer.protocol.server.connector.SocketConnectionClientConnector.ISocketConnectionClientConnectorListener;
+import org.andengine.extension.multiplayer.protocol.shared.SocketConnection;
+import org.andengine.extension.multiplayer.protocol.util.MessagePool;
+
+import org.andengine.util.debug.Debug;
+import android.widget.Toast;
+
+public class MainActivity extends SimpleBaseGameActivity{
 
     private static int CAMERA_WIDTH = 700;
     private static int CAMERA_HEIGHT = 700;
@@ -47,6 +74,186 @@ public class MainActivity extends SimpleBaseGameActivity {
     private TextureLoader textureLoader;
 
     public static LinkedList<Node> selectedNodes = new LinkedList<>();
+
+    private static final int SERVER_PORT = 4444;
+    private static final String LOCALHOST_IP = "127.0.0.1";
+    private static final int REQUESTCODE_BLUETOOTH_ENABLE = 0;
+    private static final short FLAG_MESSAGE_SERVER_CONNECTION_CLOSE = Short.MIN_VALUE;
+    private static final short FLAG_MESSAGE_SERVER_SHOW = 1;
+
+    private static final int DIALOG_CHOOSE_SERVER_OR_CLIENT_ID = 0;
+    private static final int DIALOG_ENTER_SERVER_IP_ID = DIALOG_CHOOSE_SERVER_OR_CLIENT_ID + 1;
+
+    private ShipsLayer shipsLayer;
+    private SystemsLayer systemsLayer;
+    private String mServerIP = LOCALHOST_IP;
+    public SocketServer<SocketConnectionClientConnector> mSocketServer;
+    private ServerConnector<SocketConnection> mServerConnector;
+    public final MessagePool<IMessage> mMessagePool = new MessagePool<IMessage>();
+
+
+
+
+
+    private void initMessagePool() {
+        this.mMessagePool.registerMessage(FLAG_MESSAGE_SERVER_SHOW, AddFaceServerMessage.class);
+    }
+    @Override
+    public void onCreate(final Bundle pSavedInstanceState)
+    {
+        super.onCreate(pSavedInstanceState);
+    }
+
+
+
+
+    private void initServer() {
+
+        this.mSocketServer = new SocketServer<SocketConnectionClientConnector>(SERVER_PORT, new ExampleClientConnectorListener(), new ExampleServerStateListener()) {
+            @Override
+            protected SocketConnectionClientConnector newClientConnector(final SocketConnection pSocketConnection) throws IOException {
+                return new SocketConnectionClientConnector(pSocketConnection);
+            }
+        };
+
+        this.mSocketServer.start();
+    }
+
+    private void initClient() {
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try  {
+                    try {
+                        MainActivity.this.mServerConnector = new SocketConnectionServerConnector(new SocketConnection(new Socket(MainActivity.this.mServerIP, SERVER_PORT)), new ExampleServerConnectorListener());
+
+                        MainActivity.this.mServerConnector.registerServerMessage(FLAG_MESSAGE_SERVER_CONNECTION_CLOSE, ConnectionCloseServerMessage.class, new IServerMessageHandler<SocketConnection>() {
+                            @Override
+                            public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {
+                                MainActivity.this.finish();
+                            }
+                        });
+
+                        MainActivity.this.mServerConnector.registerServerMessage(FLAG_MESSAGE_SERVER_SHOW, AddFaceServerMessage.class, new IServerMessageHandler<SocketConnection>() {
+                            @Override
+                            public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {
+                                final AddFaceServerMessage addFaceServerMessage = (AddFaceServerMessage)pServerMessage;
+                                MainActivity.this.addFace(addFaceServerMessage.x,addFaceServerMessage.y);
+                            }
+                        });
+
+
+
+                        MainActivity.this.mServerConnector.getConnection().start();
+                    } catch (final Throwable t) {
+                        Debug.e(t);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
+
+    }
+
+    public void addFace(float x, float y) {
+        Node node = new Node(x,y, Node.SystemType.FRIENDLY);
+        try {
+            shipsLayer.addFleet(new Fleet(GameObject.Side.EMPIRE,5,new Base(GameObject.Side.EMPIRE, node)),1);
+        } catch (Exception e){
+            Log.wtf("my stupid exception: ", e.toString());
+        }
+        MainActivity.this.shipsLayer.repaint();
+    }
+
+    public static class AddFaceServerMessage extends ServerMessage {
+        private float x;
+        private float y;
+
+        public AddFaceServerMessage() {
+
+        }
+
+        public AddFaceServerMessage(final float x, final float y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public void set(final float x, final float y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public short getFlag() {
+            return FLAG_MESSAGE_SERVER_SHOW;
+        }
+
+        @Override
+        protected void onReadTransmissionData(final DataInputStream pDataInputStream) throws IOException {
+            x = pDataInputStream.readFloat();
+            y = pDataInputStream.readFloat();
+        }
+
+        @Override
+        protected void onWriteTransmissionData(final DataOutputStream pDataOutputStream) throws IOException {
+            pDataOutputStream.writeFloat(x);
+            pDataOutputStream.writeFloat(y);
+        }
+    }
+    private void toast(final String pMessage) {
+        //this.log(pMessage);
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, pMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private class ExampleServerConnectorListener implements ISocketConnectionServerConnectorListener {
+        @Override
+        public void onStarted(final ServerConnector<SocketConnection> pConnector) {
+            MainActivity.this.toast("CLIENT: Connected to server.");
+        }
+
+        @Override
+        public void onTerminated(final ServerConnector<SocketConnection> pConnector) {
+           // MainActivity.this.toast("CLIENT: Disconnected from Server...");
+            MainActivity.this.finish();
+        }
+    }
+
+    private class ExampleServerStateListener implements ISocketServerListener<SocketConnectionClientConnector> {
+        @Override
+        public void onStarted(final SocketServer<SocketConnectionClientConnector> pSocketServer) {
+            MainActivity.this.toast("SERVER: Started.");
+        }
+
+        @Override
+        public void onTerminated(final SocketServer<SocketConnectionClientConnector> pSocketServer) {
+            //MainActivity.this.toast("SERVER: Terminated.");
+        }
+
+        @Override
+        public void onException(final SocketServer<SocketConnectionClientConnector> pSocketServer, final Throwable pThrowable) {
+            Debug.e(pThrowable);
+        }
+    }
+
+    private class ExampleClientConnectorListener implements ISocketConnectionClientConnectorListener {
+        @Override
+        public void onStarted(final ClientConnector<SocketConnection> pConnector) {
+            MainActivity.this.toast("SERVER: Client connected: " + pConnector.getConnection().getSocket().getInetAddress().getHostAddress());
+        }
+
+        @Override
+        public void onTerminated(final ClientConnector<SocketConnection> pConnector) {
+           // MainActivity.this.toast("SERVER: Client disconnected: " + pConnector.getConnection().getSocket().getInetAddress().getHostAddress());
+        }
+    }
 
     @Override
     public EngineOptions onCreateEngineOptions() {
@@ -61,7 +268,6 @@ public class MainActivity extends SimpleBaseGameActivity {
         CAMERA_HEIGHT = (int)PxDpConverter.dpToPx(1800);
 
         camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-
         return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED,
                 new FixedResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
     }
@@ -73,7 +279,7 @@ public class MainActivity extends SimpleBaseGameActivity {
 
     @Override
     protected Scene onCreateScene() {
-
+        PxDpConverter.createInstance(this);
         final Scene scene = new Scene();
         scene.setBackground(new Background(Color.BLACK));
         //scene.setTouchAreaBindingOnActionDownEnabled(true);//Без этого не будет работать нормально перетаскивание спрайтов
@@ -153,6 +359,22 @@ public class MainActivity extends SimpleBaseGameActivity {
             @Override
             public void onMove(Node node) {
                 manager.addNode(node);
+            try  {
+                    float x = node.getX(), y = node.getY();
+
+                    if(MainActivity.this.mSocketServer != null) {
+                        try {
+                            final AddFaceServerMessage addFaceServerMessage = new AddFaceServerMessage(x,y);
+                            MainActivity.this.mSocketServer.sendBroadcastServerMessage(addFaceServerMessage);
+                            MainActivity.this.mMessagePool.recycleMessage(addFaceServerMessage);
+                        } catch (final IOException e) {
+
+                            Debug.e(e);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -161,7 +383,7 @@ public class MainActivity extends SimpleBaseGameActivity {
             }
         });
 
-        final PanelHUD panel = new PanelHUD(camera, textureLoader, mEngine.getVertexBufferObjectManager());
+ final PanelHUD panel = new PanelHUD(camera, textureLoader, mEngine.getVertexBufferObjectManager());
         Thread timeThread = new Thread(new Runnable() {
             int time = 59;
             @Override
@@ -269,10 +491,26 @@ public class MainActivity extends SimpleBaseGameActivity {
         thread.setDaemon(true);
         thread.start();
 
-
         return scene;
     }
 
+    @Override
+        protected void onDestroy() {
+        if (this.mSocketServer != null) {
+            try {
+                this.mSocketServer.sendBroadcastServerMessage(new ConnectionCloseServerMessage());
+            } catch (final IOException e) {
+                Debug.e(e);
+            }
+            this.mSocketServer.terminate();
+        }
+
+        if (this.mServerConnector != null) {
+            this.mServerConnector.terminate();
+        }
+
+        super.onDestroy();
+    }
     Entity scrollEntity;
     float mTouchY;
     float mTouchX;
