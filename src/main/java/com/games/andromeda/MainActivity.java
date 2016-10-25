@@ -17,6 +17,9 @@ import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.Pocket;
+import com.games.andromeda.message.ConnectionCloseServerMessage;
+import com.games.andromeda.message.MoveShipClientMessage;
+import com.games.andromeda.message.MoveShipServerMessage;
 import com.games.andromeda.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
@@ -27,28 +30,25 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.color.Color;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 
 import org.andengine.entity.util.FPSLogger;
 import org.andengine.extension.multiplayer.protocol.adt.message.IMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
-import org.andengine.extension.multiplayer.protocol.adt.message.server.ServerMessage;
-import org.andengine.extension.multiplayer.protocol.adt.message.client.ClientMessage;
 import org.andengine.extension.multiplayer.protocol.client.IServerMessageHandler;
 import org.andengine.extension.multiplayer.protocol.client.connector.ServerConnector;
 import org.andengine.extension.multiplayer.protocol.client.connector.SocketConnectionServerConnector;
 import org.andengine.extension.multiplayer.protocol.client.connector.SocketConnectionServerConnector.ISocketConnectionServerConnectorListener;
-import org.andengine.extension.multiplayer.protocol.server.SocketServer;
-import org.andengine.extension.multiplayer.protocol.server.SocketServer.ISocketServerListener;
+//import org.andengine.extension.multiplayer.protocol.server.SocketServer;
+import com.games.andromeda.SocketServer;
+//import com.games.andromeda.Server;
 import org.andengine.extension.multiplayer.protocol.server.connector.ClientConnector;
 import org.andengine.extension.multiplayer.protocol.server.connector.SocketConnectionClientConnector;
 import org.andengine.extension.multiplayer.protocol.server.connector.SocketConnectionClientConnector.ISocketConnectionClientConnectorListener;
@@ -70,7 +70,6 @@ public class MainActivity extends SimpleBaseGameActivity{
 
     private static final int SERVER_PORT = 4444;
     private static final String LOCALHOST_IP = "127.0.0.1";
-    private static final int REQUESTCODE_BLUETOOTH_ENABLE = 0;
     private static final short FLAG_MESSAGE_SERVER_CONNECTION_CLOSE = Short.MIN_VALUE;
     private static final short FLAG_MESSAGE_SERVER_SHOW = 1;
 
@@ -83,16 +82,18 @@ public class MainActivity extends SimpleBaseGameActivity{
     public SocketServer<SocketConnectionClientConnector> mSocketServer;
     private ServerConnector<SocketConnection> mServerConnector;
     public final MessagePool<IMessage> mMessagePool = new MessagePool<IMessage>();
-
+    private ClientConnector<SocketConnection> clientConnector;
 
 
     private void initMessagePool() {
-        this.mMessagePool.registerMessage(FLAG_MESSAGE_SERVER_SHOW, AddFaceServerMessage.class);
+        this.mMessagePool.registerMessage(FLAG_MESSAGE_SERVER_SHOW, MoveShipServerMessage.class);
     }
     @Override
     public void onCreate(final Bundle pSavedInstanceState)
     {
+
         super.onCreate(pSavedInstanceState);
+        //initMessagePool();
     }
 
 
@@ -100,13 +101,13 @@ public class MainActivity extends SimpleBaseGameActivity{
 
     private void initServer() {
 
-        this.mSocketServer = new SocketServer<SocketConnectionClientConnector>(SERVER_PORT, new ExampleClientConnectorListener(), new ExampleServerStateListener()) {
+        this.mSocketServer = new SocketServer<SocketConnectionClientConnector>(SERVER_PORT, new ClientConnectorListener(), new ServerStateListener()) {
             @Override
             protected SocketConnectionClientConnector newClientConnector(final SocketConnection pSocketConnection) throws IOException {
                 return new SocketConnectionClientConnector(pSocketConnection);
             }
         };
-
+       //clientConnector  = new ClientConnector<SocketConnection>(new SocketConnection())
         this.mSocketServer.start();
     }
 
@@ -117,7 +118,7 @@ public class MainActivity extends SimpleBaseGameActivity{
             public void run() {
                 try  {
                     try {
-                        MainActivity.this.mServerConnector = new SocketConnectionServerConnector(new SocketConnection(new Socket(MainActivity.this.mServerIP, SERVER_PORT)), new ExampleServerConnectorListener());
+                        MainActivity.this.mServerConnector = new SocketConnectionServerConnector(new SocketConnection(new Socket(MainActivity.this.mServerIP, SERVER_PORT)), new ServerConnectorListener());
 
                         MainActivity.this.mServerConnector.registerServerMessage(FLAG_MESSAGE_SERVER_CONNECTION_CLOSE, ConnectionCloseServerMessage.class, new IServerMessageHandler<SocketConnection>() {
                             @Override
@@ -126,11 +127,11 @@ public class MainActivity extends SimpleBaseGameActivity{
                             }
                         });
 
-                        MainActivity.this.mServerConnector.registerServerMessage(FLAG_MESSAGE_SERVER_SHOW, AddFaceServerMessage.class, new IServerMessageHandler<SocketConnection>() {
+                        MainActivity.this.mServerConnector.registerServerMessage(FLAG_MESSAGE_SERVER_SHOW, MoveShipServerMessage.class, new IServerMessageHandler<SocketConnection>() {
                             @Override
                             public void onHandleMessage(final ServerConnector<SocketConnection> pServerConnector, final IServerMessage pServerMessage) throws IOException {
-                                final AddFaceServerMessage addFaceServerMessage = (AddFaceServerMessage)pServerMessage;
-                                MainActivity.this.addFace(addFaceServerMessage.x,addFaceServerMessage.y);
+                                final MoveShipServerMessage moveShipServerMessage = (MoveShipServerMessage) pServerMessage;
+                                MainActivity.this.MoveShip(moveShipServerMessage.getX(),moveShipServerMessage.getY());
                             }
                         });
 
@@ -150,53 +151,19 @@ public class MainActivity extends SimpleBaseGameActivity{
 
     }
 
-    public void addFace(float x, float y) {
-        Node node = new Node(x,y, Node.SystemType.FRIENDLY);
+    public void MoveShip(float x, float y) {
+        /*Node node = new Node(x,y, Node.SystemType.FRIENDLY);
         try {
             shipsLayer.addFleet(new Fleet(GameObject.Side.EMPIRE,5,new Base(GameObject.Side.EMPIRE, node)),1);
         } catch (Exception e){
             Log.wtf("my stupid exception: ", e.toString());
         }
-        MainActivity.this.shipsLayer.repaint();
+        MainActivity.this.shipsLayer.repaint();*/
+        MainActivity.this.toast("Сообщение передано!!!!!!!!!!!!!");
     }
 
-    public static class AddFaceServerMessage extends ServerMessage {
-        private float x;
-        private float y;
 
-        public AddFaceServerMessage() {
-
-        }
-
-        public AddFaceServerMessage(final float x, final float y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public void set(final float x, final float y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        @Override
-        public short getFlag() {
-            return FLAG_MESSAGE_SERVER_SHOW;
-        }
-
-        @Override
-        protected void onReadTransmissionData(final DataInputStream pDataInputStream) throws IOException {
-            x = pDataInputStream.readFloat();
-            y = pDataInputStream.readFloat();
-        }
-
-        @Override
-        protected void onWriteTransmissionData(final DataOutputStream pDataOutputStream) throws IOException {
-            pDataOutputStream.writeFloat(x);
-            pDataOutputStream.writeFloat(y);
-        }
-    }
     private void toast(final String pMessage) {
-        //this.log(pMessage);
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -204,7 +171,7 @@ public class MainActivity extends SimpleBaseGameActivity{
             }
         });
     }
-    private class ExampleServerConnectorListener implements ISocketConnectionServerConnectorListener {
+    private class ServerConnectorListener implements ISocketConnectionServerConnectorListener {
         @Override
         public void onStarted(final ServerConnector<SocketConnection> pConnector) {
             MainActivity.this.toast("CLIENT: Connected to server.");
@@ -215,9 +182,14 @@ public class MainActivity extends SimpleBaseGameActivity{
            // MainActivity.this.toast("CLIENT: Disconnected from Server...");
             MainActivity.this.finish();
         }
+
+        public void onMoveShipClientMessage(final ClientConnector<SocketConnection> pConnector)
+        {
+            Log.wtf("Word 1","Word 2");
+        }
     }
 
-    private class ExampleServerStateListener implements ISocketServerListener<SocketConnectionClientConnector> {
+    private class ServerStateListener implements SocketServer.ISocketServerListener<SocketConnectionClientConnector> {
         @Override
         public void onStarted(final SocketServer<SocketConnectionClientConnector> pSocketServer) {
             MainActivity.this.toast("SERVER: Started.");
@@ -234,7 +206,7 @@ public class MainActivity extends SimpleBaseGameActivity{
         }
     }
 
-    private class ExampleClientConnectorListener implements ISocketConnectionClientConnectorListener {
+    private class ClientConnectorListener implements ISocketConnectionClientConnectorListener {
         @Override
         public void onStarted(final ClientConnector<SocketConnection> pConnector) {
             MainActivity.this.toast("SERVER: Client connected: " + pConnector.getConnection().getSocket().getInetAddress().getHostAddress());
@@ -243,6 +215,11 @@ public class MainActivity extends SimpleBaseGameActivity{
         @Override
         public void onTerminated(final ClientConnector<SocketConnection> pConnector) {
            // MainActivity.this.toast("SERVER: Client disconnected: " + pConnector.getConnection().getSocket().getInetAddress().getHostAddress());
+        }
+
+        public void onMoveShipClientMessage(final ClientConnector<SocketConnection> pConnector)
+        {
+            Log.wtf("Word 1","Word 2");
         }
     }
 
@@ -360,12 +337,12 @@ public class MainActivity extends SimpleBaseGameActivity{
             @Override
             public void onMove(Node node) {
                 manager.addNode(node);
-                try  {
+               /* try  {
                     float x = node.getX(), y = node.getY();
 
                     if(MainActivity.this.mSocketServer != null) {
                         try {
-                            final AddFaceServerMessage addFaceServerMessage = new AddFaceServerMessage(x,y);
+                            final MoveShipServerMessage addFaceServerMessage = new MoveShipServerMessage(x,y);
                             MainActivity.this.mSocketServer.sendBroadcastServerMessage(addFaceServerMessage);
                             MainActivity.this.mMessagePool.recycleMessage(addFaceServerMessage);
                         } catch (final IOException e) {
@@ -374,6 +351,14 @@ public class MainActivity extends SimpleBaseGameActivity{
                         }
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
+                }*/
+                float x = node.getX(), y = node.getY();
+                MoveShipClientMessage moveShipClientMessage = new MoveShipClientMessage(x,y);
+
+                try {
+                    mServerConnector.sendClientMessage(moveShipClientMessage);
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -405,5 +390,5 @@ public class MainActivity extends SimpleBaseGameActivity{
 
         super.onDestroy();
     }
-
+    //public static Boolean getServerState
 }

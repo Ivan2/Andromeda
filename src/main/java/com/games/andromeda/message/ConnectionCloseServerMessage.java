@@ -1,4 +1,6 @@
-package com.games.andromeda;
+package com.games.andromeda.message;
+
+import com.games.andromeda.message.ServerMessageFlags;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

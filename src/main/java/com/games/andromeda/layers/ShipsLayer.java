@@ -1,15 +1,19 @@
 package com.games.andromeda.layers;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.graphics.PointF;
 import android.util.Log;
 
+import com.games.andromeda.CurrentApp;
+import com.games.andromeda.MainActivity;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.graph.PathManager;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.sprites.ShipSprite;
 import com.games.andromeda.texture.TextureLoader;
-
+import com.games.andromeda.graph.Node;
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
@@ -18,7 +22,9 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.color.Color;
+import org.andengine.util.debug.Debug;
 
+import java.io.IOException;
 
 
 public class ShipsLayer extends Layer {
@@ -89,6 +95,35 @@ public class ShipsLayer extends Layer {
                             Log.wtf("PATH", e.toString());
                         }
                         activeSprite = null;
+                       /* Node node = new Node(pTouchAreaLocalX,pTouchAreaLocalY,Node.SystemType.FRIENDLY);
+                        try  {
+                            float x = node.getX(), y = node.getY();
+                            MainActivity mainAc = (MainActivity) CurrentApp.getContext();
+                            //ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                            ///context.
+                            //MainActivity mainAc = am.getRunningAppProcesses().get(0);
+                            if(mainAc.mSocketServer != null) {
+                                //MainActivity.this.toast("Smth unexpected happened ");
+                                try {
+                                    final MainActivity.AddFaceServerMessage addFaceServerMessage = new MainActivity.AddFaceServerMessage(x,y);
+                                    //MainActivity.this.toast("Smth unexpected happened ");
+
+
+
+
+                                    //addFaceServerMessage.set(15);
+
+                                    mainAc.mSocketServer.sendBroadcastServerMessage(addFaceServerMessage);
+
+                                    mainAc.mMessagePool.recycleMessage(addFaceServerMessage);
+                                } catch (final IOException e) {
+
+                                    Debug.e(e);
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }*/
                         manager.reset();
                         ShipsLayer.this.repaint();
                     }
@@ -177,3 +212,5 @@ public class ShipsLayer extends Layer {
     }
 
 }
+
+
