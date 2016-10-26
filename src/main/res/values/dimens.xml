@@ -3,6 +3,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="dialog_title_text_size">32sp</dimen>
+    <dimen name="dialog_subtitle_text_size">22sp</dimen>
     <dimen name="text_size">20sp</dimen>
     <dimen name="panel_text_size">16sp</dimen>
 </resources>

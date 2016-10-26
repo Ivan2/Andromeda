@@ -3,15 +3,16 @@ package com.games.andromeda;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.graph.PathManager;
 import com.games.andromeda.hud.PanelHUD;
-import com.games.andromeda.layers.AskLayer;
 import com.games.andromeda.layers.BackgroundLayer;
 import com.games.andromeda.layers.MessageLayer;
 import com.games.andromeda.layers.ShipsLayer;
+import com.games.andromeda.layers.SystemInfoLayer;
 import com.games.andromeda.layers.SystemsLayer;
 import com.games.andromeda.level.LevelLoader;
 import com.games.andromeda.logic.Base;
@@ -31,35 +32,30 @@ import org.andengine.entity.Entity;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
-import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
-import org.andengine.extension.multiplayer.protocol.server.IClientMessageHandler;
-import org.andengine.extension.multiplayer.protocol.server.SocketServer;
-import org.andengine.input.touch.TouchEvent;
-import org.andengine.ui.activity.SimpleBaseGameActivity;
-import org.andengine.util.color.Color;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedList;
-
-
-import java.net.Socket;
-
-
 import org.andengine.entity.util.FPSLogger;
 import org.andengine.extension.multiplayer.protocol.adt.message.IMessage;
+import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
 import org.andengine.extension.multiplayer.protocol.client.IServerMessageHandler;
 import org.andengine.extension.multiplayer.protocol.client.connector.ServerConnector;
 import org.andengine.extension.multiplayer.protocol.client.connector.SocketConnectionServerConnector;
 import org.andengine.extension.multiplayer.protocol.client.connector.SocketConnectionServerConnector.ISocketConnectionServerConnectorListener;
+import org.andengine.extension.multiplayer.protocol.server.IClientMessageHandler;
+import org.andengine.extension.multiplayer.protocol.server.SocketServer;
 import org.andengine.extension.multiplayer.protocol.server.connector.ClientConnector;
 import org.andengine.extension.multiplayer.protocol.server.connector.SocketConnectionClientConnector;
 import org.andengine.extension.multiplayer.protocol.server.connector.SocketConnectionClientConnector.ISocketConnectionClientConnectorListener;
 import org.andengine.extension.multiplayer.protocol.shared.SocketConnection;
 import org.andengine.extension.multiplayer.protocol.util.MessagePool;
-
+import org.andengine.input.touch.TouchEvent;
+import org.andengine.ui.activity.SimpleBaseGameActivity;
+import org.andengine.util.color.Color;
 import org.andengine.util.debug.Debug;
-import android.widget.Toast;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class MainActivity extends SimpleBaseGameActivity{
 
@@ -286,7 +282,7 @@ public class MainActivity extends SimpleBaseGameActivity{
     protected void onCreateResources() {
         textureLoader = new TextureLoader(this, mEngine);
     }
-
+    Fleet fleet;
     @Override
     protected Scene onCreateScene() {
         this.mEngine.registerUpdateHandler(new FPSLogger());
@@ -333,7 +329,7 @@ public class MainActivity extends SimpleBaseGameActivity{
         pocket.increase(100500);
         try {
             Base base = new Base(GameObject.Side.EMPIRE, node);
-            Fleet fleet = Fleet.buy(5, base, pocket);
+            fleet = Fleet.buy(5, base, pocket);
             fleet.setEnergy(100);
             shipsLayer.addFleet(fleet, 1);
         } catch (Exception e){
@@ -348,7 +344,7 @@ public class MainActivity extends SimpleBaseGameActivity{
                 mEngine.getVertexBufferObjectManager());
 
         //слой с вопросом
-        final AskLayer askLayer = new AskLayer(scene, camera, textureLoader,
+        final SystemInfoLayer systemInfoLayer = new SystemInfoLayer(scene, camera, textureLoader,
                 mEngine.getVertexBufferObjectManager()) {
             @Override
             protected void onOk() {
@@ -364,7 +360,7 @@ public class MainActivity extends SimpleBaseGameActivity{
         systemsLayer.setLayerListener(new SystemsLayer.LayerListener() {
             @Override
             public void onClick(Node node) {
-                askLayer.show("dialog!");
+                systemInfoLayer.show(node, fleet);
             }
 
             @Override

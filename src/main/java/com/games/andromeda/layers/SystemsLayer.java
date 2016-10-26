@@ -11,7 +11,6 @@ import org.andengine.engine.camera.Camera;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.opengl.texture.TextureManager;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.color.Color;
@@ -19,6 +18,7 @@ import org.andengine.util.color.Color;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Random;
 
 public class SystemsLayer extends Layer {
 
@@ -65,6 +65,8 @@ public class SystemsLayer extends Layer {
         Iterator<Node> nodeIterator = nodes.iterator();
         while (nodeIterator.hasNext()) {
             final Node node = nodeIterator.next();
+            if (node.getSystemType().ordinal() < 3)
+                node.setSystemType(Node.SystemType.values()[new Random().nextInt(3)]);
             float size = 100;
             PointF pos = getPos(node.getX(), node.getY());
             Sprite sprite = new SystemSprite(node, pos.x - size / 2, pos.y - size / 2,

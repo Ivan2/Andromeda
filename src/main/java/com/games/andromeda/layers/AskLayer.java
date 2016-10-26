@@ -1,11 +1,10 @@
 package com.games.andromeda.layers;
 
-import android.util.Log;
+import android.graphics.Color;
 
 import com.games.andromeda.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
-import org.andengine.entity.IEntity;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.ButtonSprite;
 import org.andengine.entity.text.Text;
@@ -37,7 +36,8 @@ public abstract class AskLayer extends DialogLayer {
         text.setColor(1, 1, 1);
         layer.attachChild(text);
 
-        ButtonSprite okButtonSprite = new ButtonSprite(0, 0, textureLoader.loadEmptyTexture(),
+        ButtonSprite okButtonSprite = new ButtonSprite(0, 0,
+                textureLoader.loadEmptyTexture(Color.TRANSPARENT),
                 vertexBufferObjectManager);
         okButtonSprite.setOnClickListener(new ButtonSprite.OnClickListener() {
             @Override
@@ -57,7 +57,8 @@ public abstract class AskLayer extends DialogLayer {
         okText.setX((okButtonSprite.getWidth()-okText.getWidth())/2);
 
 
-        ButtonSprite cancelButtonSprite = new ButtonSprite(0, 0, textureLoader.loadEmptyTexture(),
+        ButtonSprite cancelButtonSprite = new ButtonSprite(0, 0,
+                textureLoader.loadEmptyTexture(Color.TRANSPARENT),
                 vertexBufferObjectManager);
         cancelButtonSprite.setOnClickListener(new ButtonSprite.OnClickListener() {
             @Override

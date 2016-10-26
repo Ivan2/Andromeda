@@ -1,25 +1,14 @@
 package com.games.andromeda.layers;
 
-import android.graphics.PointF;
+import android.graphics.Color;
 
-import com.games.andromeda.graph.MyGraph;
-import com.games.andromeda.graph.Node;
-import com.games.andromeda.sprites.SystemSprite;
+import com.games.andromeda.MainActivity;
 import com.games.andromeda.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
-import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.ButtonSprite;
-import org.andengine.entity.sprite.Sprite;
-import org.andengine.opengl.texture.TextureManager;
-import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
-import org.andengine.util.color.Color;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 
 public abstract class DialogLayer extends Layer {
 
@@ -29,12 +18,18 @@ public abstract class DialogLayer extends Layer {
                         VertexBufferObjectManager vertexBufferObjectManager) {
         super(scene, camera, textureLoader, vertexBufferObjectManager);
 
-        layer = new ButtonSprite(0, 0, textureLoader.loadEmptyTexture(),
+        layer = new ButtonSprite(0, 0,
+                textureLoader.loadEmptyTexture(Color.argb(220, 0, 0, 0)),
                 vertexBufferObjectManager);
-        layer.setSize(camera.getWidth(), camera.getHeight());
+        layer.setSize(MainActivity.SCREEN_WIDTH, MainActivity.SCREEN_HEIGHT);
         layer.setVisible(false);
         scene.attachChild(layer);
         scene.registerTouchArea(layer);
+    }
+
+    protected void moveToCenter() {
+        layer.setPosition(camera.getCenterX() - MainActivity.SCREEN_WIDTH/2,
+                camera.getCenterY() - MainActivity.SCREEN_HEIGHT/2);
     }
 
 }

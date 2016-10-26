@@ -82,6 +82,26 @@ public class TextureLoader {
         return loadFileTexture("hyper.png", 128, 128);
     }
 
+    public ITextureRegion loadEmptySystemTexture() {
+        return loadFileTexture("empty_system.png", 1024, 1024);
+    }
+
+    public ITextureRegion loadEnemySystemTexture() {
+        return loadFileTexture("enemy_system.png", 1024, 1024);
+    }
+
+    public ITextureRegion loadFriendlySystemTexture() {
+        return loadFileTexture("friendly_system.png", 1024, 1024);
+    }
+
+    public ITextureRegion loadBuildTexture() {
+        return loadFileTexture("build.png", 1024, 1024);
+    }
+
+    public ITextureRegion loadPatchTexture() {
+        return loadFileTexture("patch.png", 1024, 1024);
+    }
+
     private ITextureRegion loadFileTexture(String file, int sizeX, int sizeY){
         BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(textureManager, sizeX, sizeY,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -90,11 +110,11 @@ public class TextureLoader {
                 (bitmapTextureAtlas, activity, file, 0, 0);
     }
 
-    public ITextureRegion loadEmptyTexture() {
+    public ITextureRegion loadEmptyTexture(int color) {
         Bitmap bitmap = android.graphics.Bitmap.createBitmap(128, 128,
                 android.graphics.Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        canvas.drawColor(Color.argb(200, 50, 50, 50));
+        canvas.drawColor(color);
 
         BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(textureManager, 128, 128,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -112,6 +132,14 @@ public class TextureLoader {
         textureManager.loadTexture(fontTexture);
         engine.getFontManager().loadFont(font);
         return font;
+    }
+
+    public Font loadTitleDialogTexture() {
+        return loadTextTexture(PxDpConverter.dpToPx(activity.getResources().getDimension(R.dimen.dialog_title_text_size)));
+    }
+
+    public Font loadSubtitleDialogTexture() {
+        return loadTextTexture(PxDpConverter.dpToPx(activity.getResources().getDimension(R.dimen.dialog_subtitle_text_size)));
     }
 
     public Font loadDialogTexture() {
