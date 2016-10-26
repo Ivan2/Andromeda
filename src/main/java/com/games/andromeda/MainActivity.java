@@ -86,9 +86,9 @@ public class MainActivity extends SimpleBaseGameActivity{
     private ShipsLayer shipsLayer;
     private SystemsLayer systemsLayer;
     private String mServerIP = LOCALHOST_IP;
-    public SocketServer<SocketConnectionClientConnector> mSocketServer;
-    private ServerConnector<SocketConnection> mServerConnector;
-    public final MessagePool<IMessage> mMessagePool = new MessagePool<IMessage>();
+    private SocketServer<SocketConnectionClientConnector> mSocketServer;
+    private static ServerConnector<SocketConnection> mServerConnector;
+    private final MessagePool<IMessage> mMessagePool = new MessagePool<IMessage>();
     private ClientConnector<SocketConnection> clientConnector;
 
 
@@ -113,20 +113,16 @@ public class MainActivity extends SimpleBaseGameActivity{
                 connector.registerClientMessage((short)1, MoveShipClientMessage.class, new IClientMessageHandler<SocketConnection>() {
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> pClientConnector, IClientMessage pClientMessage) throws IOException {
-                        //Log.wtf("мб","мб");
                         try  {
-                            float x = 0.5f, y = 0.5f;
-
-                            //if(MainActivity.mSocketServer != null) {
                             try {
-                                final MoveShipServerMessage addFaceServerMessage = new MoveShipServerMessage(x,y);
-                                mSocketServer.sendBroadcastServerMessage(addFaceServerMessage);
-                                //recycleMessage(addFaceServerMessage);
+                                MoveShipClientMessage moveShipClientMessage = (MoveShipClientMessage) pClientMessage;
+                                final MoveShipServerMessage moveShipServerMessage = new MoveShipServerMessage(moveShipClientMessage.getX()
+                                        ,moveShipClientMessage.getY());
+                                mSocketServer.sendBroadcastServerMessage(moveShipServerMessage);
                             } catch (final IOException e) {
 
                                 Debug.e(e);
                             }
-                            //}
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -180,14 +176,13 @@ public class MainActivity extends SimpleBaseGameActivity{
     }
 
     public void MoveShip(float x, float y) {
-        /*Node node = new Node(x,y, Node.SystemType.FRIENDLY);
+        Node node = new Node(x,y, Node.SystemType.FRIENDLY);
         try {
             shipsLayer.addFleet(new Fleet(GameObject.Side.EMPIRE,5,new Base(GameObject.Side.EMPIRE, node)),1);
         } catch (Exception e){
             Log.wtf("my stupid exception: ", e.toString());
         }
-        MainActivity.this.shipsLayer.repaint();*/
-        MainActivity.this.toast("Сообщение передано!!!!!!!!!!!!!");
+        MainActivity.this.shipsLayer.repaint();
     }
 
 
@@ -328,7 +323,7 @@ public class MainActivity extends SimpleBaseGameActivity{
         iter.next();
         Node node = iter.next();
         final PathManager manager = new PathManager();
-        final ShipsLayer shipsLayer = new ShipsLayer(scene, camera, textureLoader, mEngine.getVertexBufferObjectManager(), manager);
+        shipsLayer = new ShipsLayer(scene, camera, textureLoader, mEngine.getVertexBufferObjectManager(), manager);
         Pocket pocket = new Pocket(GameObject.Side.EMPIRE);
         pocket.increase(100500);
         try {
@@ -370,14 +365,6 @@ public class MainActivity extends SimpleBaseGameActivity{
             @Override
             public void onMove(Node node) {
                 manager.addNode(node);
-                float x = node.getX(), y = node.getY();
-                MoveShipClientMessage moveShipClientMessage = new MoveShipClientMessage(x,y);
-
-                try {
-                    mServerConnector.sendClientMessage(moveShipClientMessage);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
 
             @Override
@@ -513,6 +500,11 @@ public class MainActivity extends SimpleBaseGameActivity{
         }
 
         super.onDestroy();
+    }
+
+    public static ServerConnector getServerConnector()
+    {
+        return mServerConnector;
     }
     Entity scrollEntity;
     float mTouchY;
