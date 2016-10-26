@@ -1,4 +1,4 @@
-package com.games.andromeda;
+package com.games.andromeda.message;
 
 /**
  * (c) 2010 Nicolas Gramlich 
