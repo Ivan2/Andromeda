@@ -31,6 +31,9 @@ import org.andengine.entity.Entity;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
+import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
+import org.andengine.extension.multiplayer.protocol.server.IClientMessageHandler;
+import org.andengine.extension.multiplayer.protocol.server.SocketServer;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.color.Color;
@@ -106,7 +109,30 @@ public class MainActivity extends SimpleBaseGameActivity{
         this.mSocketServer = new SocketServer<SocketConnectionClientConnector>(SERVER_PORT, new ClientConnectorListener(), new ServerStateListener()) {
             @Override
             protected SocketConnectionClientConnector newClientConnector(final SocketConnection pSocketConnection) throws IOException {
-                return new SocketConnectionClientConnector(pSocketConnection);
+                SocketConnectionClientConnector connector = new SocketConnectionClientConnector(pSocketConnection);
+                connector.registerClientMessage((short)1, MoveShipClientMessage.class, new IClientMessageHandler<SocketConnection>() {
+                    @Override
+                    public void onHandleMessage(ClientConnector<SocketConnection> pClientConnector, IClientMessage pClientMessage) throws IOException {
+                        //Log.wtf("мб","мб");
+                        try  {
+                            float x = 0.5f, y = 0.5f;
+
+                            //if(MainActivity.mSocketServer != null) {
+                            try {
+                                final MoveShipServerMessage addFaceServerMessage = new MoveShipServerMessage(x,y);
+                                mSocketServer.sendBroadcastServerMessage(addFaceServerMessage);
+                                //recycleMessage(addFaceServerMessage);
+                            } catch (final IOException e) {
+
+                                Debug.e(e);
+                            }
+                            //}
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                return connector;
             }
         };
 
