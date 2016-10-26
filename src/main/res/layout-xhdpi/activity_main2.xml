@@ -24,7 +24,7 @@
             android:layout_weight="3"
             android:text="Andromeda Rebellion"
             android:textStyle="italic"
-            android:textSize="60sp"
+            android:textSize="80sp"
             android:textColor="@color/textCoor"
             android:shadowColor="#CCA918"
             android:shadowDx="12"
