@@ -23,7 +23,7 @@ public class PanelHUD {
         Rectangle rectangle = new Rectangle((camera.getWidth()-MainActivity.SCREEN_WIDTH)/2,
                 (camera.getHeight()-MainActivity.SCREEN_HEIGHT)/2-1, MainActivity.SCREEN_WIDTH,
                 PxDpConverter.dpToPx(40), vertexBufferObjectManager);
-        rectangle.setColor(new Color(0, 0, 0, 0.9f));
+        rectangle.setColor(new Color(0.5f, 0.5f, 0.5f, 0.9f));
 
         Rectangle ship1Sprite = createFleetSprite("red", 0.5f, 0.3f, textureLoader,
                 vertexBufferObjectManager);
