@@ -20,10 +20,11 @@ public class Scrolling implements Runnable{
     private float mTouchY;
 
     public Scrolling(Camera camera, int screenWidth, int screenHeight,
-                     int entityX, int entityY) {
+                     int entityX, int entityY, ShipsLayer shipsLayer) {
         this.camera = camera;
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
+        layer = shipsLayer;
         scrollEntity = new Entity(entityX, entityY);
         camera.setChaseEntity(scrollEntity);
     }

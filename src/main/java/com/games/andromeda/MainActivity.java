@@ -5,7 +5,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.graph.PathManager;
 import com.games.andromeda.hud.PanelHUD;
@@ -68,7 +67,6 @@ public class MainActivity extends SimpleBaseGameActivity{
     private static final int DIALOG_CHOOSE_SERVER_OR_CLIENT_ID = 0;
     private static final int DIALOG_ENTER_SERVER_IP_ID = DIALOG_CHOOSE_SERVER_OR_CLIENT_ID + 1;
 
-    private ShipsLayer shipsLayer;
     private SystemsLayer systemsLayer;
     private String mServerIP = LOCALHOST_IP;
     private SocketServer<SocketConnectionClientConnector> mSocketServer;
@@ -188,7 +186,7 @@ public class MainActivity extends SimpleBaseGameActivity{
         iter.next();
         Node node = iter.next();
         final PathManager manager = new PathManager();
-        shipsLayer = new ShipsLayer(scene, camera, textureLoader,
+        ShipsLayer shipsLayer = new ShipsLayer(scene, camera, textureLoader,
                 mEngine.getVertexBufferObjectManager(), manager, client);
         world.addFleetObserver(shipsLayer);
         Pocket pocket = world.getPocket(GameObject.Side.EMPIRE);
@@ -245,7 +243,7 @@ public class MainActivity extends SimpleBaseGameActivity{
         timeThread.start();
 
         Scrolling scrolling = new Scrolling(camera, SCREEN_WIDTH, SCREEN_HEIGHT,
-                CAMERA_WIDTH/2, CAMERA_HEIGHT/2);
+                CAMERA_WIDTH/2, CAMERA_HEIGHT/2, shipsLayer);
         scene.setOnSceneTouchListener(scrolling.getListener());
 
         Thread thread = new Thread(scrolling);
