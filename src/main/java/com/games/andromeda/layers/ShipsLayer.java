@@ -1,20 +1,18 @@
 package com.games.andromeda.layers;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.graphics.PointF;
 import android.util.Log;
 
-import com.games.andromeda.CurrentApp;
-import com.games.andromeda.MainActivity;
+import com.games.andromeda.threads.GameClient;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.graph.PathManager;
 import com.games.andromeda.logic.Fleet;
+import com.games.andromeda.logic.FleetObserver;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.message.MoveShipClientMessage;
 import com.games.andromeda.sprites.ShipSprite;
 import com.games.andromeda.texture.TextureLoader;
-import com.games.andromeda.graph.Node;
+
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
@@ -22,12 +20,9 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.color.Color;
-import org.andengine.util.debug.Debug;
-
-import java.io.IOException;
 
 
-public class ShipsLayer extends Layer {
+public class ShipsLayer extends Layer implements FleetObserver {
 
     private static float SHIP_SCALE = 0.3f; // масштаб иконки корабля
     private static int SHIP_MARGIN = 20;  // вынос иконки корабля относительно системы в px
@@ -40,6 +35,7 @@ public class ShipsLayer extends Layer {
         "red", "green", "blue", "gray", "pink", "brown"
     };
 
+    private GameClient client;
     private PointF[] deltas;  // запоминаем смещения
     private ITextureRegion[] textures; // текстуры тоже не изменятся
     private ShipSprite[] sprites; // спрайты просто прикрепляем/открепляем от слоя, их всегда 6
@@ -65,6 +61,11 @@ public class ShipsLayer extends Layer {
                 (float)(SHIP_MARGIN*Math.sin(angle)));
     }
 
+    @Override
+    public void onFleetChanged(Fleet fleet, int idx) {
+        addFleet(fleet, idx);
+    }
+
     public static abstract class LayerListener {
         public abstract void onClick(Node node);
         public abstract void onMove(Node node);
@@ -73,10 +74,12 @@ public class ShipsLayer extends Layer {
 
 
     public ShipsLayer(Scene scene, Camera camera, TextureLoader textureLoader,
-                      VertexBufferObjectManager vertexBufferObjectManager, final PathManager manager) {
+                      VertexBufferObjectManager vertexBufferObjectManager, final PathManager manager,
+                      final GameClient client) {
         super(scene, camera, textureLoader, vertexBufferObjectManager);
 
         pathManager = manager;
+        this.client = client;
 
         // todo refacor this using magic layerListener ???
         layer = new Rectangle(0, 0, camera.getWidth(), camera.getHeight(),
@@ -91,7 +94,8 @@ public class ShipsLayer extends Layer {
                         // todo сделать ход, если возможно
                         try {
                             activeSprite.getFleet().makeMove(manager.getPath());
-                            MainActivity.getServerConnector().sendClientMessage(new MoveShipClientMessage(activeSprite.getFleet().getPosition().getX(),
+                            client.getConnector().sendClientMessage(new MoveShipClientMessage(
+                                    activeSprite.getFleet().getPosition().getX(),
                                     activeSprite.getFleet().getPosition().getY()));
                         } catch (Exception e) {
                             Log.wtf("PATH", e.toString());

@@ -191,5 +191,9 @@ public class Fleet extends GameObject {
         position = path.get(path.size()-1);
     }
 
+    @Deprecated
+    public void setPosition(Node position){
+        this.position = position;
+    }
 
 }
