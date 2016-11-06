@@ -1,13 +1,6 @@
 package com.games.andromeda.graph;
 
-import com.games.andromeda.logic.Base;
-import com.games.andromeda.logic.Fleet;
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class Node {
-
     //типы системы
     public static enum SystemType {EMPTY, FRIENDLY, ENEMY, MINI, HYPER}
 
@@ -17,16 +10,14 @@ public class Node {
 
     private SystemType systemType;
 
-
-    private Base base = null;
-    private List<Fleet> fleets;
-
-    public Node(float x, float y, SystemType systemType) {
+    public Node(float x, float y){
         this.x = x;
         this.y = y;
-        this.systemType = systemType;
+    }
 
-        fleets = new ArrayList<>();
+    public Node(float x, float y, SystemType systemType) {
+        this(x, y);
+        this.systemType = systemType;
     }
 
     public float getX() {
