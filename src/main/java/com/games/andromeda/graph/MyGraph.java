@@ -1,5 +1,7 @@
 package com.games.andromeda.graph;
 
+import org.andengine.util.color.Color;
+
 import java.util.Collection;
 
 import edu.uci.ics.jung.graph.SparseGraph;
@@ -19,7 +21,7 @@ public class MyGraph {
             if (hyper == null) {
                 hyper = node;
             } else {
-                graph.addEdge(new Edge(node, hyper, 0), node, hyper);
+                graph.addEdge(new Edge(node, hyper, 0, Color.BLUE), node, hyper);
                 hyper = null;
             }
         }
@@ -41,10 +43,10 @@ public class MyGraph {
             for (int i=0; i<edge.getWeight()-1; i++) {
                 Node node = new Node(node1.getX()+dx, node1.getY()+dy, Node.SystemType.MINI);
                 graph.addVertex(node);
-                graph.addEdge(new Edge(node1, node, 1), node1, node);
+                graph.addEdge(new Edge(node1, node, 1, edge.getColor()), node1, node);
                 node1 = node;
             }
-            graph.addEdge(new Edge(node1, node2, 1), node1, node2);
+            graph.addEdge(new Edge(node1, node2, 1, edge.getColor()), node1, node2);
         }
     }
 

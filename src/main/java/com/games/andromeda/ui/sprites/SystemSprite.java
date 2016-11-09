@@ -1,9 +1,7 @@
-package com.games.andromeda.sprites;
+package com.games.andromeda.ui.sprites;
 
-import android.util.Log;
 import android.view.MotionEvent;
 
-import com.games.andromeda.MainActivity;
 import com.games.andromeda.graph.Node;
 
 import org.andengine.entity.sprite.ButtonSprite;

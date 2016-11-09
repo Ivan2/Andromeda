@@ -27,6 +27,10 @@ public class Fleet extends GameObject {
         this.energy = energy;
     }
 
+    public float getEnergy() {
+        return energy;
+    }
+
     /**
      * Флоты сами по себе не появляются, поэтому конструктор deprecated.
      * Для создания флота следует использовать buy

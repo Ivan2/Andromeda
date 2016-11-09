@@ -1,15 +1,11 @@
-package com.games.andromeda;
+package com.games.andromeda.multiplayer;
 
-import android.app.Activity;
-import android.util.Log;
-import android.widget.Toast;
-
+import com.games.andromeda.MainActivity;
 import com.games.andromeda.message.MoveShipClientMessage;
 import com.games.andromeda.message.MoveShipServerMessage;
+import com.games.andromeda.message.StartGameMessage;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
-import org.andengine.extension.multiplayer.protocol.client.connector.ServerConnector;
-import org.andengine.extension.multiplayer.protocol.client.connector.SocketConnectionServerConnector;
 import org.andengine.extension.multiplayer.protocol.server.IClientMessageHandler;
 import org.andengine.extension.multiplayer.protocol.server.SocketServer;
 import org.andengine.extension.multiplayer.protocol.server.connector.ClientConnector;
@@ -18,33 +14,37 @@ import org.andengine.extension.multiplayer.protocol.shared.SocketConnection;
 import org.andengine.util.debug.Debug;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ServerCreator {
+
     private SocketServer<SocketConnectionClientConnector> server;
     private MainActivity activity;
+    private int connectedCount = 0;
+
+    Set<ClientConnector> clients = new HashSet<>();
 
     public ServerCreator(MainActivity activity) {
         this.activity = activity;
     }
 
     public SocketServer<SocketConnectionClientConnector> getServer(int port){
-        server = new SocketServer<SocketConnectionClientConnector>(port, new ServerCreator.ClientConnectorListener(), new ServerCreator.ServerStateListener()) {
+        server = new SocketServer<SocketConnectionClientConnector>(port,
+                new ClientConnectorListener(), new ServerStateListener()) {
             @Override
             protected SocketConnectionClientConnector newClientConnector(final SocketConnection pSocketConnection) throws IOException {
                 SocketConnectionClientConnector connector = new SocketConnectionClientConnector(pSocketConnection);
                 connector.registerClientMessage((short)1, MoveShipClientMessage.class, new IClientMessageHandler<SocketConnection>() {
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> pClientConnector, IClientMessage pClientMessage) throws IOException {
-                        try  {
-                            try {
-                                MoveShipClientMessage moveShipClientMessage = (MoveShipClientMessage) pClientMessage;
-                                final MoveShipServerMessage moveShipServerMessage = new MoveShipServerMessage(moveShipClientMessage.getX()
-                                        ,moveShipClientMessage.getY());
-                                server.sendBroadcastServerMessage(moveShipServerMessage);
-                            } catch (final IOException e) {
-
-                                Debug.e(e);
-                            }
+                        try {
+                            MoveShipClientMessage moveShipClientMessage = (MoveShipClientMessage) pClientMessage;
+                            MoveShipServerMessage moveShipServerMessage = new MoveShipServerMessage
+                                    (moveShipClientMessage.getX(), moveShipClientMessage.getY());
+                            server.sendBroadcastServerMessage(moveShipServerMessage);
+                        } catch (IOException e) {
+                            Debug.e(e);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -76,8 +76,18 @@ public class ServerCreator {
 
     private class ClientConnectorListener implements SocketConnectionClientConnector.ISocketConnectionClientConnectorListener {
         @Override
-        public void onStarted(final ClientConnector<SocketConnection> pConnector) {
+        public void onStarted(ClientConnector<SocketConnection> pConnector) {
             activity.toast("SERVER: Client connected: " + pConnector.getConnection().getSocket().getInetAddress().getHostAddress());
+            clients.add(pConnector);
+            connectedCount++;
+            if (connectedCount == 1) //TODO connectedCount == 2
+                try {
+                    //server.sendBroadcastServerMessage(new StartGameMessage()) почему-то отправляет сообщение только одному клиенту
+                    for (ClientConnector client : clients)
+                        client.sendServerMessage(new StartGameMessage());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
 
         @Override
@@ -85,9 +95,5 @@ public class ServerCreator {
             // MainActivity.this.toast("SERVER: Client disconnected: " + pConnector.getConnection().getSocket().getInetAddress().getHostAddress());
         }
 
-        public void onMoveShipClientMessage(final ClientConnector<SocketConnection> pConnector)
-        {
-            Log.wtf("Word 1","Word 2");
-        }
     }
 }

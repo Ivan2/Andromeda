@@ -1,17 +1,15 @@
-package com.games.andromeda.layers;
+package com.games.andromeda.ui.layers;
 
 import android.graphics.PointF;
 import android.util.Log;
 
-import com.games.andromeda.threads.GameClient;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.graph.PathManager;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.FleetObserver;
 import com.games.andromeda.logic.GameObject;
-import com.games.andromeda.message.MoveShipClientMessage;
-import com.games.andromeda.sprites.ShipSprite;
-import com.games.andromeda.texture.TextureLoader;
+import com.games.andromeda.ui.sprites.ShipSprite;
+import com.games.andromeda.ui.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.primitive.Rectangle;
@@ -24,6 +22,10 @@ import org.andengine.util.color.Color;
 
 public class ShipsLayer extends Layer implements FleetObserver {
 
+    public interface IOnFleetMove {
+        void onFleetMove(Fleet fleet);
+    }
+
     private static float SHIP_SCALE = 0.3f; // масштаб иконки корабля
     private static int SHIP_MARGIN = 20;  // вынос иконки корабля относительно системы в px
     // разные флоты смещены внутри системы в разные стороны, чтобы не перекрывать друг друга
@@ -35,7 +37,6 @@ public class ShipsLayer extends Layer implements FleetObserver {
         "red", "green", "blue", "gray", "pink", "brown"
     };
 
-    private GameClient client;
     private PointF[] deltas;  // запоминаем смещения
     private ITextureRegion[] textures; // текстуры тоже не изменятся
     private ShipSprite[] sprites; // спрайты просто прикрепляем/открепляем от слоя, их всегда 6
@@ -75,11 +76,10 @@ public class ShipsLayer extends Layer implements FleetObserver {
 
     public ShipsLayer(Scene scene, Camera camera, TextureLoader textureLoader,
                       VertexBufferObjectManager vertexBufferObjectManager, final PathManager manager,
-                      final GameClient client) {
+                      final IOnFleetMove onFleetMove) {
         super(scene, camera, textureLoader, vertexBufferObjectManager);
 
         pathManager = manager;
-        this.client = client;
 
         // todo refacor this using magic layerListener ???
         layer = new Rectangle(0, 0, camera.getWidth(), camera.getHeight(),
@@ -94,9 +94,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
                         // todo сделать ход, если возможно
                         try {
                             activeSprite.getFleet().makeMove(manager.getPath());
-                            client.getConnector().sendClientMessage(new MoveShipClientMessage(
-                                    activeSprite.getFleet().getPosition().getX(),
-                                    activeSprite.getFleet().getPosition().getY()));
+                            onFleetMove.onFleetMove(activeSprite.getFleet());
                         } catch (Exception e) {
                             Log.wtf("PATH", e.toString());
                         }
@@ -119,7 +117,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
         sprites = new ShipSprite[6];
         for(int i=0; i<6; ++i){
             deltas[i] = calc_delta(SHIP_ANGLES[i]);
-            textures[i] = textureLoader.loadColoredShipTextire(SHIP_COLORS[i]);
+            textures[i] = textureLoader.loadColoredShipTexture(SHIP_COLORS[i]);
             sprites[i] = new ShipSprite(0, 0, textures[i],vertexBufferObjectManager){
                 @Override
                 public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {

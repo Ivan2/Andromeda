@@ -1,4 +1,4 @@
-package com.games.andromeda.sprites;
+package com.games.andromeda.ui.sprites;
 
 import com.games.andromeda.logic.Fleet;
 

@@ -1,11 +1,11 @@
-package com.games.andromeda.layers;
+package com.games.andromeda.ui.layers;
 
 import android.graphics.PointF;
 
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;
-import com.games.andromeda.sprites.SystemSprite;
-import com.games.andromeda.texture.TextureLoader;
+import com.games.andromeda.ui.sprites.SystemSprite;
+import com.games.andromeda.ui.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.primitive.Rectangle;

@@ -2,7 +2,7 @@ package com.games.andromeda.threads;
 
 import android.app.Activity;
 
-import com.games.andromeda.hud.PanelHUD;
+import com.games.andromeda.ui.hud.PanelHUD;
 
 public class GameTimer implements Runnable {
     private int time;
@@ -35,7 +35,7 @@ public class GameTimer implements Runnable {
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    hud.repaint(time);
+                    hud.repaintTime(time);
                 }
             });
         }

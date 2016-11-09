@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.games.andromeda.Main2Activity">
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:id="@+id/main_menu"
@@ -24,7 +24,7 @@
             android:layout_weight="3"
             android:text="Andromeda Rebellion"
             android:textStyle="italic"
-            android:textSize="60sp"
+            android:textSize="80sp"
             android:textColor="@color/textCoor"
             android:shadowColor="#CCA918"
             android:shadowDx="12"

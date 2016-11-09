@@ -1,12 +1,11 @@
-package com.games.andromeda.layers;
+package com.games.andromeda.ui.layers;
 
 import android.graphics.PointF;
 
-import com.games.andromeda.texture.TextureLoader;
+import com.games.andromeda.ui.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.scene.Scene;
-import org.andengine.entity.sprite.ButtonSprite;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 public abstract class Layer {

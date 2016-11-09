@@ -1,8 +1,9 @@
-package com.games.andromeda.layers;
+package com.games.andromeda.ui.layers;
 
+import android.content.res.Resources;
 import android.graphics.Color;
 
-import com.games.andromeda.texture.TextureLoader;
+import com.games.andromeda.ui.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.scene.Scene;
@@ -18,23 +19,24 @@ public abstract class AskLayer extends DialogLayer {
 
     private String msg = "";
 
-    public AskLayer(Scene scene, Camera camera, TextureLoader textureLoader,
+    public AskLayer(Resources resources, Scene scene, Camera camera, TextureLoader textureLoader,
                     VertexBufferObjectManager vertexBufferObjectManager) {
-        super(scene, camera, textureLoader, vertexBufferObjectManager);
+        super(resources, scene, camera, textureLoader, vertexBufferObjectManager);
     }
 
     public void show(String msg) {
         this.msg = msg;
         repaint();
-        layer.setVisible(true);
+        setVisibility(true);
     }
 
     @Override
     public void repaint() {
-        layer.detachChildren();
+        contentLayer.detachChildren();
+
         Text text = new Text(0, 0, textureLoader.loadDialogTexture(), msg, vertexBufferObjectManager);
         text.setColor(1, 1, 1);
-        layer.attachChild(text);
+        contentLayer.attachChild(text);
 
         ButtonSprite okButtonSprite = new ButtonSprite(0, 0,
                 textureLoader.loadEmptyTexture(Color.TRANSPARENT),
@@ -42,11 +44,11 @@ public abstract class AskLayer extends DialogLayer {
         okButtonSprite.setOnClickListener(new ButtonSprite.OnClickListener() {
             @Override
             public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                layer.setVisible(false);
+                setVisibility(false);
                 onOk();
             }
         });
-        layer.attachChild(okButtonSprite);
+        contentLayer.attachChild(okButtonSprite);
         scene.registerTouchArea(okButtonSprite);
 
         Text okText = new Text(0, 0, textureLoader.loadDialogTexture(), "Да", vertexBufferObjectManager);
@@ -63,11 +65,11 @@ public abstract class AskLayer extends DialogLayer {
         cancelButtonSprite.setOnClickListener(new ButtonSprite.OnClickListener() {
             @Override
             public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                layer.setVisible(false);
+                setVisibility(false);
                 onCancel();
             }
         });
-        layer.attachChild(cancelButtonSprite);
+        contentLayer.attachChild(cancelButtonSprite);
         scene.registerTouchArea(cancelButtonSprite);
 
         Text cancelText = new Text(0, 0, textureLoader.loadDialogTexture(), "Нет", vertexBufferObjectManager);

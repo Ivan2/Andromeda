@@ -1,15 +1,19 @@
 package com.games.andromeda.graph;
 
+import org.andengine.util.color.Color;
+
 public class Edge {
 
     private Node node1;
     private Node node2;
     private int weight;
+    private Color color;
 
-    public Edge(Node node1, Node node2, int weight) {
+    public Edge(Node node1, Node node2, int weight, Color color) {
         this.node1 = node1;
         this.node2 = node2;
         this.weight = weight;
+        this.color = color;
     }
 
     public Node getNode1() {
@@ -22,6 +26,10 @@ public class Edge {
 
     public int getWeight() {
         return weight;
+    }
+
+    public Color getColor() {
+        return color;
     }
 
     @Override

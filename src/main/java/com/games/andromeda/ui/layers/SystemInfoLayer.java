@@ -1,9 +1,10 @@
-package com.games.andromeda.layers;
+package com.games.andromeda.ui.layers;
+
+import android.content.res.Resources;
 
 import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.graph.Node;
-import com.games.andromeda.logic.Fleet;
-import com.games.andromeda.texture.TextureLoader;
+import com.games.andromeda.ui.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.primitive.Rectangle;
@@ -11,8 +12,6 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.ButtonSprite;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
-import org.andengine.opengl.font.Font;
-import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.HorizontalAlign;
 import org.andengine.util.color.Color;
@@ -23,33 +22,30 @@ public abstract class SystemInfoLayer extends DialogLayer {
     protected abstract void onCancel();
 
     private Node node;
-    private Fleet fleet;
 
-    public SystemInfoLayer(Scene scene, Camera camera, TextureLoader textureLoader,
+    public SystemInfoLayer(Resources resources, Scene scene, Camera camera, TextureLoader textureLoader,
                            VertexBufferObjectManager vertexBufferObjectManager) {
-        super(scene, camera, textureLoader, vertexBufferObjectManager);
+        super(resources, scene, camera, textureLoader, vertexBufferObjectManager);
     }
 
-    public void show(Node node, Fleet fleet) {
+    public void show(Node node) {
         this.node = node;
-        this.fleet = fleet;
         repaint();
-        moveToCenter();
-        layer.setVisible(true);
+        setVisibility(true);
     }
 
     @Override
     public void repaint() {
-        layer.detachChildren();
+        contentLayer.detachChildren();
 
-        float WIDTH = layer.getWidth();
-        float HEIGHT = layer.getHeight();
+        float WIDTH = contentLayer.getWidth();
+        float HEIGHT = contentLayer.getHeight();
 
         Text titleText = new Text(0, 0, textureLoader.loadTitleDialogTexture(),
                 "Система " + node.getSystemType(), vertexBufferObjectManager);
-        titleText.setPosition((WIDTH-titleText.getWidth())/2, PxDpConverter.dpToPx(60));//60 - размер верхней панели TODO вынести в dimens
+        titleText.setPosition((WIDTH-titleText.getWidth())/2, PxDpConverter.dpToPx(20));
         titleText.setColor(1, 1, 1);
-        layer.attachChild(titleText);
+        contentLayer.attachChild(titleText);
 
         String systemType = "нейтральная";
         if (node.getSystemType() == Node.SystemType.FRIENDLY)
@@ -61,7 +57,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
         subtitleText.setPosition((WIDTH-subtitleText.getWidth())/2,
                 titleText.getY()+titleText.getHeight()+PxDpConverter.dpToPx(5));
         subtitleText.setColor(1, 1, 1);
-        layer.attachChild(subtitleText);
+        contentLayer.attachChild(subtitleText);
 
 
         ButtonSprite okButton = new ButtonSprite(0, 0,
@@ -70,11 +66,11 @@ public abstract class SystemInfoLayer extends DialogLayer {
         okButton.setOnClickListener(new ButtonSprite.OnClickListener() {
             @Override
             public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                layer.setVisible(false);
+                setVisibility(false);
                 onOk();
             }
         });
-        layer.attachChild(okButton);
+        contentLayer.attachChild(okButton);
         scene.registerTouchArea(okButton);
 
         Text okText = new Text(0, 0, textureLoader.loadDialogTexture(), "OK", vertexBufferObjectManager);
@@ -110,7 +106,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
                 createEmptySystem(parent);
                 break;
         }
-        layer.attachChild(parent);
+        contentLayer.attachChild(parent);
     }
 
     private void createEmptySystem(Rectangle parent) {
@@ -152,10 +148,10 @@ public abstract class SystemInfoLayer extends DialogLayer {
                 vertexBufferObjectManager);
         shipRow1.setColor(Color.TRANSPARENT);
         parent.attachChild(shipRow1);
-        if (fleet.getPosition().equals(node)) {
+        /*if (fleet.getPosition().equals(node)) {
             float shipSize = PxDpConverter.dpToPx(100);
             Sprite shipSprite = new Sprite(0, (shipRowHeight-shipSize)/2,
-                    textureLoader.loadColoredShipTextire("red"),
+                    textureLoader.loadColoredShipTexture("red"),
                     vertexBufferObjectManager);
             shipSprite.setSize(shipSize, shipSize);
             shipRow1.attachChild(shipSprite);
@@ -201,7 +197,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
                     (shipRow1.getHeight()-patchButton.getHeight())/2);
             shipRow1.attachChild(patchButton);
             scene.registerTouchArea(patchButton);
-        }
+        }*/
     }
 
     private void createFriendlySystem(Rectangle parent) {
@@ -243,10 +239,10 @@ public abstract class SystemInfoLayer extends DialogLayer {
                 vertexBufferObjectManager);
         shipRow1.setColor(Color.TRANSPARENT);
         parent.attachChild(shipRow1);
-        if (fleet.getPosition().equals(node)) {
+        /*if (fleet.getPosition().equals(node)) {
             float shipSize = PxDpConverter.dpToPx(100);
             Sprite shipSprite = new Sprite(0, (shipRowHeight-shipSize)/2,
-                    textureLoader.loadColoredShipTextire("red"),
+                    textureLoader.loadColoredShipTexture("red"),
                     vertexBufferObjectManager);
             shipSprite.setSize(shipSize, shipSize);
             shipRow1.attachChild(shipSprite);
@@ -292,7 +288,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
                     (shipRow1.getHeight()-patchButton.getHeight())/2);
             shipRow1.attachChild(patchButton);
             scene.registerTouchArea(patchButton);
-        }
+        }*/
     }
 
     private void createEnemySystem(Rectangle parent) {

@@ -1,4 +1,4 @@
-package com.games.andromeda.texture;
+package com.games.andromeda.ui.texture;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -74,7 +74,7 @@ public class TextureLoader {
          return loadFileTexture("background.png", 1024, 1024);
     }
 
-    public ITextureRegion loadColoredShipTextire(String color){
+    public ITextureRegion loadColoredShipTexture(String color){
         return loadFileTexture("ship/" + color + ".png", 128, 128);
     }
 
@@ -148,14 +148,6 @@ public class TextureLoader {
 
     public Font loadPanelTexture() {
         return loadTextTexture(PxDpConverter.dpToPx(activity.getResources().getDimension(R.dimen.panel_text_size)));
-    }
-
-    public ITextureRegion loadMoneyTexture() {
-        return loadFileTexture("score_icon.9.png", 64, 64);
-    }
-
-    public ITextureRegion loadEnergyTexture() {
-        return loadFileTexture("energy_icon.9.png", 64, 64);
     }
 
 }

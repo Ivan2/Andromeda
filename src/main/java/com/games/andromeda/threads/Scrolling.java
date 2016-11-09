@@ -1,7 +1,7 @@
 package com.games.andromeda.threads;
 
 import com.games.andromeda.PxDpConverter;
-import com.games.andromeda.layers.ShipsLayer;
+import com.games.andromeda.ui.layers.ShipsLayer;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.Entity;
@@ -9,7 +9,7 @@ import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.input.touch.TouchEvent;
 
-public class Scrolling implements Runnable{
+public class Scrolling implements Runnable {
 
     private Camera camera;
     private int screenWidth;

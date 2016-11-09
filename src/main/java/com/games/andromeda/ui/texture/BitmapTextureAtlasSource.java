@@ -1,4 +1,4 @@
-package com.games.andromeda.texture;
+package com.games.andromeda.ui.texture;
 
 import android.graphics.Bitmap;
 

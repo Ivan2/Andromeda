@@ -7,7 +7,10 @@ import com.games.andromeda.graph.Edge;
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;
 
+import org.andengine.util.color.Color;
+
 import java.io.IOException;
+import java.util.Random;
 
 public class LevelLoader {
     public class MapFormatException extends Exception {}
@@ -26,7 +29,9 @@ public class LevelLoader {
     }
 
     private void addEdge(Integer firstId, Integer secondId, Integer weight){
-        result.addEdge(new Edge(map.get(firstId), map.get(secondId), weight));
+        Random random = new Random();
+        result.addEdge(new Edge(map.get(firstId), map.get(secondId), weight,
+                new Color(random.nextFloat(), random.nextFloat(), random.nextFloat())));
     }
 
 
