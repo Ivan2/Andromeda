@@ -45,7 +45,7 @@ class SideNodeListMessage extends SideMessage {
 
     @Override
     public short getFlag() {
-        return 1;
+        return SIDE_NODE_LIST_MESSAGE;
     }
 
     public List<Node> getNodeList() {

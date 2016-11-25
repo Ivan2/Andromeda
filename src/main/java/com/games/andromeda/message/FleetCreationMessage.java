@@ -7,7 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 
-public class FleetCreationMessage extends FleetDestructionMessage {
+public class FleetCreationMessage extends FleetDestructionMessage implements MessageFlags {
     private int shipCount;
 
     public FleetCreationMessage(){}
@@ -30,7 +30,7 @@ public class FleetCreationMessage extends FleetDestructionMessage {
 
     @Override
     public short getFlag() {
-        return 1;
+        return FLEET_CREATION_MESSAGE;
     }
 
     public int getShipCount() {

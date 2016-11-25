@@ -6,7 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class PocketChangesMessage extends SideMessage {
+public class PocketChangesMessage extends SideMessage implements MessageFlags{
     private int delta;
 
     public PocketChangesMessage() {
@@ -31,7 +31,7 @@ public class PocketChangesMessage extends SideMessage {
 
     @Override
     public short getFlag() {
-        return 1;
+        return POCKET_CHANGE_MESSAGE;
     }
 
     public int getDelta() {

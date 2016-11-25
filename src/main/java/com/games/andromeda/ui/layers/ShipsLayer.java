@@ -8,6 +8,7 @@ import com.games.andromeda.graph.PathManager;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.FleetObserver;
 import com.games.andromeda.logic.GameObject;
+import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.ui.sprites.ShipSprite;
 import com.games.andromeda.ui.texture.TextureLoader;
 
@@ -23,9 +24,12 @@ import org.andengine.util.color.Color;
 public class ShipsLayer extends Layer implements FleetObserver {
 
     public interface IOnFleetMove {
-        void onFleetMove(Fleet fleet);
+        void onFleetMove(Fleet fleet,int num);
     }
-
+    public interface IOnFleetFight
+    {
+        void onFleetFight(Fleet attackingFleet, Fleet anotherFleet, int number, int secondNumber);
+    }
     private static float SHIP_SCALE = 0.3f; // масштаб иконки корабля
     private static int SHIP_MARGIN = 20;  // вынос иконки корабля относительно системы в px
     // разные флоты смещены внутри системы в разные стороны, чтобы не перекрывать друг друга
@@ -39,7 +43,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
 
     private PointF[] deltas;  // запоминаем смещения
     private ITextureRegion[] textures; // текстуры тоже не изменятся
-    private ShipSprite[] sprites; // спрайты просто прикрепляем/открепляем от слоя, их всегда 6
+    private static ShipSprite[] sprites; // спрайты просто прикрепляем/открепляем от слоя, их всегда 6
 //    private Fleet[] fleets;  // флоты - та часть, которая вносит изменения
 
 
@@ -76,7 +80,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
 
     public ShipsLayer(Scene scene, Camera camera, TextureLoader textureLoader,
                       VertexBufferObjectManager vertexBufferObjectManager, final PathManager manager,
-                      final IOnFleetMove onFleetMove) {
+                      final IOnFleetMove onFleetMove,final IOnFleetFight onFleetFight) {
         super(scene, camera, textureLoader, vertexBufferObjectManager);
 
         pathManager = manager;
@@ -94,12 +98,29 @@ public class ShipsLayer extends Layer implements FleetObserver {
                         // todo сделать ход, если возможно
                         try {
                             activeSprite.getFleet().makeMove(manager.getPath());
-                            onFleetMove.onFleetMove(activeSprite.getFleet());
+                            WorldAccessor world = WorldAccessor.getInstance();
+                            int fleetNum = -1;
+                            for (int i = 0; i < 6; i++) {
+                                if (world.getAllFleets()[i] == activeSprite.getFleet()) {
+                                    if (i > 2) i -=3;
+                                    fleetNum = i+1;
+                                    onFleetMove.onFleetMove(activeSprite.getFleet(), fleetNum);
+                                    break;
+                                }
+                            }
+                            for (int i = 0; i < 6; i++) {
+                                if (world.getAllFleets()[i] != activeSprite.getFleet() &&
+                                        world.getAllFleets()[i].getPosition().getX() == activeSprite.getFleet().getPosition().getX() &&
+                                        world.getAllFleets()[i].getPosition().getY() == activeSprite.getFleet().getPosition().getY()) {
+                                    if (i > 2) i -=3;
+                                    onFleetFight.onFleetFight(activeSprite.getFleet(),world.getAllFleets()[i],fleetNum,i+1);
+                                    break;
+                                }
+                            }
                         } catch (Exception e) {
                             Log.wtf("PATH", e.toString());
                         }
                         activeSprite = null;
-
                         manager.reset();
                         ShipsLayer.this.repaint();
                     }
@@ -160,6 +181,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
         // todo бросить исключение при перезаписи или выходе за рамки 1..3
         sprites[idx].setFleet(fleet);
         moveToPosition(idx);
+        Log.wtf("idx = ","" + idx);
         layer.attachChild(sprites[idx]);
     }
 
@@ -198,6 +220,11 @@ public class ShipsLayer extends Layer implements FleetObserver {
     public void move(float x, float y) {
         activeSprite.setX(x);
         activeSprite.setY(y);
+    }
+
+    public static void removeShip(int num)
+    {
+        sprites[num].detachSelf();
     }
 }
 

@@ -7,7 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-public class MoveShipMessage extends SideNodeListMessage{
+public class MoveShipMessage extends SideNodeListMessage implements MessageFlags{
     private int fleetNumber;
 
     // for receiving
@@ -34,7 +34,7 @@ public class MoveShipMessage extends SideNodeListMessage{
 
     @Override
     public short getFlag() {
-        return 1;
+        return MOVE_SHIP_MESSAGE;
     }
 
     public int getFleetNumber() {

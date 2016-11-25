@@ -28,7 +28,7 @@ public class UI {
 
     public UI(Activity activity, Scene scene, Camera camera, TextureLoader textureLoader,
               VertexBufferObjectManager vertexBufferObjectManager, WorldAccessor world,
-              ShipsLayer.IOnFleetMove onFleetMove) {
+              ShipsLayer.IOnFleetMove onFleetMove,ShipsLayer.IOnFleetFight onFleetFight) {
         manager = new PathManager();
 
         scene.setBackground(new Background(Color.BLACK));
@@ -47,7 +47,7 @@ public class UI {
 
         //слой с кораблями
         ShipsLayer shipsLayer = new ShipsLayer(scene, camera, textureLoader,
-                vertexBufferObjectManager, manager, onFleetMove);
+                vertexBufferObjectManager, manager, onFleetMove,onFleetFight);
         world.addFleetObserver(shipsLayer);
         shipsLayer.repaint();
 

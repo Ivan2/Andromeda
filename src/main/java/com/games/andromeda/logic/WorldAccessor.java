@@ -1,5 +1,7 @@
 package com.games.andromeda.logic;
 
+import android.util.Log;
+
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;
 
@@ -111,6 +113,7 @@ public class WorldAccessor {
     public void moveFleet(GameObject.Side side, int number, Node position){
         Fleet fleet = getFleet(side, number);
         fleet.setPosition(position); // todo makeMove
+
         for(FleetObserver observer: fleetObservers){
             observer.onFleetChanged(fleet, number);
         }
@@ -139,5 +142,7 @@ public class WorldAccessor {
             getInstance().setBase(base);
         }
     }
+
+
 
 }

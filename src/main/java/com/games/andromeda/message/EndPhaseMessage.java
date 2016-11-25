@@ -10,32 +10,42 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class SideMessage extends Message implements IClientMessage, IServerMessage,MessageFlags {
-    private GameObject.Side side;
+/**
+ * Created by 1038844 on 24.11.2016.
+ */
 
-    public SideMessage() {
+public class EndPhaseMessage extends SideMessage {
+    private int phaseNumber;
+
+    public EndPhaseMessage(){
+        phaseNumber = -1;
     }
 
-    public SideMessage(GameObject.Side side) {
-        this.side = side;
+    public EndPhaseMessage(GameObject.Side side,int phaseNumber)
+    {
+        super(side);
+        this.phaseNumber = phaseNumber;
     }
 
     @Override
     protected void onReadTransmissionData(DataInputStream pDataInputStream) throws IOException {
-        side = pDataInputStream.readBoolean() ? GameObject.Side.FEDERATION: GameObject.Side.EMPIRE;
+        super.onReadTransmissionData(pDataInputStream);
+        phaseNumber = pDataInputStream.readInt();
     }
 
     @Override
     protected void onWriteTransmissionData(DataOutputStream pDataOutputStream) throws IOException {
-        pDataOutputStream.writeBoolean(side == GameObject.Side.FEDERATION);
+        super.onWriteTransmissionData(pDataOutputStream);
+        pDataOutputStream.writeInt(phaseNumber);
     }
 
     @Override
     public short getFlag() {
-        return SIDE_MESSAGE;
+        return END_PHASE_MESSAGE;
     }
 
-    public GameObject.Side getSide() {
-        return side;
+    public int getPhaseNumber()
+    {
+        return phaseNumber;
     }
 }

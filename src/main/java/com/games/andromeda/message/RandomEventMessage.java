@@ -9,7 +9,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 
-public class RandomEventMessage extends Message implements IClientMessage, IServerMessage {
+public class RandomEventMessage extends Message implements IClientMessage, IServerMessage, MessageFlags {
     @Override
     protected void onReadTransmissionData(DataInputStream pDataInputStream) throws IOException {
 
@@ -22,6 +22,6 @@ public class RandomEventMessage extends Message implements IClientMessage, IServ
 
     @Override
     public short getFlag() {
-        return 1;
+        return RANDOM_EVENT_MESSAGE;
     }
 }

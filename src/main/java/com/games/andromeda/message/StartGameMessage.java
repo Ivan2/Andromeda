@@ -6,13 +6,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class StartGameMessage extends ServerMessage {
+public class StartGameMessage extends ServerMessage implements MessageFlags{
 
-    public static final short FLAG = 6382; //TODO вынести из класса
+
 
     @Override
     public short getFlag() {
-        return FLAG;
+        return START_GAME_MESSAGE;
     }
 
     @Override

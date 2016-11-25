@@ -79,14 +79,22 @@ public class GameActivity extends SimpleBaseGameActivity{
 
         ShipsLayer.IOnFleetMove onFleetMove = new ShipsLayer.IOnFleetMove() {
             @Override
-            public void onFleetMove(Fleet fleet) {
-                client.sendMoveShipMessage(fleet);
+            public void onFleetMove(Fleet fleet,int num) {
+                client.sendMoveShipMessage(fleet,num);
+                //////////
+                client.sendEndPhaseMessage();
+            }
+        };
+        ShipsLayer.IOnFleetFight onFleetFight = new ShipsLayer.IOnFleetFight() {
+            @Override
+            public void onFleetFight(Fleet attackingFleet,  Fleet anotherFleet, int number, int secondNumber) {
+                client.sendFightMessage(attackingFleet,anotherFleet,number,secondNumber);
             }
         };
 
 
         UI ui = new UI(this, scene, camera, textureLoader, mEngine.getVertexBufferObjectManager(),
-                world, onFleetMove);
+                world, onFleetMove,onFleetFight);
 
 
         //generate bases and fleets

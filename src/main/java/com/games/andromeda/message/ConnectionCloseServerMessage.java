@@ -1,44 +1,17 @@
 package com.games.andromeda.message;
 
-import com.games.andromeda.message.ServerMessageFlags;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.server.ServerMessage;
 
-/**
- * (c) 2010 Nicolas Gramlich 
- * (c) 2011 Zynga Inc.
- * 
- * @author Nicolas Gramlich
- * @since 16:11:40 - 11.03.2011
- */
-public class ConnectionCloseServerMessage extends ServerMessage implements ServerMessageFlags {
-	// ===========================================================
-	// Constants
-	// ===========================================================
 
-	// ===========================================================
-	// Fields
-	// ===========================================================
-
-	// ===========================================================
-	// Constructors
-	// ===========================================================
+public class ConnectionCloseServerMessage extends ServerMessage implements MessageFlags {
 
 	public ConnectionCloseServerMessage() {
 
 	}
-
-	// ===========================================================
-	// Getter & Setter
-	// ===========================================================
-
-	// ===========================================================
-	// Methods for/from SuperClass/Interfaces
-	// ===========================================================
 
 	@Override
 	public short getFlag() {
@@ -47,19 +20,10 @@ public class ConnectionCloseServerMessage extends ServerMessage implements Serve
 
 	@Override
 	protected void onReadTransmissionData(final DataInputStream pDataInputStream) throws IOException {
-		/* Nothing to read. */
 	}
 
 	@Override
 	protected void onWriteTransmissionData(final DataOutputStream pDataOutputStream) throws IOException {
-		/* Nothing to write. */
 	}
 
-	// ===========================================================
-	// Methods
-	// ===========================================================
-
-	// ===========================================================
-	// Inner and Anonymous Classes
-	// ===========================================================
 }

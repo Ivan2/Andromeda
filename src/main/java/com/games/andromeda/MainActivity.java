@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initServer() {
+        start.setEnabled(false);
+        join.setEnabled(false);
         ServerCreator creator = new ServerCreator(this);
         mSocketServer = creator.getServer(SERVER_PORT);
         mSocketServer.start();

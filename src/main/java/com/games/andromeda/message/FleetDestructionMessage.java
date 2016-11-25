@@ -6,7 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class FleetDestructionMessage extends SideNodeMessage {
+public class FleetDestructionMessage extends SideNodeMessage implements  MessageFlags{
     protected int number;
 
     public FleetDestructionMessage(){}
@@ -30,7 +30,7 @@ public class FleetDestructionMessage extends SideNodeMessage {
 
     @Override
     public short getFlag() {
-        return 1;
+        return FLEET_DESTRUCTION_MESSAGE;
     }
 
     public int getNumber() {

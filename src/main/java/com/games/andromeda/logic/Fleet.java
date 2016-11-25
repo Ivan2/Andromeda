@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.games.andromeda.draw.Drawer;
 import com.games.andromeda.graph.Node;
+import com.games.andromeda.ui.layers.ShipsLayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -159,6 +160,23 @@ public class Fleet extends GameObject {
     }
 
 
+    public boolean attack(Fleet another){
+        Boolean result = null;
+        while (result == null){
+            if (another.splitDamage(this.properties.getAttack(this.getShipCount()))) {
+                result = true;
+                if (this.splitDamage(another.properties.getAttack(another.getShipCount()))){
+                    result = false;
+                }
+            }
+            //drawer.drawFleets(this, another);
+            this.tryToRestoreShields();
+            another.tryToRestoreShields();
+            //drawer.reDrawFleets(this, another);
+        }
+        return result;
+    }
+
     public int getCost(){
         return properties.getEmptyFleetCost() + properties.getShipCost()*ships.size();
     }
@@ -198,6 +216,18 @@ public class Fleet extends GameObject {
     @Deprecated
     public void setPosition(Node position){
         this.position = position;
+    }
+
+    public void destroyShips(int amount,int num)
+    {
+        for (int i = 0; i < amount; i++)
+            ships.remove(ships.size()-1);
+        if (getSide() == Side.FEDERATION)
+            num+=3;
+        num-=1;
+        if (getShipCount() == 0)
+            ShipsLayer.removeShip(num);
+
     }
 
 }
