@@ -228,7 +228,7 @@ public class ServerCreator implements MessageFlags{
             activity.toast("SERVER: Client connected: " + pConnector.getConnection().getSocket().getInetAddress().getHostAddress());
             clients.add(pConnector);
             connectedCount++;
-            if (connectedCount == 1)
+            if (connectedCount == 1) //Поменять на 2 для двух устройств
                 try {
                     Random random = new Random();
                     int rand = -1;
