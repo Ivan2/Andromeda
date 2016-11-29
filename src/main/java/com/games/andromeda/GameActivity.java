@@ -40,7 +40,6 @@ public class GameActivity extends SimpleBaseGameActivity{
 
     @Override
     public EngineOptions onCreateEngineOptions() {
-        client = new Client();
 
         PxDpConverter.createInstance(this);
         DisplayMetrics metrics = new DisplayMetrics();
@@ -95,6 +94,7 @@ public class GameActivity extends SimpleBaseGameActivity{
 
         UI ui = new UI(this, scene, camera, textureLoader, mEngine.getVertexBufferObjectManager(),
                 world, onFleetMove,onFleetFight);
+        client = new Client(ui);
 
 
         //generate bases and fleets
@@ -117,10 +117,13 @@ public class GameActivity extends SimpleBaseGameActivity{
         iter.next();
         iter.next();
         node = iter.next();
+
+        Pocket pocket2 = world.getPocket(GameObject.Side.FEDERATION);
+        pocket2.increase(150000);
         try {
-            Base base = new Base(GameObject.Side.EMPIRE, node);
+            Base base = new Base(GameObject.Side.FEDERATION, node);
             world.setBase(base);
-            world.setFleet(Fleet.buy(8, base, pocket), 2);
+            world.setFleet(Fleet.buy(8, base, pocket2), 2);
         } catch (Exception e) {
             Log.wtf("my stupid exception: ", e.toString());
         }

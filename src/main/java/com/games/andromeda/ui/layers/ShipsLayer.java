@@ -43,7 +43,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
 
     private PointF[] deltas;  // запоминаем смещения
     private ITextureRegion[] textures; // текстуры тоже не изменятся
-    private static ShipSprite[] sprites; // спрайты просто прикрепляем/открепляем от слоя, их всегда 6
+    private ShipSprite[] sprites; // спрайты просто прикрепляем/открепляем от слоя, их всегда 6
 //    private Fleet[] fleets;  // флоты - та часть, которая вносит изменения
 
 
@@ -111,7 +111,9 @@ public class ShipsLayer extends Layer implements FleetObserver {
                             for (int i = 0; i < 6; i++) {
                                 if (world.getAllFleets()[i] != activeSprite.getFleet() &&
                                         world.getAllFleets()[i].getPosition().getX() == activeSprite.getFleet().getPosition().getX() &&
-                                        world.getAllFleets()[i].getPosition().getY() == activeSprite.getFleet().getPosition().getY()) {
+                                        world.getAllFleets()[i].getPosition().getY() == activeSprite.getFleet().getPosition().getY() &&
+                                        activeSprite.getFleet().getSide() != world.getAllFleets()[i].getSide()
+                                        ) {
                                     if (i > 2) i -=3;
                                     onFleetFight.onFleetFight(activeSprite.getFleet(),world.getAllFleets()[i],fleetNum,i+1);
                                     break;
@@ -222,10 +224,6 @@ public class ShipsLayer extends Layer implements FleetObserver {
         activeSprite.setY(y);
     }
 
-    public static void removeShip(int num)
-    {
-        sprites[num].detachSelf();
-    }
 }
 
 

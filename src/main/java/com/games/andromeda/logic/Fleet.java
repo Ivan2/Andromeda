@@ -218,16 +218,10 @@ public class Fleet extends GameObject {
         this.position = position;
     }
 
-    public void destroyShips(int amount,int num)
+    public void destroyShips(int amount)
     {
         for (int i = 0; i < amount; i++)
             ships.remove(ships.size()-1);
-        if (getSide() == Side.FEDERATION)
-            num+=3;
-        num-=1;
-        if (getShipCount() == 0)
-            ShipsLayer.removeShip(num);
-
     }
 
 }

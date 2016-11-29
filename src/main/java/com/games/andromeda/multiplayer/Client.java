@@ -12,15 +12,20 @@ import com.games.andromeda.message.MessageFlags;
 import com.games.andromeda.message.MoveShipClientMessage;
 import com.games.andromeda.message.MoveShipServerMessage;
 import com.games.andromeda.message.SideMessage;
+import com.games.andromeda.ui.UI;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
 
 import java.io.IOException;
 
 
-public class Client  implements MessageFlags{
+public class Client implements MessageFlags{
 
-    public Client(){
+
+    private UI ui;
+
+    public Client(UI ui){
+        this.ui = ui;
         GameClient.getInstance().setMessageReceiver(new GameClient.MessageReceiver() {
             @Override
             public void onMessageReceive(short flag, IServerMessage message) {
@@ -38,6 +43,7 @@ public class Client  implements MessageFlags{
                     case FIGHT_MESSAGE:
                         FightMessage fightMessage = (FightMessage) message;
                         onFightMessage(fightMessage.getFleet1(),fightMessage.getFleet2(),fightMessage.getNumber1(),fightMessage.getNumber2());
+
                         break;
                     case SIDE_MESSAGE:
                         SideMessage sideMessage = (SideMessage) message;
@@ -108,8 +114,9 @@ public class Client  implements MessageFlags{
     private void onFightMessage(Fleet firstFleet,  Fleet secondFleet, int num, int num2)
     {
         WorldAccessor world = WorldAccessor.getInstance();
-        world.getFleet(firstFleet.getSide(),num).destroyShips(world.getFleet(firstFleet.getSide(),num).getShipCount() - firstFleet.getShipCount(),num);
-        world.getFleet(secondFleet.getSide(),num2).destroyShips(world.getFleet(secondFleet.getSide(),num2).getShipCount() - secondFleet.getShipCount(),num2);
+        world.getFleet(firstFleet.getSide(),num).destroyShips(world.getFleet(firstFleet.getSide(),num).getShipCount() - firstFleet.getShipCount());
+        world.getFleet(secondFleet.getSide(),num2).destroyShips(world.getFleet(secondFleet.getSide(),num2).getShipCount() - secondFleet.getShipCount());
+        ui.getShipsLayer().repaint();
     }
 
     private void setSide(GameObject.Side side)

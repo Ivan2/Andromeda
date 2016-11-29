@@ -25,6 +25,10 @@ public class UI {
 
     private PathManager manager;
     private PanelHUD panel;
+    private final BackgroundLayer backgroundLayer;
+    private final SystemsLayer systemsLayer;
+    private final ShipsLayer shipsLayer;
+    private final SystemInfoLayer systemInfoLayer;
 
     public UI(Activity activity, Scene scene, Camera camera, TextureLoader textureLoader,
               VertexBufferObjectManager vertexBufferObjectManager, WorldAccessor world,
@@ -36,17 +40,17 @@ public class UI {
         scene.setOnAreaTouchTraversalFrontToBack();//Сначала получает фокус верхний спрайт
 
         //Слой с фоном и линиями
-        BackgroundLayer backgroundLayer = new BackgroundLayer(scene, camera, textureLoader,
+        backgroundLayer = new BackgroundLayer(scene, camera, textureLoader,
                 vertexBufferObjectManager, world.getMap());
         backgroundLayer.repaint();
 
         //слой с системами
-        SystemsLayer systemsLayer = new SystemsLayer(scene, camera, textureLoader,
+        systemsLayer = new SystemsLayer(scene, camera, textureLoader,
                 vertexBufferObjectManager, world.getMap());
         systemsLayer.repaint();
 
         //слой с кораблями
-        ShipsLayer shipsLayer = new ShipsLayer(scene, camera, textureLoader,
+        shipsLayer = new ShipsLayer(scene, camera, textureLoader,
                 vertexBufferObjectManager, manager, onFleetMove,onFleetFight);
         world.addFleetObserver(shipsLayer);
         shipsLayer.repaint();
@@ -56,7 +60,8 @@ public class UI {
         //        vertexBufferObjectManager);
 
         //слой с вопросом
-        final SystemInfoLayer systemInfoLayer = new SystemInfoLayer(activity.getResources(), scene,
+        systemInfoLayer =
+                new SystemInfoLayer(activity.getResources(), scene,
                 camera, textureLoader, vertexBufferObjectManager) {
             @Override
             protected void onOk() {
@@ -105,4 +110,20 @@ public class UI {
         panel.repaint();
     }
 
+
+    public BackgroundLayer getBackgroundLayer() {
+        return backgroundLayer;
+    }
+
+    public SystemsLayer getSystemsLayer() {
+        return systemsLayer;
+    }
+
+    public ShipsLayer getShipsLayer() {
+        return shipsLayer;
+    }
+
+    public SystemInfoLayer getSystemInfoLayer() {
+        return systemInfoLayer;
+    }
 }
