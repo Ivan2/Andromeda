@@ -273,8 +273,7 @@ public class ServerCreator implements MessageFlags{
             if (connectedCount == 2) //Поменять на 2 для двух устройств
                 try {
                     Random random = new Random();
-                    //int rand = random.nextInt(2);
-                    int rand = 0;
+                    int rand = random.nextInt(2);
                     int i = 0;
                     for (ClientConnector client : clients) {
                         client.sendServerMessage(new StartGameMessage());
