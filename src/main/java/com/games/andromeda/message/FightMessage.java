@@ -14,15 +14,16 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class FightMessage extends Message implements IClientMessage, IServerMessage, MessageFlags{
+public class FightMessage extends SideMessage implements IClientMessage, IServerMessage, MessageFlags{
     private Fleet fleet1;
     private Fleet fleet2;
     private int number1;
     private int number2;
 
     public FightMessage() {}
-    public FightMessage(final Fleet fleet1, final Fleet fleet2,int number1, int number2)
+    public FightMessage(GameObject.Side side, final Fleet fleet1, final Fleet fleet2, int number1, int number2)
     {
+        super(side);
         this.fleet1 = fleet1;
         this.fleet2 = fleet2;
         this.number1 = number1;
@@ -31,6 +32,7 @@ public class FightMessage extends Message implements IClientMessage, IServerMess
 
     @Override
     protected void onReadTransmissionData(DataInputStream pDataInputStream) throws IOException {
+        super.onReadTransmissionData(pDataInputStream);
         float   fleet1X = pDataInputStream.readFloat(),
                 fleet1Y = pDataInputStream.readFloat();
         int fleet1Side = pDataInputStream.readInt(),
@@ -67,6 +69,7 @@ public class FightMessage extends Message implements IClientMessage, IServerMess
 
     @Override
     protected void onWriteTransmissionData(DataOutputStream pDataOutputStream) throws IOException {
+        super.onWriteTransmissionData(pDataOutputStream);
         pDataOutputStream.writeFloat(fleet1.getPosition().getX());
         pDataOutputStream.writeFloat(fleet1.getPosition().getY());
         if (fleet1.getSide() == GameObject.Side.EMPIRE)

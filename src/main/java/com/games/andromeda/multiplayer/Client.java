@@ -69,12 +69,9 @@ public class Client implements MessageFlags{
     public void sendMoveShipMessage(Fleet fleet, int num) {
         try {
             GameObject.Side side = fleet.getSide();
-            int s = 0;
-            if (side == GameObject.Side.EMPIRE)
-                s=1;
             GameClient.getInstance().sendMessage(new MoveShipClientMessage(
                     fleet.getPosition().getX(),
-                    fleet.getPosition().getY(),num, s));
+                    fleet.getPosition().getY(),num, side));
         } catch (IOException e) {
             Log.wtf("PATH", e.toString());
         }
@@ -88,10 +85,12 @@ public class Client implements MessageFlags{
         }
     }
 
-    public void sendFightMessage(Fleet attackingFleet, Fleet anotherFleet, int number,int secondNum)
+    public void sendFightMessage(GameObject.Side side, Fleet attackingFleet, Fleet anotherFleet, int number, int secondNum)
     {
         try {
-            GameClient.getInstance().sendMessage(new FightMessage(attackingFleet,anotherFleet,number,secondNum));
+            attackingFleet.attack(anotherFleet);
+            Log.wtf("" + attackingFleet.getShipCount(),"" + anotherFleet.getShipCount());
+            GameClient.getInstance().sendMessage(new FightMessage(side,attackingFleet,anotherFleet,number,secondNum));
         } catch (IOException e) {
             Log.wtf("PATH", e.toString());
         }
@@ -116,6 +115,7 @@ public class Client implements MessageFlags{
         WorldAccessor world = WorldAccessor.getInstance();
         world.getFleet(firstFleet.getSide(),num).destroyShips(world.getFleet(firstFleet.getSide(),num).getShipCount() - firstFleet.getShipCount());
         world.getFleet(secondFleet.getSide(),num2).destroyShips(world.getFleet(secondFleet.getSide(),num2).getShipCount() - secondFleet.getShipCount());
+        Log.wtf(""+ world.getFleet(firstFleet.getSide(),num).getShipCount(),""+ world.getFleet(secondFleet.getSide(),num2).getShipCount());
         ui.getShipsLayer().repaint();
     }
 

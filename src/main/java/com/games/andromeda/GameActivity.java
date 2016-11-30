@@ -80,14 +80,13 @@ public class GameActivity extends SimpleBaseGameActivity{
             @Override
             public void onFleetMove(Fleet fleet,int num) {
                 client.sendMoveShipMessage(fleet,num);
-                //////////
-                client.sendEndPhaseMessage();
             }
         };
         ShipsLayer.IOnFleetFight onFleetFight = new ShipsLayer.IOnFleetFight() {
             @Override
             public void onFleetFight(Fleet attackingFleet,  Fleet anotherFleet, int number, int secondNumber) {
-                client.sendFightMessage(attackingFleet,anotherFleet,number,secondNumber);
+                client.sendFightMessage(attackingFleet.getSide(),attackingFleet,anotherFleet,number,secondNumber);
+
             }
         };
 
@@ -127,7 +126,6 @@ public class GameActivity extends SimpleBaseGameActivity{
         } catch (Exception e) {
             Log.wtf("my stupid exception: ", e.toString());
         }
-
         ui.repaintHUD();
 
         return scene;

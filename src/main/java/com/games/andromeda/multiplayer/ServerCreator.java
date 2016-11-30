@@ -34,6 +34,7 @@ import org.andengine.util.debug.Debug;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
@@ -42,7 +43,8 @@ public class ServerCreator implements MessageFlags{
     private SocketServer<SocketConnectionClientConnector> server;
     private MainActivity activity;
     private int connectedCount = 0;
-
+    private ClientConnector empire;
+    private ClientConnector federation;
     Set<ClientConnector> clients = new HashSet<>();
 
     public ServerCreator(MainActivity activity) {
@@ -62,7 +64,11 @@ public class ServerCreator implements MessageFlags{
                             MoveShipClientMessage moveShipClientMessage = (MoveShipClientMessage) pClientMessage;
                             MoveShipServerMessage moveShipServerMessage = new MoveShipServerMessage
                                     (moveShipClientMessage.getX(), moveShipClientMessage.getY(),moveShipClientMessage.getNum(),moveShipClientMessage.getSide());
-                            server.sendBroadcastServerMessage(moveShipServerMessage);
+                            //server.sendBroadcastServerMessage(moveShipServerMessage);
+                            if (moveShipClientMessage.getSide() == GameObject.Side.EMPIRE)
+                                federation.sendServerMessage(moveShipServerMessage);
+                            else
+                                empire.sendServerMessage(moveShipServerMessage);
                         } catch (IOException e) {
                             Debug.e(e);
                         } catch (Exception e) {
@@ -74,9 +80,12 @@ public class ServerCreator implements MessageFlags{
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
                         try {
-                            EndPhaseMessage endPhaseMessage = (EndPhaseMessage) iClientMessage;
+                            EndPhaseMessage message = (EndPhaseMessage) iClientMessage;
 
-                            server.sendBroadcastServerMessage(endPhaseMessage);
+                            if (message.getSide() == GameObject.Side.EMPIRE)
+                                federation.sendServerMessage(message);
+                            else
+                                empire.sendServerMessage(message);
                         } catch (IOException e) {
                             Debug.e(e);
                         } catch (Exception e) {
@@ -89,11 +98,17 @@ public class ServerCreator implements MessageFlags{
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
                         try {
                             FightMessage fightMessage = (FightMessage) iClientMessage;
-                            Fleet   first = fightMessage.getFleet1(),
-                                    second = fightMessage.getFleet2();
-                            first.attack(second);
-                            fightMessage = new FightMessage(first,second,fightMessage.getNumber1(),fightMessage.getNumber2());
-                            server.sendBroadcastServerMessage(fightMessage);
+                            //Fleet   first = fightMessage.getFleet1(),
+                            //        second = fightMessage.getFleet2();
+                            //first.attack(second);
+                           // FightMessage serverFightMessage = new FightMessage(fightMessage.getSide(),
+                           //         first,second,fightMessage.getNumber1(),fightMessage.getNumber2());
+                            if (fightMessage.getSide() == GameObject.Side.EMPIRE) {
+                                federation.sendServerMessage(fightMessage);
+                            }
+                            else {
+                                empire.sendServerMessage(fightMessage);
+                            }
                         } catch (IOException e) {
                             Debug.e(e);
                         } catch (Exception e) {
@@ -105,8 +120,11 @@ public class ServerCreator implements MessageFlags{
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
                         try {
-
-                            server.sendBroadcastServerMessage((BaseCreationMessage)iClientMessage);
+                            BaseCreationMessage message = (BaseCreationMessage)iClientMessage;
+                            if (message.getSide() == GameObject.Side.EMPIRE)
+                                federation.sendServerMessage(message);
+                            else
+                                empire.sendServerMessage(message);
                         } catch (IOException e) {
                             Debug.e(e);
                         } catch (Exception e) {
@@ -118,7 +136,11 @@ public class ServerCreator implements MessageFlags{
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
                         try {
-                            server.sendBroadcastServerMessage((BaseDestructionMessage)iClientMessage);
+                            BaseDestructionMessage message = (BaseDestructionMessage) iClientMessage;
+                            if (message.getSide() == GameObject.Side.EMPIRE)
+                                federation.sendServerMessage(message);
+                            else
+                                empire.sendServerMessage(message);
                         } catch (IOException e) {
                             Debug.e(e);
                         } catch (Exception e) {
@@ -130,7 +152,11 @@ public class ServerCreator implements MessageFlags{
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
                         try {
-                            server.sendBroadcastServerMessage((FleetCreationMessage)iClientMessage);
+                            FleetCreationMessage message = (FleetCreationMessage) iClientMessage;
+                            if (message.getSide() == GameObject.Side.EMPIRE)
+                                federation.sendServerMessage(message);
+                            else
+                                empire.sendServerMessage(message);
                         } catch (IOException e) {
                             Debug.e(e);
                         } catch (Exception e) {
@@ -142,7 +168,11 @@ public class ServerCreator implements MessageFlags{
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
                         try {
-                            server.sendBroadcastServerMessage((FleetDestructionMessage)iClientMessage);
+                            FleetDestructionMessage message = (FleetDestructionMessage) iClientMessage;
+                            if (message.getSide() == GameObject.Side.EMPIRE)
+                                federation.sendServerMessage(message);
+                            else
+                                empire.sendServerMessage(message);
                         } catch (IOException e) {
                             Debug.e(e);
                         } catch (Exception e) {
@@ -154,7 +184,11 @@ public class ServerCreator implements MessageFlags{
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
                         try {
-                            server.sendBroadcastServerMessage((PocketChangesMessage) iClientMessage);
+                            PocketChangesMessage message = (PocketChangesMessage) iClientMessage;
+                            if (message.getSide() == GameObject.Side.EMPIRE)
+                                federation.sendServerMessage(message);
+                            else
+                                empire.sendServerMessage(message);
                         } catch (IOException e) {
                             Debug.e(e);
                         } catch (Exception e) {
@@ -166,7 +200,7 @@ public class ServerCreator implements MessageFlags{
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
                         try {
-                            server.sendBroadcastServerMessage((RandomEventMessage) iClientMessage);
+                            server.sendBroadcastServerMessage((RandomEventMessage)iClientMessage);
                         } catch (IOException e) {
                             Debug.e(e);
                         } catch (Exception e) {
@@ -178,7 +212,11 @@ public class ServerCreator implements MessageFlags{
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
                         try {
-                            server.sendBroadcastServerMessage((SetupBasesMessage) iClientMessage);
+                            SetupBasesMessage message = (SetupBasesMessage) iClientMessage;
+                            if (message.getSide() == GameObject.Side.EMPIRE)
+                                federation.sendServerMessage(message);
+                            else
+                                empire.sendServerMessage(message);
                         } catch (IOException e) {
                             Debug.e(e);
                         } catch (Exception e) {
@@ -190,7 +228,11 @@ public class ServerCreator implements MessageFlags{
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
                         try {
-                            server.sendBroadcastServerMessage((SetupFleetsMessage) iClientMessage);
+                            SetupFleetsMessage message = (SetupFleetsMessage) iClientMessage;
+                            if (message.getSide() == GameObject.Side.EMPIRE)
+                                federation.sendServerMessage(message);
+                            else
+                                empire.sendServerMessage(message);
                         } catch (IOException e) {
                             Debug.e(e);
                         } catch (Exception e) {
@@ -231,17 +273,19 @@ public class ServerCreator implements MessageFlags{
             if (connectedCount == 2) //Поменять на 2 для двух устройств
                 try {
                     Random random = new Random();
-                    int rand = -1;
-                    for (int i = 0; i < 10; i++) {
-                        rand = random.nextInt(2);
-                    }
+                    //int rand = random.nextInt(2);
+                    int rand = 0;
                     int i = 0;
                     for (ClientConnector client : clients) {
                         client.sendServerMessage(new StartGameMessage());
-                        if (i == rand)
+                        if (i == rand) {
                             client.sendServerMessage(new SideMessage(GameObject.Side.EMPIRE));
-                        else
+                            empire = client;
+                        }
+                        else {
                             client.sendServerMessage(new SideMessage(GameObject.Side.FEDERATION));
+                            federation = client;
+                        }
                         i++;
                     }
 

@@ -11,25 +11,24 @@ import java.io.IOException;
 /**
  * Created by eugeny on 20.10.16.
  */
-public class MoveShipServerMessage extends ServerMessage implements MessageFlags {
+public class MoveShipServerMessage extends SideMessage implements MessageFlags {
 
 
 
     private float x;
     private float y;
     private int num;
-    private int side;
 
     public MoveShipServerMessage() {
 
     }
 
-    public MoveShipServerMessage(final float x, final float y, final int num, final int side)
+    public MoveShipServerMessage(final float x, final float y, final int num, final GameObject.Side side)
     {
+        super(side);
         this.x = x;
         this.y = y;
         this.num = num;
-        this.side = side;
     }
 
     public void set(final float x, final float y) {
@@ -44,18 +43,18 @@ public class MoveShipServerMessage extends ServerMessage implements MessageFlags
 
     @Override
     protected void onReadTransmissionData(final DataInputStream pDataInputStream) throws IOException {
+        super.onReadTransmissionData(pDataInputStream);
         x = pDataInputStream.readFloat();
         y = pDataInputStream.readFloat();
         num = pDataInputStream.readInt();
-        side = pDataInputStream.readInt();
     }
 
     @Override
     protected void onWriteTransmissionData(final DataOutputStream pDataOutputStream) throws IOException {
+        super.onWriteTransmissionData(pDataOutputStream);
         pDataOutputStream.writeFloat(x);
         pDataOutputStream.writeFloat(y);
         pDataOutputStream.writeInt(num);
-        pDataOutputStream.writeInt(side);
     }
 
     public float getX()
@@ -73,10 +72,4 @@ public class MoveShipServerMessage extends ServerMessage implements MessageFlags
         return num;
     }
 
-    public GameObject.Side getSide()
-    {
-        if (side == 1)
-            return GameObject.Side.EMPIRE;
-        else return GameObject.Side.FEDERATION;
-    }
 }
