@@ -1,6 +1,7 @@
 package com.games.andromeda.ui;
 
 import android.app.Activity;
+import android.util.Log;
 
 import com.games.andromeda.GameActivity;
 import com.games.andromeda.graph.Node;
@@ -21,6 +22,8 @@ import org.andengine.entity.scene.background.Background;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.color.Color;
 
+import com.games.andromeda.logic.phases.LevelPreparationStrategy;
+
 public class UI {
 
     private PathManager manager;
@@ -31,8 +34,8 @@ public class UI {
     private final SystemInfoLayer systemInfoLayer;
 
     public UI(Activity activity, Scene scene, Camera camera, TextureLoader textureLoader,
-              VertexBufferObjectManager vertexBufferObjectManager, WorldAccessor world,
-              ShipsLayer.IOnFleetMove onFleetMove,ShipsLayer.IOnFleetFight onFleetFight) {
+              VertexBufferObjectManager vertexBufferObjectManager, final WorldAccessor world,
+              ShipsLayer.IOnFleetMove onFleetMove, ShipsLayer.IOnFleetFight onFleetFight) {
         manager = new PathManager();
 
         scene.setBackground(new Background(Color.BLACK));
@@ -77,7 +80,17 @@ public class UI {
         systemsLayer.setLayerListener(new SystemsLayer.LayerListener() {
             @Override
             public void onClick(Node node) {
-                systemInfoLayer.show(node);
+                Log.wtf("Phase", WorldAccessor.getInstance().getPhaseType().toString());
+                switch (WorldAccessor.getInstance().getPhaseType()){
+                    case LEVEL_PREPARATION_BASES:
+                        LevelPreparationStrategy phase = (LevelPreparationStrategy)
+                                WorldAccessor.getInstance().getPhase();
+                        phase.handlePhaseEvent(node);
+                        systemsLayer.repaint(); // todo
+                        break;
+                    default:
+                        systemInfoLayer.show(node);
+                }
             }
 
             @Override

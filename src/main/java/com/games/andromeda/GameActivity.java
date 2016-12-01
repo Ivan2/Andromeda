@@ -10,6 +10,8 @@ import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.Pocket;
 import com.games.andromeda.logic.WorldAccessor;
+import com.games.andromeda.logic.phases.GamePhases;
+import com.games.andromeda.logic.phases.HandlingStrategy;
 import com.games.andromeda.multiplayer.Client;
 import com.games.andromeda.ui.UI;
 import com.games.andromeda.ui.layers.ShipsLayer;
@@ -90,11 +92,9 @@ public class GameActivity extends SimpleBaseGameActivity{
             }
         };
 
-
         UI ui = new UI(this, scene, camera, textureLoader, mEngine.getVertexBufferObjectManager(),
-                world, onFleetMove,onFleetFight);
+                world, onFleetMove, onFleetFight);
         client = new Client(ui);
-
 
         //generate bases and fleets
         Pocket pocket = world.getPocket(GameObject.Side.EMPIRE);

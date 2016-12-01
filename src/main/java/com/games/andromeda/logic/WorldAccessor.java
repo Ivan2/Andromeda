@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;
+import com.games.andromeda.logic.phases.GamePhases;
+import com.games.andromeda.logic.phases.HandlingStrategy;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,6 +38,7 @@ public class WorldAccessor {
     private Pocket federationPocket;
     private Set<FleetObserver> fleetObservers;
     private Set<BaseObserver> baseObservers;
+    private GamePhases phases;
 
     protected WorldAccessor(){
         bases = new HashMap<>();
@@ -110,6 +113,18 @@ public class WorldAccessor {
         }
     }
 
+    public HandlingStrategy changePhase() {
+        return phases.iterator().next();
+    }
+
+    public HandlingStrategy getPhase() {
+        return phases.getCurrentPhase();
+    }
+
+    public GamePhases.PhaseType getPhaseType(){
+        return phases.getPhaseType();
+    }
+
     public void moveFleet(GameObject.Side side, int number, Node position){
         Fleet fleet = getFleet(side, number);
         fleet.setPosition(position); // todo makeMove
@@ -132,6 +147,8 @@ public class WorldAccessor {
     }
 
     public static void init(MyGraph graph){
+        getInstance().phases = new GamePhases();
+        getInstance().phases.iterator().next();
         getInstance().setPocket(new Pocket(GameObject.Side.FEDERATION));
         getInstance().setPocket(new Pocket(GameObject.Side.EMPIRE));
         getInstance().setMap(graph);

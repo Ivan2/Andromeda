@@ -17,7 +17,9 @@ import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.texture.region.TextureRegionFactory;
+import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.andengine.ui.activity.BaseGameActivity;
 
 public class TextureLoader {
@@ -39,13 +41,23 @@ public class TextureLoader {
         Bitmap bitmap = android.graphics.Bitmap.createBitmap(size, size,
                 android.graphics.Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
+        drawSystem(canvas, radius, 0, systemType);
+        BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(textureManager,
+                bitmap.getWidth(), bitmap.getHeight(), TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        BitmapTextureAtlasSource source = new BitmapTextureAtlasSource(bitmap);
+        bitmapTextureAtlas.addTextureAtlasSource(source, 0, 0);
+        bitmapTextureAtlas.load();
+        return TextureRegionFactory.createFromSource(bitmapTextureAtlas, source, 0, 0);
+    }
+
+    private void drawSystem(Canvas canvas, float radius, int idx, Node.SystemType systemType){
         Paint paint = new Paint();
         paint.setStrokeWidth(16);
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         if (systemType == Node.SystemType.MINI)
             radius *= 0.4;
-        canvas.drawCircle(bitmap.getWidth()/2, bitmap.getHeight()/2, radius, paint);
+        canvas.drawCircle(canvas.getWidth()/2 + idx*canvas.getHeight(), canvas.getHeight()/2, radius, paint);
         switch (systemType) {
             case EMPTY:
                 paint.setColor(Color.GRAY);
@@ -60,15 +72,29 @@ public class TextureLoader {
                 paint.setColor(Color.GRAY);
         }
         paint.setStyle(Paint.Style.STROKE);
-        canvas.drawCircle(bitmap.getWidth()/2, bitmap.getHeight()/2, radius, paint);
+        canvas.drawCircle(canvas.getWidth()/2 + idx*canvas.getHeight(), canvas.getHeight()/2,
+                radius, paint);
+    }
 
+
+    public TiledTextureRegion loadSystemTile() {
+        int size = 256;
+        float radius = 50;
+        Bitmap bitmap = android.graphics.Bitmap.createBitmap(size * Node.SystemType.values().length,
+                size, android.graphics.Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        for(int i = 0; i < Node.SystemType.values().length; ++i){
+            drawSystem(canvas, radius, i, Node.SystemType.values()[i]);
+        }
         BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(textureManager,
                 bitmap.getWidth(), bitmap.getHeight(), TextureOptions.BILINEAR_PREMULTIPLYALPHA);
         BitmapTextureAtlasSource source = new BitmapTextureAtlasSource(bitmap);
         bitmapTextureAtlas.addTextureAtlasSource(source, 0, 0);
         bitmapTextureAtlas.load();
-        return TextureRegionFactory.createFromSource(bitmapTextureAtlas, source, 0, 0);
+        return BitmapTextureAtlasTextureRegionFactory.createTiledFromSource(bitmapTextureAtlas,
+                source, 0, 0, Node.SystemType.values().length, 1);
     }
+
 
     public ITextureRegion loadBackgroundTexture() {
          return loadFileTexture("background.png", 1024, 1024);
