@@ -4,8 +4,8 @@ import com.games.andromeda.MainActivity;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.message.MessageFlags;
 import com.games.andromeda.message.SetupBasesMessage;
+import com.games.andromeda.message.SetupFleetsMessage;
 import com.games.andromeda.message.SideMessage;
-import com.games.andromeda.ui.UI;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
 import org.andengine.extension.multiplayer.protocol.server.IClientMessageHandler;
@@ -194,40 +194,32 @@ public class ServerCreator implements MessageFlags {
                 connector.registerClientMessage(SETUP_BASE_MESSAGE, SetupBasesMessage.class, new IClientMessageHandler<SocketConnection>() {
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        try {
-                            SetupBasesMessage message = (SetupBasesMessage) iClientMessage;
-                            if (message.getSide() == GameObject.Side.EMPIRE)
-                                federation.sendServerMessage(message);
-                            else
-                                empire.sendServerMessage(message);
-                        } catch (IOException e) {
-                            Debug.e(e);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        sendMessageToEnemy(iClientMessage);
                     }
                 });
-                /*connector.registerClientMessage(SETUP_FLEET_MESSAGE, SetupFleetsMessage.class, new IClientMessageHandler<SocketConnection>() {
+                connector.registerClientMessage(SETUP_FLEET_MESSAGE, SetupFleetsMessage.class, new IClientMessageHandler<SocketConnection>() {
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        try {
-                            SetupFleetsMessage message = (SetupFleetsMessage) iClientMessage;
-                            if (message.getSide() == GameObject.Side.EMPIRE)
-                                federation.sendServerMessage(message);
-                            else
-                                empire.sendServerMessage(message);
-                        } catch (IOException e) {
-                            Debug.e(e);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        sendMessageToEnemy(iClientMessage);
                     }
-                });*/
+                });
                 return connector;
             }
         };
 
         return server;
+    }
+
+    private void sendMessageToEnemy(IClientMessage message) {
+        try {
+            SideMessage sideMessage = (SideMessage) message;
+            if (sideMessage.getSide() == GameObject.Side.EMPIRE)
+                federation.sendServerMessage(sideMessage);
+            else
+                empire.sendServerMessage(sideMessage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private class ServerStateListener implements SocketServer.ISocketServerListener<SocketConnectionClientConnector> {

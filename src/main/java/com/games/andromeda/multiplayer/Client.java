@@ -4,9 +4,11 @@ import android.util.Log;
 
 import com.games.andromeda.Phases;
 import com.games.andromeda.logic.Base;
+import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.MessageFlags;
 import com.games.andromeda.message.SetupBasesMessage;
+import com.games.andromeda.message.SetupFleetsMessage;
 import com.games.andromeda.message.SideMessage;
 import com.games.andromeda.ui.UI;
 
@@ -52,12 +54,24 @@ public class Client implements MessageFlags {
                         Phases.getInstance().side = sideMessage.getSide();
                         break;
                     case SETUP_BASE_MESSAGE:
-                        final SetupBasesMessage setupBasesMessage = (SetupBasesMessage) message;
+                        SetupBasesMessage setupBasesMessage = (SetupBasesMessage) message;
                         for (Base base : setupBasesMessage.getBases()) {
                             WorldAccessor.getInstance().setBase(base);
                         }
 
                         UI.getInstance().getSystemsLayer().repaint();
+                        Phases.getInstance().endPhase();
+                        break;
+                    case SETUP_FLEET_MESSAGE:
+                        SetupFleetsMessage setupFleetsMessage = (SetupFleetsMessage) message;
+                        int i = 1;
+                        for (Fleet fleet : setupFleetsMessage.getFleets()) {
+                            WorldAccessor.getInstance().setFleet(fleet, i);
+                            i++;
+                        }
+
+                        UI.getInstance().getShipsLayer().repaint();
+                        UI.getInstance().repaintHUD();
                         Phases.getInstance().endPhase();
                         break;
                     //case BASE_CREATION_MESSAGE:
@@ -82,6 +96,18 @@ public class Client implements MessageFlags {
                     Phases.getInstance().side,
                     new ArrayList<>(WorldAccessor.getInstance().getMap().getNodes()),
                     bases
+            ));
+        } catch (IOException e) {
+            Log.wtf("PATH", e.toString());
+        }
+    }
+
+    public void sendSetupFleetMessage(Collection<Fleet> fleets) {
+        try {
+            GameClient.getInstance().sendMessage(new SetupFleetsMessage(
+                    Phases.getInstance().side,
+                    new ArrayList<>(WorldAccessor.getInstance().getMap().getNodes()),
+                    fleets
             ));
         } catch (IOException e) {
             Log.wtf("PATH", e.toString());

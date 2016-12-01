@@ -9,6 +9,7 @@ import com.games.andromeda.MainActivity;
 import com.games.andromeda.message.ConnectionCloseServerMessage;
 import com.games.andromeda.message.MessageFlags;
 import com.games.andromeda.message.SetupBasesMessage;
+import com.games.andromeda.message.SetupFleetsMessage;
 import com.games.andromeda.message.SideMessage;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
@@ -167,13 +168,13 @@ public class GameClient implements Runnable,MessageFlags {
                         messageReceiver.onMessageReceive(SETUP_BASE_MESSAGE, iServerMessage);
                 }
             });
-            /*connector.registerServerMessage(SETUP_FLEET_MESSAGE, SetupFleetsMessage.class, new IServerMessageHandler<SocketConnection>() {
+            connector.registerServerMessage(SETUP_FLEET_MESSAGE, SetupFleetsMessage.class, new IServerMessageHandler<SocketConnection>() {
                 @Override
                 public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
                     if (messageReceiver != null)
                         messageReceiver.onMessageReceive(SETUP_FLEET_MESSAGE, iServerMessage);
                 }
-            });*/
+            });
             connector.getConnection().start();
         } catch (Throwable t) {
             Debug.e(t);
