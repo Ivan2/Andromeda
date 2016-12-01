@@ -1,12 +1,8 @@
 package com.games.andromeda.message;
 
-import com.games.andromeda.graph.Node;
-import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
-import com.games.andromeda.logic.Pocket;
 
-import org.andengine.extension.multiplayer.protocol.adt.message.Message;
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
 
@@ -33,7 +29,7 @@ public class FightMessage extends SideMessage implements IClientMessage, IServer
     @Override
     protected void onReadTransmissionData(DataInputStream pDataInputStream) throws IOException {
         super.onReadTransmissionData(pDataInputStream);
-        float   fleet1X = pDataInputStream.readFloat(),
+        /*float   fleet1X = pDataInputStream.readFloat(),
                 fleet1Y = pDataInputStream.readFloat();
         int fleet1Side = pDataInputStream.readInt(),
             fleet1ShipCount = pDataInputStream.readInt(),
@@ -63,14 +59,14 @@ public class FightMessage extends SideMessage implements IClientMessage, IServer
             fleet2 = Fleet.buy(fleet2ShipCount,b,pocket);
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
 
     @Override
     protected void onWriteTransmissionData(DataOutputStream pDataOutputStream) throws IOException {
         super.onWriteTransmissionData(pDataOutputStream);
-        pDataOutputStream.writeFloat(fleet1.getPosition().getX());
+        /*pDataOutputStream.writeFloat(fleet1.getPosition().getX());
         pDataOutputStream.writeFloat(fleet1.getPosition().getY());
         if (fleet1.getSide() == GameObject.Side.EMPIRE)
             pDataOutputStream.writeInt(1);
@@ -85,7 +81,7 @@ public class FightMessage extends SideMessage implements IClientMessage, IServer
         else
             pDataOutputStream.writeInt(0);
         pDataOutputStream.writeInt(fleet2.getShipCount());
-        pDataOutputStream.writeInt(number2);
+        pDataOutputStream.writeInt(number2);*/
     }
 
     @Override

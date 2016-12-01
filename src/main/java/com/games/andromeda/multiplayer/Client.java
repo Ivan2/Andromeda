@@ -2,35 +2,37 @@ package com.games.andromeda.multiplayer;
 
 import android.util.Log;
 
-import com.games.andromeda.graph.Node;
-import com.games.andromeda.logic.Fleet;
-import com.games.andromeda.logic.GameObject;
+import com.games.andromeda.Phases;
+import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.WorldAccessor;
-import com.games.andromeda.message.EndPhaseMessage;
-import com.games.andromeda.message.FightMessage;
 import com.games.andromeda.message.MessageFlags;
-import com.games.andromeda.message.MoveShipClientMessage;
-import com.games.andromeda.message.MoveShipServerMessage;
+import com.games.andromeda.message.SetupBasesMessage;
 import com.games.andromeda.message.SideMessage;
 import com.games.andromeda.ui.UI;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 
-public class Client implements MessageFlags{
+public class Client implements MessageFlags {
 
+    private static Client instance;
 
-    private UI ui;
+    public static Client getInstance() {
+        if (instance == null)
+            instance = new Client();
+        return instance;
+    }
 
-    public Client(UI ui){
-        this.ui = ui;
+    private Client() {
         GameClient.getInstance().setMessageReceiver(new GameClient.MessageReceiver() {
             @Override
             public void onMessageReceive(short flag, IServerMessage message) {
                 switch (flag) {
-                    case FLAG_MESSAGE_SERVER_SHOW:
+                    /*case FLAG_MESSAGE_SERVER_SHOW:
                         MoveShipServerMessage moveShipServerMessage = (MoveShipServerMessage) message;
                         moveShip(moveShipServerMessage.getX(), moveShipServerMessage.getY(),moveShipServerMessage.getSide(),
                                 moveShipServerMessage.getNum());
@@ -44,20 +46,28 @@ public class Client implements MessageFlags{
                         FightMessage fightMessage = (FightMessage) message;
                         onFightMessage(fightMessage.getFleet1(),fightMessage.getFleet2(),fightMessage.getNumber1(),fightMessage.getNumber2());
 
-                        break;
+                        break;*/
                     case SIDE_MESSAGE:
                         SideMessage sideMessage = (SideMessage) message;
-
+                        Phases.getInstance().side = sideMessage.getSide();
                         break;
-                    case BASE_CREATION_MESSAGE:
-                    case BASE_DESTRUCTION_MESSAGE:
-                    case FLEET_CREATION_MESSAGE:
-                    case FLEET_DESTRUCTION_MESSAGE:
-                    case POCKET_CHANGE_MESSAGE:
-                    case RANDOM_EVENT_MESSAGE:
                     case SETUP_BASE_MESSAGE:
-                    case SIDE_NODE_LIST_MESSAGE:
-                    case SIDE_NODE_MESSAGE:
+                        final SetupBasesMessage setupBasesMessage = (SetupBasesMessage) message;
+                        for (Base base : setupBasesMessage.getBases()) {
+                            WorldAccessor.getInstance().setBase(base);
+                        }
+
+                        UI.getInstance().getSystemsLayer().repaint();
+                        Phases.getInstance().endPhase();
+                        break;
+                    //case BASE_CREATION_MESSAGE:
+                    //case BASE_DESTRUCTION_MESSAGE:
+                    //case FLEET_CREATION_MESSAGE:
+                    //case FLEET_DESTRUCTION_MESSAGE:
+                    //case POCKET_CHANGE_MESSAGE:
+                    //case RANDOM_EVENT_MESSAGE:
+                    //case SIDE_NODE_LIST_MESSAGE:
+                    //case SIDE_NODE_MESSAGE:
 
                 }
 
@@ -66,7 +76,19 @@ public class Client implements MessageFlags{
         });
     }
 
-    public void sendMoveShipMessage(Fleet fleet, int num) {
+    public void sendSetupBaseMessage(Collection<Base> bases) {
+        try {
+            GameClient.getInstance().sendMessage(new SetupBasesMessage(
+                    Phases.getInstance().side,
+                    new ArrayList<>(WorldAccessor.getInstance().getMap().getNodes()),
+                    bases
+            ));
+        } catch (IOException e) {
+            Log.wtf("PATH", e.toString());
+        }
+    }
+
+    /*public void sendMoveShipMessage(Fleet fleet, int num) {
         try {
             GameObject.Side side = fleet.getSide();
             GameClient.getInstance().sendMessage(new MoveShipClientMessage(
@@ -118,9 +140,5 @@ public class Client implements MessageFlags{
         Log.wtf(""+ world.getFleet(firstFleet.getSide(),num).getShipCount(),""+ world.getFleet(secondFleet.getSide(),num2).getShipCount());
         ui.getShipsLayer().repaint();
     }
-
-    private void setSide(GameObject.Side side)
-    {
-
-    }
+*/
 }

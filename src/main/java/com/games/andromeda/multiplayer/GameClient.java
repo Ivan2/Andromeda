@@ -6,21 +6,10 @@ import android.widget.Toast;
 
 import com.games.andromeda.GameActivity;
 import com.games.andromeda.MainActivity;
-import com.games.andromeda.message.BaseCreationMessage;
-import com.games.andromeda.message.BaseDestructionMessage;
 import com.games.andromeda.message.ConnectionCloseServerMessage;
-import com.games.andromeda.message.EndPhaseMessage;
-import com.games.andromeda.message.FightMessage;
-import com.games.andromeda.message.FleetCreationMessage;
-import com.games.andromeda.message.FleetDestructionMessage;
 import com.games.andromeda.message.MessageFlags;
-import com.games.andromeda.message.MoveShipServerMessage;
-import com.games.andromeda.message.PocketChangesMessage;
-import com.games.andromeda.message.RandomEventMessage;
 import com.games.andromeda.message.SetupBasesMessage;
-import com.games.andromeda.message.SetupFleetsMessage;
 import com.games.andromeda.message.SideMessage;
-import com.games.andromeda.message.StartGameMessage;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
@@ -83,7 +72,7 @@ public class GameClient implements Runnable,MessageFlags {
                 }
             });
 
-            connector.registerServerMessage(FLAG_MESSAGE_SERVER_SHOW, MoveShipServerMessage.class,
+            /*connector.registerServerMessage(FLAG_MESSAGE_SERVER_SHOW, MoveShipServerMessage.class,
                     new IServerMessageHandler<SocketConnection>() {
                 @Override
                 public void onHandleMessage(ServerConnector<SocketConnection> pServerConnector,
@@ -100,8 +89,6 @@ public class GameClient implements Runnable,MessageFlags {
                         @Override
                         public void onHandleMessage(ServerConnector<SocketConnection> pServerConnector,
                                                     IServerMessage pServerMessage) throws IOException {
-                            Intent start = new Intent(activity, GameActivity.class);
-                            activity.startActivity(start);
                         }
                     });
             connector.registerServerMessage(END_PHASE_MESSAGE, EndPhaseMessage.class, new IServerMessageHandler<SocketConnection>() {
@@ -117,15 +104,21 @@ public class GameClient implements Runnable,MessageFlags {
                     if (messageReceiver != null)
                         messageReceiver.onMessageReceive(FIGHT_MESSAGE, iServerMessage);
                 }
-            });
+            });*/
             connector.registerServerMessage(SIDE_MESSAGE, SideMessage.class, new IServerMessageHandler<SocketConnection>() {
                 @Override
                 public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
+                    Intent start = new Intent(activity, GameActivity.class);
+                    activity.startActivity(start);
                     if (messageReceiver != null)
                         messageReceiver.onMessageReceive(SIDE_MESSAGE, iServerMessage);
+                    else {
+                        Client.getInstance();
+                        messageReceiver.onMessageReceive(SIDE_MESSAGE, iServerMessage);
+                    }
                 }
             });
-            connector.registerServerMessage(BASE_CREATION_MESSAGE, BaseCreationMessage.class, new IServerMessageHandler<SocketConnection>() {
+            /*connector.registerServerMessage(BASE_CREATION_MESSAGE, BaseCreationMessage.class, new IServerMessageHandler<SocketConnection>() {
                 @Override
                 public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
                     if (messageReceiver != null)
@@ -166,7 +159,7 @@ public class GameClient implements Runnable,MessageFlags {
                     if (messageReceiver != null)
                         messageReceiver.onMessageReceive(RANDOM_EVENT_MESSAGE, iServerMessage);
                 }
-            });
+            });*/
             connector.registerServerMessage(SETUP_BASE_MESSAGE, SetupBasesMessage.class, new IServerMessageHandler<SocketConnection>() {
                 @Override
                 public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
@@ -174,13 +167,13 @@ public class GameClient implements Runnable,MessageFlags {
                         messageReceiver.onMessageReceive(SETUP_BASE_MESSAGE, iServerMessage);
                 }
             });
-            connector.registerServerMessage(SETUP_FLEET_MESSAGE, SetupFleetsMessage.class, new IServerMessageHandler<SocketConnection>() {
+            /*connector.registerServerMessage(SETUP_FLEET_MESSAGE, SetupFleetsMessage.class, new IServerMessageHandler<SocketConnection>() {
                 @Override
                 public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
                     if (messageReceiver != null)
                         messageReceiver.onMessageReceive(SETUP_FLEET_MESSAGE, iServerMessage);
                 }
-            });
+            });*/
             connector.getConnection().start();
         } catch (Throwable t) {
             Debug.e(t);

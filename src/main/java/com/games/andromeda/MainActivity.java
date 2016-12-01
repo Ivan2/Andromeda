@@ -29,7 +29,7 @@ import java.net.UnknownHostException;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int SERVER_PORT = 4444;
+    private static final int SERVER_PORT = 8686;
     private static final String LOCALHOST_IP = "127.0.0.1";
     private static final short FLAG_MESSAGE_SERVER_SHOW = 1;
 

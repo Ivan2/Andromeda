@@ -1,43 +1,52 @@
 package com.games.andromeda.threads;
 
-import android.app.Activity;
+public abstract class GameTimer {
 
-import com.games.andromeda.ui.hud.PanelHUD;
+    public abstract void onTime(int time);
 
-public class GameTimer implements Runnable {
     private int time;
-    private PanelHUD hud;
-    private Activity activity;
     private int delay;
+    private Thread thread;
 
-    public GameTimer(Activity activity, PanelHUD hud, int time, int delay) {
+    public GameTimer(int time, int delay) {
         this.time = time;
-        this.hud = hud;
-        this.activity = activity;
         this.delay = delay;
+        createThread();
+        thread.setDaemon(true);
+        thread.start();
     }
 
-    public GameTimer(Activity activity, PanelHUD hud){
-        this(activity, hud, 59, 1000);
+    public GameTimer(){
+        this(50, 1000);
     }
 
-    @Override
-    public void run() {
-        while (true) {
-            try {
-                Thread.sleep(delay);
-            } catch (InterruptedException e) {
-                break;
-            }
-            time--;
-            if (time == -1)
-                time = 59;
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    hud.repaintTime(time);
+    public void restart() {
+        time = 50;
+    }
+
+    public void stop() {
+        time = 0;
+        onTime(0);
+    }
+
+    private void createThread() {
+        thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(delay);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+
+                    if (time > 0) {
+                        time--;
+                        onTime(time);
+                    }
                 }
-            });
-        }
+            }
+        });
     }
+
 }

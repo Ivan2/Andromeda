@@ -8,4 +8,5 @@ public interface HandlingStrategy<TParam, TOut> {
     boolean applyChanges(); // вызывать, если игрок завершает фазу. true - фаза успешно завершена, false - ход невозможен
     void autoApplyChanges(); // вызывать, если у игрока вышло время и надо завершить ход автоматически
     GameObject.Side getSide();
+    String getTextDescription();
 }

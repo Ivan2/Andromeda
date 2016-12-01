@@ -1,7 +1,6 @@
 package com.games.andromeda.logic;
 
-import android.util.Log;
-
+import com.games.andromeda.Phases;
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;
 
@@ -71,8 +70,21 @@ public class WorldAccessor {
         return map;
     }
 
-    public void setBase(Base base){
-        bases.put(base.getNode(), base);
+    public void setBase(Base base) {
+        Collection<Node> nodes = getMap().getNodes();
+        Node node = null;
+        for (Node n : nodes)
+            if (n.equals(base.getNode())) {//TODO добавить в Node id и сравнивать по id, а не по координатам
+                node = n;
+                break;
+            }
+        if (node == null)
+            node = base.getNode();
+        bases.put(node, base);
+        if (base.getSide() == Phases.getInstance().side)
+            node.setSystemType(Node.SystemType.FRIENDLY);
+        else
+            node.setSystemType(Node.SystemType.ENEMY);
         for(BaseObserver observer: baseObservers){
             observer.onBaseChanged(base);
         }

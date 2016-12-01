@@ -1,30 +1,13 @@
 package com.games.andromeda.multiplayer;
 
-import android.util.Log;
-
 import com.games.andromeda.MainActivity;
-import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
-import com.games.andromeda.message.BaseCreationMessage;
-import com.games.andromeda.message.BaseDestructionMessage;
-import com.games.andromeda.message.EndPhaseMessage;
-import com.games.andromeda.message.FightMessage;
-import com.games.andromeda.message.FleetCreationMessage;
-import com.games.andromeda.message.FleetDestructionMessage;
 import com.games.andromeda.message.MessageFlags;
-import com.games.andromeda.message.MoveShipClientMessage;
-import com.games.andromeda.message.MoveShipServerMessage;
-import com.games.andromeda.message.PocketChangesMessage;
-import com.games.andromeda.message.RandomEventMessage;
 import com.games.andromeda.message.SetupBasesMessage;
-import com.games.andromeda.message.SetupFleetsMessage;
 import com.games.andromeda.message.SideMessage;
-import com.games.andromeda.message.StartGameMessage;
+import com.games.andromeda.ui.UI;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
-import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
-import org.andengine.extension.multiplayer.protocol.client.IServerMessageHandler;
-import org.andengine.extension.multiplayer.protocol.client.connector.ServerConnector;
 import org.andengine.extension.multiplayer.protocol.server.IClientMessageHandler;
 import org.andengine.extension.multiplayer.protocol.server.SocketServer;
 import org.andengine.extension.multiplayer.protocol.server.connector.ClientConnector;
@@ -34,11 +17,10 @@ import org.andengine.util.debug.Debug;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
-public class ServerCreator implements MessageFlags{
+public class ServerCreator implements MessageFlags {
 
     private SocketServer<SocketConnectionClientConnector> server;
     private MainActivity activity;
@@ -57,7 +39,8 @@ public class ServerCreator implements MessageFlags{
             @Override
             protected SocketConnectionClientConnector newClientConnector(final SocketConnection pSocketConnection) throws IOException {
                 SocketConnectionClientConnector connector = new SocketConnectionClientConnector(pSocketConnection);
-                connector.registerClientMessage(FLAG_MESSAGE_CLIENT_SHOW, MoveShipClientMessage.class, new IClientMessageHandler<SocketConnection>() {
+
+                /*connector.registerClientMessage(FLAG_MESSAGE_CLIENT_SHOW, MoveShipClientMessage.class, new IClientMessageHandler<SocketConnection>() {
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> pClientConnector, IClientMessage pClientMessage) throws IOException {
                         try {
@@ -207,7 +190,7 @@ public class ServerCreator implements MessageFlags{
                             e.printStackTrace();
                         }
                     }
-                });
+                });*/
                 connector.registerClientMessage(SETUP_BASE_MESSAGE, SetupBasesMessage.class, new IClientMessageHandler<SocketConnection>() {
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
@@ -224,7 +207,7 @@ public class ServerCreator implements MessageFlags{
                         }
                     }
                 });
-                connector.registerClientMessage(SETUP_FLEET_MESSAGE, SetupFleetsMessage.class, new IClientMessageHandler<SocketConnection>() {
+                /*connector.registerClientMessage(SETUP_FLEET_MESSAGE, SetupFleetsMessage.class, new IClientMessageHandler<SocketConnection>() {
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
                         try {
@@ -239,7 +222,7 @@ public class ServerCreator implements MessageFlags{
                             e.printStackTrace();
                         }
                     }
-                });
+                });*/
                 return connector;
             }
         };
@@ -276,7 +259,7 @@ public class ServerCreator implements MessageFlags{
                     int rand = random.nextInt(2);
                     int i = 0;
                     for (ClientConnector client : clients) {
-                        client.sendServerMessage(new StartGameMessage());
+                        //client.sendServerMessage(new StartGameMessage());
                         if (i == rand) {
                             client.sendServerMessage(new SideMessage(GameObject.Side.EMPIRE));
                             empire = client;

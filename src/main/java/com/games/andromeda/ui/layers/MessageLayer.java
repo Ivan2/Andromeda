@@ -24,13 +24,17 @@ public class MessageLayer extends DialogLayer {
         setVisibility(true);
     }
 
+    public void hide() {
+        setVisibility(false);
+    }
+
     @Override
     public void repaint() {
         Text text = new Text(0, 0, textureLoader.loadDialogTexture(), msg, vertexBufferObjectManager);
         text.setColor(1, 1, 1);
         contentLayer.attachChild(text);
-        text.setX(camera.getCenterX()-text.getWidth()/2);
-        text.setY(camera.getCenterY()-text.getHeight()/2);
+        text.setX((contentLayer.getWidth()-text.getWidth())/2);
+        text.setY((contentLayer.getHeight()-text.getHeight())/2);
     }
 
 }

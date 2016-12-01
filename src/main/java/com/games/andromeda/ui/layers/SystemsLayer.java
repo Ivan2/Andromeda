@@ -18,7 +18,6 @@ import org.andengine.util.color.Color;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Random;
 
 public class SystemsLayer extends Layer {
 
@@ -65,10 +64,31 @@ public class SystemsLayer extends Layer {
         Iterator<Node> nodeIterator = nodes.iterator();
         while (nodeIterator.hasNext()) {
             final Node node = nodeIterator.next();
-            if (node.getSystemType().ordinal() < 3)
-                node.setSystemType(Node.SystemType.values()[new Random().nextInt(3)]);
             float size = 100;
             PointF pos = getPos(node.getX(), node.getY());
+
+            //TODO цвет системы по наличию базы?
+            /*ITextureRegion textureRegion;
+            if (node.getSystemType() == Node.SystemType.MINI || node.getSystemType() == Node.SystemType.HYPER)
+                textureRegion = systemTextures.get(node.getSystemType());
+            else {
+                Collection<Base> bases = WorldAccessor.getInstance().getBases();
+                Base base = null;
+                for (Base b : bases)
+                    if (b.getNode().equals(node)) {
+                        base = b;
+                        break;
+                    }
+                if (base == null)
+                    textureRegion = systemTextures.get(Node.SystemType.EMPTY);
+                else {
+                    if (base.getSide() == Phases.getInstance().side)
+                        textureRegion = systemTextures.get(Node.SystemType.FRIENDLY);
+                    else
+                        textureRegion = systemTextures.get(Node.SystemType.ENEMY);
+                }
+            }*/
+
             Sprite sprite = new SystemSprite(node, pos.x - size / 2, pos.y - size / 2,
                     systemTextures.get(node.getSystemType()), vertexBufferObjectManager) {
 

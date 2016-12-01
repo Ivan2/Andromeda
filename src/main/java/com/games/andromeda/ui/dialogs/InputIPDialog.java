@@ -11,6 +11,7 @@ public abstract class InputIPDialog {
 
     public void show(Context context) {
         final EditText ipEditText = new EditText(context);
+        ipEditText.setText("192.168.1.230");
         AlertDialog dialog = new AlertDialog.Builder(context)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setTitle("Enter Server-IP ...")

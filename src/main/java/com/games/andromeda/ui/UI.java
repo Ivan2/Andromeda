@@ -1,15 +1,16 @@
 package com.games.andromeda.ui;
 
 import android.app.Activity;
+import android.widget.Toast;
 
 import com.games.andromeda.GameActivity;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.graph.PathManager;
 import com.games.andromeda.logic.WorldAccessor;
-import com.games.andromeda.threads.GameTimer;
 import com.games.andromeda.threads.Scrolling;
 import com.games.andromeda.ui.hud.PanelHUD;
 import com.games.andromeda.ui.layers.BackgroundLayer;
+import com.games.andromeda.ui.layers.MessageLayer;
 import com.games.andromeda.ui.layers.ShipsLayer;
 import com.games.andromeda.ui.layers.SystemInfoLayer;
 import com.games.andromeda.ui.layers.SystemsLayer;
@@ -23,16 +24,43 @@ import org.andengine.util.color.Color;
 
 public class UI {
 
+    public static void toast(final String msg) {
+        if (getInstance() != null && getInstance().activity != null)
+            getInstance().activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getInstance().activity, msg, Toast.LENGTH_LONG).show();
+                }
+            });
+    }
+
+    private static UI instance;
+
+    public static void createInstance(Activity activity, Scene scene, Camera camera, TextureLoader textureLoader,
+                                      VertexBufferObjectManager vertexBufferObjectManager, WorldAccessor world,
+                                      ShipsLayer.IOnFleetMove onFleetMove,ShipsLayer.IOnFleetFight onFleetFight) {
+        instance = new UI(activity, scene, camera, textureLoader, vertexBufferObjectManager,
+                world, onFleetMove, onFleetFight);
+    }
+
+    public static UI getInstance() {
+        return instance;
+    }
+
     private PathManager manager;
     private PanelHUD panel;
     private final BackgroundLayer backgroundLayer;
     private final SystemsLayer systemsLayer;
     private final ShipsLayer shipsLayer;
     private final SystemInfoLayer systemInfoLayer;
+    private final MessageLayer messageLayer;
 
-    public UI(Activity activity, Scene scene, Camera camera, TextureLoader textureLoader,
+    public Activity activity;
+
+    private UI(Activity activity, Scene scene, Camera camera, TextureLoader textureLoader,
               VertexBufferObjectManager vertexBufferObjectManager, WorldAccessor world,
               ShipsLayer.IOnFleetMove onFleetMove,ShipsLayer.IOnFleetFight onFleetFight) {
+        this.activity = activity;
         manager = new PathManager();
 
         scene.setBackground(new Background(Color.BLACK));
@@ -56,8 +84,8 @@ public class UI {
         shipsLayer.repaint();
 
         //слой с сообщением
-        //MessageLayer messageLayer = new MessageLayer(scene, camera, textureLoader,
-        //        vertexBufferObjectManager);
+        messageLayer = new MessageLayer(activity.getResources(), scene, camera, textureLoader,
+                vertexBufferObjectManager);
 
         //слой с вопросом
         systemInfoLayer =
@@ -93,9 +121,6 @@ public class UI {
 
         panel = new PanelHUD(camera, textureLoader, vertexBufferObjectManager,
                 activity.getResources());
-        Thread timeThread = new Thread(new GameTimer(activity, panel));
-        timeThread.setDaemon(true);
-        timeThread.start();
 
         Scrolling scrolling = new Scrolling(camera, GameActivity.SCREEN_WIDTH, GameActivity.SCREEN_HEIGHT,
                 (int)camera.getWidth()/2, (int)camera.getHeight()/2, shipsLayer);
@@ -106,10 +131,25 @@ public class UI {
         thread.start();
     }
 
+    public void setEnabled(boolean enabled) {
+        if (enabled) {
+            messageLayer.show("Ход противника");
+        } else {
+            messageLayer.hide();
+        }
+    }
+
+    public void setPhaseName(String phaseName) {
+        panel.setPhaseName(phaseName);
+    }
+
     public void repaintHUD() {
         panel.repaint();
     }
 
+    public void repaintTimer(int time) {
+        panel.repaintTime(time);
+    }
 
     public BackgroundLayer getBackgroundLayer() {
         return backgroundLayer;

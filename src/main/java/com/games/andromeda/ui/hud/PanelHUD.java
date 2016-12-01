@@ -3,6 +3,7 @@ package com.games.andromeda.ui.hud;
 import android.content.res.Resources;
 
 import com.games.andromeda.GameActivity;
+import com.games.andromeda.Phases;
 import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.R;
 import com.games.andromeda.logic.Fleet;
@@ -13,19 +14,24 @@ import com.games.andromeda.ui.texture.TextureLoader;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.primitive.Rectangle;
+import org.andengine.entity.sprite.ButtonSprite;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
+import org.andengine.util.HorizontalAlign;
 import org.andengine.util.color.Color;
 
 public class PanelHUD {
 
+    private HUD hud;
     private Text timerText;
     private Rectangle rectangleVertical;
     private Rectangle rectangleHorizontal;
     private TextureLoader textureLoader;
     private VertexBufferObjectManager vertexBufferObjectManager;
+
+    private String phaseName;
 
     public PanelHUD(Camera camera, TextureLoader textureLoader,
                     VertexBufferObjectManager vertexBufferObjectManager, Resources resources) {
@@ -44,12 +50,17 @@ public class PanelHUD {
                 vertexBufferObjectManager);
         rectangleHorizontal.setColor(Color.TRANSPARENT);
 
-        repaint();
-
-        HUD hud = new HUD();
+        hud = new HUD();
         hud.attachChild(rectangleVertical);
         hud.attachChild(rectangleHorizontal);
         camera.setHUD(hud);
+
+        repaint();
+    }
+
+    public void setPhaseName(String phaseName) {
+        this.phaseName = phaseName;
+        repaint();
     }
 
     public void repaintTime(int time) {
@@ -112,16 +123,41 @@ public class PanelHUD {
 
         Font font = textureLoader.loadSubtitleDialogTexture();
 
+        ButtonSprite endPhaseButton = new ButtonSprite(0, 0,
+                textureLoader.loadEmptyTexture(android.graphics.Color.argb(20, 255, 255, 255)),
+                vertexBufferObjectManager);
+        endPhaseButton.setOnClickListener(new ButtonSprite.OnClickListener() {
+            @Override
+            public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+                Phases.getInstance().clientEndPhase();
+            }
+        });
+        hud.registerTouchArea(endPhaseButton);
+
+        float margin = PxDpConverter.dpToPx(5);
+
+        Text endPhaseText = new Text(0, 0, textureLoader.loadDialogTexture(), "End", vertexBufferObjectManager);
+        endPhaseText.setColor(1, 1, 1);
+        endPhaseText.setHorizontalAlign(HorizontalAlign.CENTER);
+        endPhaseButton.attachChild(endPhaseText);
+        endPhaseButton.setSize(endPhaseText.getWidth()*2, rectangleHorizontal.getHeight()-margin*2);
+        endPhaseText.setPosition((endPhaseButton.getWidth() - endPhaseText.getWidth())/2,
+                (endPhaseButton.getHeight() - endPhaseText.getHeight())/2);
+
+        endPhaseButton.setPosition(GameActivity.SCREEN_WIDTH-endPhaseButton.getWidth()-margin*2, margin);
+
+
         Text phaseText = new Text(0,
                 (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
-                font, "Фаза 1. ............", vertexBufferObjectManager);
-        phaseText.setX(GameActivity.SCREEN_WIDTH-phaseText.getWidth()-10);
+                font, "Фаза "+phaseName, vertexBufferObjectManager);
+        phaseText.setX(endPhaseButton.getX()-phaseText.getWidth()-margin*4);
 
         timerText = new Text(0,
                 (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
                 font, "00:45", vertexBufferObjectManager);
-        timerText.setX(phaseText.getX()-timerText.getWidth()-20);
+        timerText.setX(phaseText.getX()-timerText.getWidth()-margin*4);
 
+        rectangleHorizontal.attachChild(endPhaseButton);
         rectangleHorizontal.attachChild(phaseText);
         rectangleHorizontal.attachChild(timerText);
     }

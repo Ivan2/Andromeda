@@ -2,15 +2,13 @@ package com.games.andromeda;
 
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.widget.Toast;
 
-import com.games.andromeda.graph.Node;
 import com.games.andromeda.level.LevelLoader;
-import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
-import com.games.andromeda.logic.GameObject;
-import com.games.andromeda.logic.Pocket;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.multiplayer.Client;
+import com.games.andromeda.threads.GameTimer;
 import com.games.andromeda.ui.UI;
 import com.games.andromeda.ui.layers.ShipsLayer;
 import com.games.andromeda.ui.texture.TextureLoader;
@@ -23,7 +21,6 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 public class GameActivity extends SimpleBaseGameActivity{
 
@@ -79,25 +76,35 @@ public class GameActivity extends SimpleBaseGameActivity{
         ShipsLayer.IOnFleetMove onFleetMove = new ShipsLayer.IOnFleetMove() {
             @Override
             public void onFleetMove(Fleet fleet,int num) {
-                client.sendMoveShipMessage(fleet,num);
+                //client.sendMoveShipMessage(fleet,num);
             }
         };
         ShipsLayer.IOnFleetFight onFleetFight = new ShipsLayer.IOnFleetFight() {
             @Override
             public void onFleetFight(Fleet attackingFleet,  Fleet anotherFleet, int number, int secondNumber) {
-                client.sendFightMessage(attackingFleet.getSide(),attackingFleet,anotherFleet,number,secondNumber);
+                //client.sendFightMessage(attackingFleet.getSide(),attackingFleet,anotherFleet,number,secondNumber);
 
             }
         };
 
 
-        UI ui = new UI(this, scene, camera, textureLoader, mEngine.getVertexBufferObjectManager(),
+        UI.createInstance(this, scene, camera, textureLoader, mEngine.getVertexBufferObjectManager(),
                 world, onFleetMove,onFleetFight);
-        client = new Client(ui);
 
+        GameTimer gameTimer = new GameTimer() {
+            @Override
+            public void onTime(final int time) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        UI.getInstance().repaintTimer(time);
+                    }
+                });
+            }
+        };
 
         //generate bases and fleets
-        Pocket pocket = world.getPocket(GameObject.Side.EMPIRE);
+        /*Pocket pocket = world.getPocket(GameObject.Side.EMPIRE);
         pocket.increase(100500);
 
         Iterator<Node> iter = world.getMap().getNodes().iterator();
@@ -126,7 +133,15 @@ public class GameActivity extends SimpleBaseGameActivity{
         } catch (Exception e) {
             Log.wtf("my stupid exception: ", e.toString());
         }
-        ui.repaintHUD();
+        ui.repaintHUD();*/
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(GameActivity.this, Phases.getInstance().side+"", Toast.LENGTH_SHORT).show();
+            }
+        });
+        Phases.getInstance().startGame(gameTimer);
 
         return scene;
     }
