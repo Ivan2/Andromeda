@@ -66,7 +66,7 @@ public class FleetPreparationStrategy extends ListStrategy<Node, Boolean> {
         }
 
         UI.getInstance().getShipsLayer().repaint();
-        UI.getInstance().repaintHUD();
+        UI.getInstance().repaintShipInfo();
         Client.getInstance().sendSetupFleetMessage(fleets);
     }
 }

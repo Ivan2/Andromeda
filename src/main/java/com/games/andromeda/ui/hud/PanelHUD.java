@@ -7,7 +7,6 @@ import com.games.andromeda.Phases;
 import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.R;
 import com.games.andromeda.logic.Fleet;
-import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.ui.texture.TextureLoader;
 
@@ -25,13 +24,21 @@ import org.andengine.util.color.Color;
 public class PanelHUD {
 
     private HUD hud;
-    private Text timerText;
     private Rectangle rectangleVertical;
     private Rectangle rectangleHorizontal;
     private TextureLoader textureLoader;
     private VertexBufferObjectManager vertexBufferObjectManager;
 
-    private String phaseName;
+    private float margin = PxDpConverter.dpToPx(5);
+    private float size = PxDpConverter.dpToPx(30);
+    private float progressHeight = PxDpConverter.dpToPx(4);
+    private float gap = PxDpConverter.dpToPx(2);
+    private Rectangle[] shipSprites;
+    private Sprite[] shipEnergySprites;
+    private Text[] shipCountTexts;
+    private ButtonSprite endPhaseButton;
+    private Text phaseText;
+    private Text timerText;
 
     public PanelHUD(Camera camera, TextureLoader textureLoader,
                     VertexBufferObjectManager vertexBufferObjectManager, Resources resources) {
@@ -55,75 +62,31 @@ public class PanelHUD {
         hud.attachChild(rectangleHorizontal);
         camera.setHUD(hud);
 
-        repaint();
+        createGUI();
+        repaintShipInfo();
     }
 
-    public void setPhaseName(String phaseName) {
-        this.phaseName = phaseName;
-        repaint();
-    }
-
-    public void repaintTime(int time) {
-        timerText.setText("00:"+(time<10?"0"+time:time));
-    }
-
-    public void repaint() {
-        rectangleVertical.detachChildren();
-        rectangleHorizontal.detachChildren();
-
-        WorldAccessor world = WorldAccessor.getInstance();
-        Fleet fleet1 = world.getFleet(GameObject.Side.FEDERATION, 1);
-        Fleet fleet2 = world.getFleet(GameObject.Side.FEDERATION, 2);
-        Fleet fleet3 = world.getFleet(GameObject.Side.FEDERATION, 3);
-        Fleet fleet4 = world.getFleet(GameObject.Side.EMPIRE, 1);
-        Fleet fleet5 = world.getFleet(GameObject.Side.EMPIRE, 2);
-        Fleet fleet6 = world.getFleet(GameObject.Side.EMPIRE, 3);
-
-        Rectangle ship1Sprite = createFleetSprite("red", fleet1==null?0:fleet1.getEnergy(),
-                fleet1==null?0:fleet1.getShipCount(),
-                textureLoader, vertexBufferObjectManager);
-        ship1Sprite.setPosition(PxDpConverter.dpToPx(4),
-                PxDpConverter.dpToPx(20));
-        rectangleVertical.attachChild(ship1Sprite);
-
-        Rectangle ship2Sprite = createFleetSprite("gray", fleet2==null?0:fleet2.getEnergy(),
-                fleet2==null?0:fleet2.getShipCount(),
-                textureLoader, vertexBufferObjectManager);
-        ship2Sprite.setPosition(ship1Sprite.getX(),
-                ship1Sprite.getY()+ship1Sprite.getHeight()+PxDpConverter.dpToPx(10));
-        rectangleVertical.attachChild(ship2Sprite);
-
-        Rectangle ship3Sprite = createFleetSprite("blue", fleet3==null?0:fleet3.getEnergy(),
-                fleet3==null?0:fleet3.getShipCount(),
-                textureLoader, vertexBufferObjectManager);
-        ship3Sprite.setPosition(ship1Sprite.getX(),
-                ship2Sprite.getY()+ship2Sprite.getHeight()+PxDpConverter.dpToPx(10));
-        rectangleVertical.attachChild(ship3Sprite);
-
-        Rectangle ship4Sprite = createFleetSprite("brown", fleet4==null?0:fleet4.getEnergy(),
-                fleet4==null?0:fleet4.getShipCount(),
-                textureLoader, vertexBufferObjectManager);
-        ship4Sprite.setPosition(ship1Sprite.getX(),
-                ship3Sprite.getY()+ship3Sprite.getHeight()+PxDpConverter.dpToPx(30));
-        rectangleVertical.attachChild(ship4Sprite);
-
-        Rectangle ship5Sprite = createFleetSprite("pink", fleet5==null?0:fleet5.getEnergy(),
-                fleet5==null?0:fleet5.getShipCount(),
-                textureLoader, vertexBufferObjectManager);
-        ship5Sprite.setPosition(ship1Sprite.getX(),
-                ship4Sprite.getY()+ship4Sprite.getHeight()+PxDpConverter.dpToPx(10));
-        rectangleVertical.attachChild(ship5Sprite);
-
-        Rectangle ship6Sprite = createFleetSprite("green", fleet6==null?0:fleet6.getEnergy(),
-                fleet6==null?0:fleet6.getShipCount(),
-                textureLoader, vertexBufferObjectManager);
-        ship6Sprite.setPosition(ship1Sprite.getX(),
-                ship5Sprite.getY()+ship5Sprite.getHeight()+PxDpConverter.dpToPx(10));
-        rectangleVertical.attachChild(ship6Sprite);
+    private void createGUI() {
+        float top = 0;
+        float left = PxDpConverter.dpToPx(4);
+        String[] colors = new String[]{"red", "gray", "blue", "brown", "pink", "green"};
+        shipSprites = new Rectangle[6];
+        shipCountTexts = new Text[6];
+        shipEnergySprites = new Sprite[6];
+        for (int i=0; i<6; i++) {
+            shipSprites[i] = createFleetSprite(i, colors[i],
+                    textureLoader, vertexBufferObjectManager);
+            top += PxDpConverter.dpToPx(10);
+            if (i % 3 == 0)
+                top += PxDpConverter.dpToPx(10);
+            shipSprites[i].setPosition(left, top);
+            top += shipSprites[i].getHeight();
+            rectangleVertical.attachChild(shipSprites[i]);
+        }
 
         Font font = textureLoader.loadSubtitleDialogTexture();
 
-        ButtonSprite endPhaseButton = new ButtonSprite(0, 0,
+        endPhaseButton = new ButtonSprite(0, 0,
                 textureLoader.loadEmptyTexture(android.graphics.Color.argb(20, 255, 255, 255)),
                 vertexBufferObjectManager);
         endPhaseButton.setOnClickListener(new ButtonSprite.OnClickListener() {
@@ -134,7 +97,6 @@ public class PanelHUD {
         });
         hud.registerTouchArea(endPhaseButton);
 
-        float margin = PxDpConverter.dpToPx(5);
 
         Text endPhaseText = new Text(0, 0, textureLoader.loadDialogTexture(), "End", vertexBufferObjectManager);
         endPhaseText.setColor(1, 1, 1);
@@ -147,32 +109,53 @@ public class PanelHUD {
         endPhaseButton.setPosition(GameActivity.SCREEN_WIDTH-endPhaseButton.getWidth()-margin*2, margin);
 
 
-        Text phaseText = new Text(0,
-                (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
-                font, "Фаза "+phaseName, vertexBufferObjectManager);
-        phaseText.setX(endPhaseButton.getX()-phaseText.getWidth()-margin*4);
-
         timerText = new Text(0,
                 (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
                 font, "00:45", vertexBufferObjectManager);
-        timerText.setX(phaseText.getX()-timerText.getWidth()-margin*4);
+        timerText.setX(endPhaseButton.getX()-timerText.getWidth()-margin*4);
+
+        phaseText = new Text(0,
+                (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
+                font, "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyz1234567890",
+                vertexBufferObjectManager);
+        phaseText.setX(timerText.getX()-phaseText.getWidth()-margin*4);
+
 
         rectangleHorizontal.attachChild(endPhaseButton);
-        rectangleHorizontal.attachChild(phaseText);
         rectangleHorizontal.attachChild(timerText);
+        rectangleHorizontal.attachChild(phaseText);
     }
 
-    private Rectangle createFleetSprite(String color, float energy, int count,
-                                        TextureLoader textureLoader,
+    public void repaintPhaseName(String phaseName) {
+        phaseText.setText("Фаза " + phaseName);
+        phaseText.setX(timerText.getX()-phaseText.getWidth()-margin*4);
+    }
+
+    public void repaintTime(int time) {
+        timerText.setText("00:"+(time<10?"0"+time:time));
+    }
+
+    public void repaintShipInfo() {
+        WorldAccessor world = WorldAccessor.getInstance();
+        Fleet[] fleets = world.getAllFleets();
+        for (int i=0; i<fleets.length; i++)
+            if (fleets[i] != null) {
+                shipCountTexts[i].setText(fleets[i].getShipCount()+"");
+                shipEnergySprites[i].setWidth(size*fleets[i].getEnergy());
+            } else {
+                shipCountTexts[i].setText("0");
+                shipEnergySprites[i].setWidth(0);
+            }
+    }
+
+    private Rectangle createFleetSprite(int ind, String color, TextureLoader textureLoader,
                                         VertexBufferObjectManager vertexBufferObjectManager) {
-        float size = PxDpConverter.dpToPx(30);
-        float progressHeight = PxDpConverter.dpToPx(4);
-        float gap = PxDpConverter.dpToPx(2);
 
         Font font = textureLoader.loadPanelTexture();
-        Text text = new Text(0, 0, font, count+"", vertexBufferObjectManager);
 
-        Rectangle rectangle = new Rectangle(0, 0, size+gap+text.getWidth(), size+progressHeight+gap,
+        shipCountTexts[ind] = new Text(0, 0, font, "00", vertexBufferObjectManager);
+
+        Rectangle rectangle = new Rectangle(0, 0, size+gap+size/2, size+progressHeight+gap,
                 vertexBufferObjectManager);
         rectangle.setColor(Color.TRANSPARENT);
 
@@ -187,14 +170,15 @@ public class PanelHUD {
         shipMaxEnergySprite.setSize(size, progressHeight);
         rectangle.attachChild(shipMaxEnergySprite);
 
-        Sprite shipEnergySprite = new Sprite(0, 0,
+        shipEnergySprites[ind] = new Sprite(0, 0,
                 textureLoader.loadEmptyTexture(android.graphics.Color.BLUE),
                 vertexBufferObjectManager);
-        shipEnergySprite.setSize(size*energy, progressHeight);
-        rectangle.attachChild(shipEnergySprite);
+        shipEnergySprites[ind].setSize(0, progressHeight);
+        rectangle.attachChild(shipEnergySprites[ind]);
 
-        text.setPosition(rectangle.getWidth()-text.getWidth(), rectangle.getHeight()-text.getHeight());
-        rectangle.attachChild(text);
+        shipCountTexts[ind].setPosition(shipSprite.getWidth()+gap,
+                rectangle.getHeight()-shipCountTexts[ind].getHeight());
+        rectangle.attachChild(shipCountTexts[ind]);
 
         return rectangle;
     }

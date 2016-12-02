@@ -4,6 +4,8 @@ import android.content.res.Resources;
 
 import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.graph.Node;
+import com.games.andromeda.logic.Fleet;
+import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.ui.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
@@ -12,9 +14,13 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.ButtonSprite;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
+import org.andengine.opengl.font.Font;
+import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.HorizontalAlign;
 import org.andengine.util.color.Color;
+
+import java.util.ArrayList;
 
 public abstract class SystemInfoLayer extends DialogLayer {
 
@@ -110,7 +116,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
     }
 
     private void createEmptySystem(Rectangle parent) {
-        float margin = PxDpConverter.dpToPx(50);
+        float margin = PxDpConverter.dpToPx(20);
 
         ///Создание кнопки постройки базы
         ButtonSprite buildButton = new ButtonSprite(0, 0, textureLoader.loadBuildTexture(),
@@ -140,68 +146,91 @@ public abstract class SystemInfoLayer extends DialogLayer {
         parent.attachChild(systemSprite);
 
 
-        float shipRowHeight = PxDpConverter.dpToPx(150);
-        Rectangle shipRow1 = new Rectangle(parent.getWidth()/2+margin,
-                margin,
-                parent.getWidth()/2-margin*2,
-                shipRowHeight,
+        float shipRowHeight = PxDpConverter.dpToPx(90);
+
+        ArrayList<Fleet> fleets = new ArrayList<>(3);
+        for (Fleet fleet : WorldAccessor.getInstance().getAllFleets())
+            if (fleet != null && fleet.getPosition().equals(node))
+                fleets.add(fleet);
+
+        for (int i=0; i<fleets.size(); i++) {
+            Fleet fleet = fleets.get(i);
+
+            Rectangle shipRow = new Rectangle(
+                    parent.getWidth()/2+margin,
+                    margin*(i+1)+shipRowHeight*i,
+                    parent.getWidth()/2-margin*2,
+                    shipRowHeight,
+                    vertexBufferObjectManager
+            );
+            shipRow.setColor(Color.TRANSPARENT);
+            parent.attachChild(shipRow);
+
+            createShipRow(shipRow, fleet);
+        }
+    }
+
+    private void createShipRow(Rectangle shipRow, Fleet fleet) {
+        float shipSize = PxDpConverter.dpToPx(70);
+
+        Sprite shipSprite = new Sprite(0, (shipRow.getHeight()-shipSize)/2,
+                textureLoader.loadColoredShipTexture("red"),
                 vertexBufferObjectManager);
-        shipRow1.setColor(Color.TRANSPARENT);
-        parent.attachChild(shipRow1);
-        /*if (fleet.getPosition().equals(node)) {
-            float shipSize = PxDpConverter.dpToPx(100);
-            Sprite shipSprite = new Sprite(0, (shipRowHeight-shipSize)/2,
-                    textureLoader.loadColoredShipTexture("red"),
-                    vertexBufferObjectManager);
-            shipSprite.setSize(shipSize, shipSize);
-            shipRow1.attachChild(shipSprite);
+        shipSprite.setSize(shipSize, shipSize);
+        shipRow.attachChild(shipSprite);
 
+        ITextureRegion shipCountTexture = textureLoader.loadColoredShipTexture("red");
+        Sprite shipCountSprite = new Sprite(shipSize+PxDpConverter.dpToPx(20),
+                shipSprite.getY(), shipCountTexture, vertexBufferObjectManager);
+        shipCountSprite.setSize(PxDpConverter.dpToPx(30), PxDpConverter.dpToPx(30));
 
-            ITextureRegion moneyTexture = textureLoader.loadMoneyTexture();
-            Sprite moneySprite = new Sprite(shipSize+PxDpConverter.dpToPx(20),
-                    shipSprite.getY(), moneyTexture, vertexBufferObjectManager);
-            moneySprite.setSize(PxDpConverter.dpToPx(30), PxDpConverter.dpToPx(30));
+        Font font = textureLoader.loadPanelTexture();
+        Text shipCountText = new Text(
+                shipCountSprite.getX()+shipCountSprite.getWidth()+PxDpConverter.dpToPx(10),
+                shipCountSprite.getY(),
+                font,
+                fleet.getShipCount()+"",
+                vertexBufferObjectManager
+        );
 
-            Font font = textureLoader.loadPanelTexture();
-            Text moneyText = new Text(moneySprite.getX()+moneySprite.getWidth()+PxDpConverter.dpToPx(10),
-                    moneySprite.getY(),
-                    font, fleet.getCost()+"", vertexBufferObjectManager);
+        ITextureRegion energyTexture = textureLoader.loadEnergyTexture();
+        Sprite energySprite = new Sprite(shipSize+PxDpConverter.dpToPx(20),
+                shipCountSprite.getY()+shipCountSprite.getHeight()+PxDpConverter.dpToPx(10),
+                energyTexture, vertexBufferObjectManager);
+        energySprite.setSize(PxDpConverter.dpToPx(30), PxDpConverter.dpToPx(30));
 
-            ITextureRegion energyTexture = textureLoader.loadEnergyTexture();
-            Sprite energySprite = new Sprite(shipSize+PxDpConverter.dpToPx(20),
-                    moneySprite.getY()+moneySprite.getHeight()+PxDpConverter.dpToPx(10),
-                    energyTexture, vertexBufferObjectManager);
-            energySprite.setSize(PxDpConverter.dpToPx(30), PxDpConverter.dpToPx(30));
+        Text energyText = new Text(
+                energySprite.getX()+energySprite.getWidth()+PxDpConverter.dpToPx(10),
+                energySprite.getY(),
+                font,
+                fleet.getEnergy()+"",
+                vertexBufferObjectManager
+        );
 
-            Text energyText = new Text(energySprite.getX()+energySprite.getWidth()+PxDpConverter.dpToPx(10),
-                    energySprite.getY(),
-                    font, "100", vertexBufferObjectManager);
+        shipRow.attachChild(shipCountSprite);
+        shipRow.attachChild(shipCountText);
+        shipRow.attachChild(energySprite);
+        shipRow.attachChild(energyText);
 
-            shipRow1.attachChild(moneySprite);
-            shipRow1.attachChild(moneyText);
-            shipRow1.attachChild(energySprite);
-            shipRow1.attachChild(energyText);
-
-
-            ///Создание кнопки патча
-            ButtonSprite patchButton = new ButtonSprite(0, 0, textureLoader.loadPatchTexture(),
-                    vertexBufferObjectManager);
-            patchButton.setOnClickListener(new ButtonSprite.OnClickListener() {
-                @Override
-                public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                    //TODO
-                }
-            });
-            patchButton.setSize(PxDpConverter.dpToPx(50), PxDpConverter.dpToPx(50));
-            patchButton.setPosition(shipRow1.getWidth()-patchButton.getWidth(),
-                    (shipRow1.getHeight()-patchButton.getHeight())/2);
-            shipRow1.attachChild(patchButton);
-            scene.registerTouchArea(patchButton);
-        }*/
+/*
+        ///Создание кнопки патча
+        ButtonSprite patchButton = new ButtonSprite(0, 0, textureLoader.loadPatchTexture(),
+                vertexBufferObjectManager);
+        patchButton.setOnClickListener(new ButtonSprite.OnClickListener() {
+            @Override
+            public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+                //TODO
+            }
+        });
+        patchButton.setSize(PxDpConverter.dpToPx(50), PxDpConverter.dpToPx(50));
+        patchButton.setPosition(shipRow1.getWidth()-patchButton.getWidth(),
+                (shipRow1.getHeight()-patchButton.getHeight())/2);
+        shipRow1.attachChild(patchButton);
+        scene.registerTouchArea(patchButton);*/
     }
 
     private void createFriendlySystem(Rectangle parent) {
-        float margin = PxDpConverter.dpToPx(50);
+        float margin = PxDpConverter.dpToPx(20);
 
         ///Создание кнопки постройки базы
         ButtonSprite patchBaseButton = new ButtonSprite(0, 0, textureLoader.loadPatchTexture(),
@@ -232,67 +261,31 @@ public abstract class SystemInfoLayer extends DialogLayer {
 
 
         float shipRowHeight = PxDpConverter.dpToPx(150);
-        Rectangle shipRow1 = new Rectangle(parent.getWidth()/2+margin,
-                margin,
-                parent.getWidth()/2-margin*2,
-                shipRowHeight,
-                vertexBufferObjectManager);
-        shipRow1.setColor(Color.TRANSPARENT);
-        parent.attachChild(shipRow1);
-        /*if (fleet.getPosition().equals(node)) {
-            float shipSize = PxDpConverter.dpToPx(100);
-            Sprite shipSprite = new Sprite(0, (shipRowHeight-shipSize)/2,
-                    textureLoader.loadColoredShipTexture("red"),
-                    vertexBufferObjectManager);
-            shipSprite.setSize(shipSize, shipSize);
-            shipRow1.attachChild(shipSprite);
 
+        ArrayList<Fleet> fleets = new ArrayList<>(3);
+        for (Fleet fleet : WorldAccessor.getInstance().getAllFleets())
+            if (fleet.getPosition().equals(node))
+                fleets.add(fleet);
 
-            ITextureRegion moneyTexture = textureLoader.loadMoneyTexture();
-            Sprite moneySprite = new Sprite(shipSize+PxDpConverter.dpToPx(20),
-                    shipSprite.getY(), moneyTexture, vertexBufferObjectManager);
-            moneySprite.setSize(PxDpConverter.dpToPx(30), PxDpConverter.dpToPx(30));
+        for (int i=0; i<fleets.size(); i++) {
+            Fleet fleet = fleets.get(i);
 
-            Font font = textureLoader.loadPanelTexture();
-            Text moneyText = new Text(moneySprite.getX()+moneySprite.getWidth()+PxDpConverter.dpToPx(10),
-                    moneySprite.getY(),
-                    font, fleet.getCost()+"", vertexBufferObjectManager);
+            Rectangle shipRow = new Rectangle(
+                    parent.getWidth()/2+margin,
+                    margin*(i+1)+shipRowHeight*i,
+                    parent.getWidth()/2-margin*2,
+                    shipRowHeight,
+                    vertexBufferObjectManager
+            );
+            shipRow.setColor(Color.TRANSPARENT);
+            parent.attachChild(shipRow);
 
-            ITextureRegion energyTexture = textureLoader.loadEnergyTexture();
-            Sprite energySprite = new Sprite(shipSize+PxDpConverter.dpToPx(20),
-                    moneySprite.getY()+moneySprite.getHeight()+PxDpConverter.dpToPx(10),
-                    energyTexture, vertexBufferObjectManager);
-            energySprite.setSize(PxDpConverter.dpToPx(30), PxDpConverter.dpToPx(30));
-
-            Text energyText = new Text(energySprite.getX()+energySprite.getWidth()+PxDpConverter.dpToPx(10),
-                    energySprite.getY(),
-                    font, "100", vertexBufferObjectManager);
-
-            shipRow1.attachChild(moneySprite);
-            shipRow1.attachChild(moneyText);
-            shipRow1.attachChild(energySprite);
-            shipRow1.attachChild(energyText);
-
-
-            ///Создание кнопки патча
-            ButtonSprite patchButton = new ButtonSprite(0, 0, textureLoader.loadPatchTexture(),
-                    vertexBufferObjectManager);
-            patchButton.setOnClickListener(new ButtonSprite.OnClickListener() {
-                @Override
-                public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                    //TODO
-                }
-            });
-            patchButton.setSize(PxDpConverter.dpToPx(50), PxDpConverter.dpToPx(50));
-            patchButton.setPosition(shipRow1.getWidth()-patchButton.getWidth(),
-                    (shipRow1.getHeight()-patchButton.getHeight())/2);
-            shipRow1.attachChild(patchButton);
-            scene.registerTouchArea(patchButton);
-        }*/
+            createShipRow(shipRow, fleet);
+        }
     }
 
     private void createEnemySystem(Rectangle parent) {
-        float margin = PxDpConverter.dpToPx(50);
+        float margin = PxDpConverter.dpToPx(20);
 
         ///Создание картинки с системой
         Sprite systemSprite = new Sprite(0, 0, textureLoader.loadEnemySystemTexture(),

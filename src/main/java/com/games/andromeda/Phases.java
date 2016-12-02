@@ -57,7 +57,7 @@ public class Phases {
 
     private void nextPhase() {
         strategy = iterator.next();
-        UI.getInstance().setPhaseName(strategy.getTextDescription());
+        UI.getInstance().repaintPhaseName(strategy.getTextDescription());
         if (strategy.getSide() == side) {
             gameTimer.restart();
             UI.getInstance().setEnabled(true);

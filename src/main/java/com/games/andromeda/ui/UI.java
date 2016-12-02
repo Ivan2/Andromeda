@@ -139,12 +139,12 @@ public class UI {
         }
     }
 
-    public void setPhaseName(String phaseName) {
-        panel.setPhaseName(phaseName);
+    public void repaintPhaseName(String phaseName) {
+        panel.repaintPhaseName(phaseName);
     }
 
-    public void repaintHUD() {
-        panel.repaint();
+    public void repaintShipInfo() {
+        panel.repaintShipInfo();
     }
 
     public void repaintTimer(int time) {

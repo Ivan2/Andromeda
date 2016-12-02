@@ -71,7 +71,7 @@ public class Client implements MessageFlags {
                         }
 
                         UI.getInstance().getShipsLayer().repaint();
-                        UI.getInstance().repaintHUD();
+                        UI.getInstance().repaintShipInfo();
                         Phases.getInstance().endPhase();
                         break;
                     //case BASE_CREATION_MESSAGE:

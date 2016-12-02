@@ -94,6 +94,10 @@ public class TextureLoader {
         return loadFileTexture("friendly_system.png", 1024, 1024);
     }
 
+    public ITextureRegion loadEnergyTexture() {
+        return loadFileTexture("energy.png", 1024, 1024);
+    }
+
     public ITextureRegion loadBuildTexture() {
         return loadFileTexture("build.png", 1024, 1024);
     }
