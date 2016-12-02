@@ -39,6 +39,10 @@ public class Phases {
         nextPhase();
     }
 
+    public HandlingStrategy getPhase() {
+        return strategy;
+    }
+
     public void serverEndPhase() {
         strategy.autoApplyChanges();
         endPhase();

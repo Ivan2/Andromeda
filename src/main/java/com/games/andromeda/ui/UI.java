@@ -4,9 +4,12 @@ import android.app.Activity;
 import android.widget.Toast;
 
 import com.games.andromeda.GameActivity;
+import com.games.andromeda.Phases;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.graph.PathManager;
+import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.WorldAccessor;
+import com.games.andromeda.logic.phases.LevelPreparationStrategy;
 import com.games.andromeda.threads.Scrolling;
 import com.games.andromeda.ui.hud.PanelHUD;
 import com.games.andromeda.ui.layers.BackgroundLayer;
@@ -105,7 +108,18 @@ public class UI {
         systemsLayer.setLayerListener(new SystemsLayer.LayerListener() {
             @Override
             public void onClick(Node node) {
-                systemInfoLayer.show(node);
+                if (Phases.getInstance().getPhase() instanceof LevelPreparationStrategy) {
+                    if (node.getSystemType() != Node.SystemType.EMPTY)
+                        return;
+                    try {
+                        Base base = new Base(Phases.getInstance().side, node); //TODO check base count
+                        WorldAccessor.getInstance().setBase(base);
+                        getSystemsLayer().repaint(); //TODO перерисовка только одной ноды
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else
+                    systemInfoLayer.show(node);
             }
 
             @Override

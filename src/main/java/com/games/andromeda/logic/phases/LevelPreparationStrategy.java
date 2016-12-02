@@ -13,6 +13,7 @@ import com.games.andromeda.ui.UI;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -55,13 +56,23 @@ public class LevelPreparationStrategy extends ListStrategy<Node, Boolean>{
     @Override
     public void autoApplyChanges() {
         // todo set maxSize - result.size() random empty systems to friendly
-        //applyChanges();
-        Collection<Base> bases = new LinkedList<>();
-
+        //applyChanges();.
         Random random = new Random();
         WorldAccessor world = WorldAccessor.getInstance();
+
+        Collection<Base> bases = new LinkedList<>(world.getBases());
+        //удаление баз противника из списка
+        Iterator<Base> baseIterator = bases.iterator();
+        while (baseIterator.hasNext()) {
+            Base base = baseIterator.next();
+            if (base.getSide() != Phases.getInstance().side)
+                baseIterator.remove();
+        }
+
         ArrayList<Node> nodes = new ArrayList<>(world.getMap().getNodes());
-        for (int i=0; i<6; i++) {
+        int baseCount = 6 - bases.size(); //количество создаваемых баз TODO change
+
+        for (int i=0; i<baseCount; i++) {
             while (true) {
                 int ind = random.nextInt(nodes.size());
                 if (nodes.get(ind).getSystemType() == Node.SystemType.EMPTY) {
