@@ -1,12 +1,9 @@
 package com.games.andromeda;
 
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.games.andromeda.level.LevelLoader;
 import com.games.andromeda.logic.Fleet;
-import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.multiplayer.Client;
 import com.games.andromeda.threads.GameTimer;
 import com.games.andromeda.ui.UI;
@@ -19,8 +16,6 @@ import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.FixedResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
-
-import java.io.IOException;
 
 public class GameActivity extends SimpleBaseGameActivity{
 
@@ -62,13 +57,13 @@ public class GameActivity extends SimpleBaseGameActivity{
         PxDpConverter.createInstance(this);
         Scene scene = new Scene();
 
-        try {
+        /*try {
             WorldAccessor.init(LevelLoader.loadMap(this, "map"));
         } catch (IOException e) {
             Log.wtf("loadMap: opening csv error", e.toString());
         } catch (LevelLoader.MapFormatException e) {
             Log.wtf("loadMap: csv content error", e.toString());
-        }
+        }*/
 
         ShipsLayer.IOnFleetMove onFleetMove = new ShipsLayer.IOnFleetMove() {
             @Override

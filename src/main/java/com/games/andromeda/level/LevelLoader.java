@@ -6,6 +6,7 @@ import android.util.SparseArray;
 import com.games.andromeda.graph.Edge;
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;
+import com.games.andromeda.message.StartGameMessage;
 
 import org.andengine.util.color.Color;
 
@@ -29,11 +30,8 @@ public class LevelLoader {
         result.addNode(node);
     }
 
-    private void addEdge(Integer firstId, Integer secondId, Integer weight){
-        Random random = new Random();
-
-        Edge edge = new Edge(map.get(firstId), map.get(secondId), 1,
-                new Color(random.nextFloat(), random.nextFloat(), random.nextFloat()));
+    private void addEdge(Integer firstId, Integer secondId, Integer weight, Color color) {
+        Edge edge = new Edge(map.get(firstId), map.get(secondId), 1, color);
         if (weight <= 1)
             result.addEdge(edge);
         else {
@@ -65,6 +63,7 @@ public class LevelLoader {
         if (line == null){
             return false;
         }
+        Random random = new Random();
         switch(line[0]){
             case "V":
                 addVertex(
@@ -76,7 +75,8 @@ public class LevelLoader {
             case "E":
                 addEdge(Integer.parseInt(line[1]),
                         Integer.parseInt(line[2]),
-                        Integer.parseInt(line[3]));
+                        Integer.parseInt(line[3]),
+                        new Color(random.nextFloat(), random.nextFloat(), random.nextFloat()));
                 break;
             case "H":
                 addVertex(
@@ -100,16 +100,28 @@ public class LevelLoader {
      * @throws MapFormatException
      */
     public static MyGraph loadMap(Context context, String file) throws IOException,
-            MapFormatException{
+            MapFormatException {
         LevelLoader loader = new LevelLoader();
         ResourceReader csvReader = new ResourceReader(context, file);
         String buf;
         while ((buf = csvReader.readLine()) != null){
             loader.processLine(buf.split(";"));
-        };
+        }
         return loader.result;
     }
 
-
+    /**
+     * Фабричный метод для загрузки карты из собщения с сервера
+     * @param message
+     * @return
+     */
+    public static MyGraph loadMap(StartGameMessage message) {
+        LevelLoader loader = new LevelLoader();
+        for (Node node : message.getNodeList())
+            loader.addVertex(node.getId(), node.getX(), node.getY(), node.getSystemType());
+        for (StartGameMessage.TempEdge edge : message.getEdgeList())
+            loader.addEdge(edge.node1ID, edge.node2ID, edge.weight, edge.color);
+        return loader.result;
+    }
 
 }

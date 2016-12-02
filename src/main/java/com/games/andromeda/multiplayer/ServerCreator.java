@@ -1,11 +1,16 @@
 package com.games.andromeda.multiplayer;
 
+import android.util.Log;
+
 import com.games.andromeda.MainActivity;
+import com.games.andromeda.graph.MyGraph;
+import com.games.andromeda.level.LevelLoader;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.message.MessageFlags;
 import com.games.andromeda.message.SetupBasesMessage;
 import com.games.andromeda.message.SetupFleetsMessage;
 import com.games.andromeda.message.SideMessage;
+import com.games.andromeda.message.StartGameMessage;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
 import org.andengine.extension.multiplayer.protocol.server.IClientMessageHandler;
@@ -17,6 +22,7 @@ import org.andengine.util.debug.Debug;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.Set;
 
@@ -247,17 +253,29 @@ public class ServerCreator implements MessageFlags {
             connectedCount++;
             if (connectedCount == 2) //Поменять на 2 для двух устройств
                 try {
+                    MyGraph graph = null;
+                    try {
+                        graph = LevelLoader.loadMap(activity, "map");
+                    } catch (IOException e) {
+                        Log.wtf("loadMap: opening csv error", e.toString());
+                    } catch (LevelLoader.MapFormatException e) {
+                        Log.wtf("loadMap: csv content error", e.toString());
+                    }
+
                     Random random = new Random();
                     int rand = random.nextInt(2);
                     int i = 0;
                     for (ClientConnector client : clients) {
                         //client.sendServerMessage(new StartGameMessage());
                         if (i == rand) {
-                            client.sendServerMessage(new SideMessage(GameObject.Side.EMPIRE));
+                            client.sendServerMessage(new StartGameMessage(GameObject.Side.EMPIRE,
+                                    new LinkedList<>(graph.getNodes()),
+                                    new LinkedList<>(graph.getEdges())));
                             empire = client;
-                        }
-                        else {
-                            client.sendServerMessage(new SideMessage(GameObject.Side.FEDERATION));
+                        } else {
+                            client.sendServerMessage(new StartGameMessage(GameObject.Side.FEDERATION,
+                                    new LinkedList<>(graph.getNodes()),
+                                    new LinkedList<>(graph.getEdges())));
                             federation = client;
                         }
                         i++;

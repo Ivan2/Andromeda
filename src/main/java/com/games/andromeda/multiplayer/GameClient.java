@@ -6,11 +6,13 @@ import android.widget.Toast;
 
 import com.games.andromeda.GameActivity;
 import com.games.andromeda.MainActivity;
+import com.games.andromeda.level.LevelLoader;
+import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.ConnectionCloseServerMessage;
 import com.games.andromeda.message.MessageFlags;
 import com.games.andromeda.message.SetupBasesMessage;
 import com.games.andromeda.message.SetupFleetsMessage;
-import com.games.andromeda.message.SideMessage;
+import com.games.andromeda.message.StartGameMessage;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
@@ -106,12 +108,13 @@ public class GameClient implements Runnable,MessageFlags {
                         messageReceiver.onMessageReceive(FIGHT_MESSAGE, iServerMessage);
                 }
             });*/
-            connector.registerServerMessage(SIDE_MESSAGE, SideMessage.class, new IServerMessageHandler<SocketConnection>() {
+            connector.registerServerMessage(START_GAME_MESSAGE, StartGameMessage.class, new IServerMessageHandler<SocketConnection>() {
                 @Override
                 public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
                     if (messageReceiver == null)
                         Client.getInstance();
-                    messageReceiver.onMessageReceive(SIDE_MESSAGE, iServerMessage);
+                    messageReceiver.onMessageReceive(START_GAME_MESSAGE, iServerMessage);
+                    WorldAccessor.init(LevelLoader.loadMap((StartGameMessage)iServerMessage));
 
                     Intent start = new Intent(activity, GameActivity.class);
                     activity.startActivity(start);

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class SideNodeListMessage extends SideMessage {
+
     private List<Node> nodeList;
 
     public SideNodeListMessage() {
@@ -23,8 +24,8 @@ class SideNodeListMessage extends SideMessage {
     @Override
     protected void onReadTransmissionData(DataInputStream pDataInputStream) throws IOException {
         super.onReadTransmissionData(pDataInputStream);
-        nodeList = new ArrayList<>();
         int size = pDataInputStream.readInt();
+        nodeList = new ArrayList<>(size);
         for (int i=0; i<size; ++i) {
             int id = pDataInputStream.readInt();
             float x = pDataInputStream.readFloat();

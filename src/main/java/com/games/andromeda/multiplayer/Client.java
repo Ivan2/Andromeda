@@ -9,7 +9,7 @@ import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.MessageFlags;
 import com.games.andromeda.message.SetupBasesMessage;
 import com.games.andromeda.message.SetupFleetsMessage;
-import com.games.andromeda.message.SideMessage;
+import com.games.andromeda.message.StartGameMessage;
 import com.games.andromeda.ui.UI;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
@@ -49,8 +49,9 @@ public class Client implements MessageFlags {
                         onFightMessage(fightMessage.getFleet1(),fightMessage.getFleet2(),fightMessage.getNumber1(),fightMessage.getNumber2());
 
                         break;*/
-                    case SIDE_MESSAGE:
-                        SideMessage sideMessage = (SideMessage) message;
+                    case START_GAME_MESSAGE:
+                        StartGameMessage sideMessage = (StartGameMessage) message;
+                        Phases.getInstance().side = sideMessage.getSide();
                         Phases.getInstance().side = sideMessage.getSide();
                         break;
                     case SETUP_BASE_MESSAGE:
