@@ -16,6 +16,7 @@ public class LevelLoader {
     public class MapFormatException extends Exception {}
     private SparseArray<Node> map;
     private MyGraph result;
+    private int miniSystemID = -1;
 
     private LevelLoader(){
         map = new SparseArray<>();
@@ -23,17 +24,42 @@ public class LevelLoader {
     }
 
     private void addVertex(Integer id, Float x, Float y, Node.SystemType type){
-        Node node = new Node(x, y, type);
+        Node node = new Node(id, x, y, type);
         map.put(id, node);
         result.addNode(node);
     }
 
     private void addEdge(Integer firstId, Integer secondId, Integer weight){
         Random random = new Random();
-        result.addEdge(new Edge(map.get(firstId), map.get(secondId), weight,
-                new Color(random.nextFloat(), random.nextFloat(), random.nextFloat())));
+
+        Edge edge = new Edge(map.get(firstId), map.get(secondId), 1,
+                new Color(random.nextFloat(), random.nextFloat(), random.nextFloat()));
+        if (weight <= 1)
+            result.addEdge(edge);
+        else {
+            Node node1 = edge.getNode1();
+            Node node2 = edge.getNode2();
+            //угол наклона прямой (ребра)
+            double a = Math.atan2(node2.getY()-node1.getY(), node2.getX()-node1.getX());
+            //длина ребра
+            double d = getD(node1, node2) / weight;
+            float dx = (float)(Math.cos(a)*d);
+            float dy = (float)(Math.sin(a)*d);
+            //деление ребер и добавление мини систем
+            for (int i=0; i<weight-1; i++) {
+                Node node = new Node(miniSystemID--, node1.getX()+dx, node1.getY()+dy, Node.SystemType.MINI);
+                result.addNode(node);
+                result.addEdge(new Edge(node1, node, 1, edge.getColor()));
+                node1 = node;
+            }
+            result.addEdge(new Edge(node1, node2, 1, edge.getColor()));
+        }
     }
 
+    private double getD(Node node1, Node node2) {
+        return Math.sqrt(Math.pow(node1.getX()-node2.getX(), 2)
+                + Math.pow(node1.getY()-node2.getY(), 2));
+    }
 
     private boolean processLine(String[] line) throws MapFormatException {
         if (line == null){

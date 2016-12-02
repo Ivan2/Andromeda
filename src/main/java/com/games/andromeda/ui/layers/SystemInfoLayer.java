@@ -150,7 +150,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
 
         ArrayList<Fleet> fleets = new ArrayList<>(3);
         for (Fleet fleet : WorldAccessor.getInstance().getAllFleets())
-            if (fleet != null && fleet.getPosition().equals(node))
+            if (fleet != null && fleet.getPosition() == node.getId())
                 fleets.add(fleet);
 
         for (int i=0; i<fleets.size(); i++) {
@@ -264,7 +264,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
 
         ArrayList<Fleet> fleets = new ArrayList<>(3);
         for (Fleet fleet : WorldAccessor.getInstance().getAllFleets())
-            if (fleet != null && fleet.getPosition().equals(node))
+            if (fleet != null && fleet.getPosition() == node.getId())
                 fleets.add(fleet);
 
         for (int i=0; i<fleets.size(); i++) {

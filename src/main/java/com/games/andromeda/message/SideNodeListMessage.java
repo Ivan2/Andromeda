@@ -25,10 +25,12 @@ class SideNodeListMessage extends SideMessage {
         super.onReadTransmissionData(pDataInputStream);
         nodeList = new ArrayList<>();
         int size = pDataInputStream.readInt();
-        for (int i=0; i<size; ++i){
+        for (int i=0; i<size; ++i) {
+            int id = pDataInputStream.readInt();
             float x = pDataInputStream.readFloat();
             float y = pDataInputStream.readFloat();
-            nodeList.add(new Node(x, y));
+            int type = pDataInputStream.readInt();
+            nodeList.add(new Node(id, x, y, Node.SystemType.values()[type]));
         }
 
     }
@@ -37,9 +39,11 @@ class SideNodeListMessage extends SideMessage {
     protected void onWriteTransmissionData(DataOutputStream pDataOutputStream) throws IOException {
         super.onWriteTransmissionData(pDataOutputStream);
         pDataOutputStream.writeInt(nodeList.size());
-        for (Node node: nodeList){
+        for (Node node: nodeList) {
+            pDataOutputStream.writeInt(node.getId());
             pDataOutputStream.writeFloat(node.getX());
             pDataOutputStream.writeFloat(node.getY());
+            pDataOutputStream.writeInt(node.getSystemType().ordinal());
         }
     }
 

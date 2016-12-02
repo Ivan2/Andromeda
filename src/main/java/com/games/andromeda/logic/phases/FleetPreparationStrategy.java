@@ -47,7 +47,7 @@ public class FleetPreparationStrategy extends ListStrategy<Node, Boolean> {
 
         Random random = new Random();
         WorldAccessor world = WorldAccessor.getInstance();
-        ArrayList<Base> bases = new ArrayList<>(world.getBases());
+        ArrayList<Base> bases = new ArrayList<>(world.getBases().values());
         for (int i=1; i<=3; i++) {
             while (true) {
                 int ind = random.nextInt(bases.size());

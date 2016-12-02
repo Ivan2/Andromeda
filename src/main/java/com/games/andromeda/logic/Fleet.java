@@ -3,8 +3,6 @@ package com.games.andromeda.logic;
 import android.util.Log;
 
 import com.games.andromeda.draw.Drawer;
-import com.games.andromeda.graph.Node;
-import com.games.andromeda.ui.layers.ShipsLayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +19,7 @@ public class Fleet extends GameObject {
     private List<SpaceShip> ships;
     private static Random random = new Random();
     private float energy;  // 0..1
-    private Node position;
+    private int nodeID;
     private static float CURRENCY = 0.0000001f;
 
     public void setEnergy(float energy) {
@@ -65,7 +63,7 @@ public class Fleet extends GameObject {
         if (base.getSide() != side){
             throw new InvalidPositionException();
         }
-        this.position = base.getNode();
+        this.nodeID = base.getNodeID();
     }
 
     public static Fleet buy(int shipCount, Base base, Pocket pocket)
@@ -181,22 +179,22 @@ public class Fleet extends GameObject {
         return properties.getEmptyFleetCost() + properties.getShipCost()*ships.size();
     }
 
-    public Node getPosition(){
-        return position;
+    public int getPosition(){
+        return nodeID;
     }
 
     /**
      * Выполняется перемещение флота, если оно возможно
      * @param path результат пользовательского ввода
      */
-    public void makeMove(List<Node> path) throws InvalidPathException, InvalidPositionException,
+    public void makeMove(List<Integer> path) throws InvalidPathException, InvalidPositionException,
             NotEnoughEnergyException {
         if (false) {
             // todo проверка валидности последовательности вершин. лучше в пакете graph ?
             throw new InvalidPathException();
         }
 
-        if (!path.get(0).equals(position)){
+        if (!path.get(0).equals(nodeID)){
             throw new InvalidPositionException();
         }
         if (path.size() == 0){
@@ -210,12 +208,12 @@ public class Fleet extends GameObject {
         Log.wtf("required_energy", String.valueOf(requiredEnergy));
         Log.wtf("energy", String.valueOf(energy));
         energy -= requiredEnergy;
-        position = path.get(path.size()-1);
+        nodeID = path.get(path.size()-1);
     }
 
     @Deprecated
-    public void setPosition(Node position){
-        this.position = position;
+    public void setPosition(int nodeID){
+        this.nodeID = nodeID;
     }
 
     public void destroyShips(int amount)

@@ -8,23 +8,23 @@ import java.util.List;
 
 public class PathManager {
 
-    private Deque<Node> path;
+    private Deque<Integer> path;
 
     public PathManager(){
         path = new LinkedList<>();
     }
 
-    public boolean addNode(Node node){
+    public boolean addNode(int nodeID){
         if (path.size() > 0)
-            if (path.getLast() == node)
+            if (path.getLast() == nodeID)
                 return false;
-        path.addLast(node);
+        path.addLast(nodeID);
         return true;
     }
 
-    public List<Node> getPath(){
+    public List<Integer> getPath(){
         //todo check path on graph
-        return (List<Node>)path;
+        return (List<Integer>)path;
     }
 
     public void reset(){

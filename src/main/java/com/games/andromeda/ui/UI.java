@@ -40,10 +40,10 @@ public class UI {
     private static UI instance;
 
     public static void createInstance(Activity activity, Scene scene, Camera camera, TextureLoader textureLoader,
-                                      VertexBufferObjectManager vertexBufferObjectManager, WorldAccessor world,
+                                      VertexBufferObjectManager vertexBufferObjectManager,
                                       ShipsLayer.IOnFleetMove onFleetMove,ShipsLayer.IOnFleetFight onFleetFight) {
         instance = new UI(activity, scene, camera, textureLoader, vertexBufferObjectManager,
-                world, onFleetMove, onFleetFight);
+                onFleetMove, onFleetFight);
     }
 
     public static UI getInstance() {
@@ -61,7 +61,7 @@ public class UI {
     public Activity activity;
 
     private UI(Activity activity, Scene scene, Camera camera, TextureLoader textureLoader,
-              VertexBufferObjectManager vertexBufferObjectManager, WorldAccessor world,
+              VertexBufferObjectManager vertexBufferObjectManager,
               ShipsLayer.IOnFleetMove onFleetMove,ShipsLayer.IOnFleetFight onFleetFight) {
         this.activity = activity;
         manager = new PathManager();
@@ -72,18 +72,18 @@ public class UI {
 
         //Слой с фоном и линиями
         backgroundLayer = new BackgroundLayer(scene, camera, textureLoader,
-                vertexBufferObjectManager, world.getMap());
+                vertexBufferObjectManager, WorldAccessor.getInstance().getMap());
         backgroundLayer.repaint();
 
         //слой с системами
         systemsLayer = new SystemsLayer(scene, camera, textureLoader,
-                vertexBufferObjectManager, world.getMap());
+                vertexBufferObjectManager, WorldAccessor.getInstance().getMap());
         systemsLayer.repaint();
 
         //слой с кораблями
         shipsLayer = new ShipsLayer(scene, camera, textureLoader,
                 vertexBufferObjectManager, manager, onFleetMove,onFleetFight);
-        world.addFleetObserver(shipsLayer);
+        WorldAccessor.getInstance().addFleetObserver(shipsLayer);
         shipsLayer.repaint();
 
         //слой с сообщением
@@ -112,7 +112,7 @@ public class UI {
                     if (node.getSystemType() != Node.SystemType.EMPTY)
                         return;
                     try {
-                        Base base = new Base(Phases.getInstance().side, node); //TODO check base count
+                        Base base = new Base(Phases.getInstance().side, node.getId()); //TODO check base count
                         WorldAccessor.getInstance().setBase(base);
                         getSystemsLayer().repaint(); //TODO перерисовка только одной ноды
                     } catch (Exception e) {
@@ -124,7 +124,7 @@ public class UI {
 
             @Override
             public void onMove(Node node) {
-                manager.addNode(node);
+                manager.addNode(node.getId());
             }
 
             @Override

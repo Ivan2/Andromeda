@@ -24,7 +24,7 @@ import org.andengine.util.color.Color;
 public class ShipsLayer extends Layer implements FleetObserver {
 
     public interface IOnFleetMove {
-        void onFleetMove(Fleet fleet,int num);
+        void onFleetMove(Fleet fleet, int num);
     }
     public interface IOnFleetFight
     {
@@ -80,7 +80,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
 
     public ShipsLayer(Scene scene, Camera camera, TextureLoader textureLoader,
                       VertexBufferObjectManager vertexBufferObjectManager, final PathManager manager,
-                      final IOnFleetMove onFleetMove,final IOnFleetFight onFleetFight) {
+                      final IOnFleetMove onFleetMove, final IOnFleetFight onFleetFight) {
         super(scene, camera, textureLoader, vertexBufferObjectManager);
 
         pathManager = manager;
@@ -110,8 +110,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
                             }
                             for (int i = 0; i < 6; i++) {
                                 if (world.getAllFleets()[i] != activeSprite.getFleet() &&
-                                        world.getAllFleets()[i].getPosition().getX() == activeSprite.getFleet().getPosition().getX() &&
-                                        world.getAllFleets()[i].getPosition().getY() == activeSprite.getFleet().getPosition().getY() &&
+                                        world.getAllFleets()[i].getPosition() == activeSprite.getFleet().getPosition() &&
                                         activeSprite.getFleet().getSide() != world.getAllFleets()[i].getSide()
                                         ) {
                                     if (i > 2) i -=3;
@@ -163,7 +162,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
      */
     private void moveToPosition(int idx){
         if ((sprites[idx].getFleet() != null) && (activeSprite != sprites[idx]) ){
-            Node node = sprites[idx].getFleet().getPosition();
+            Node node = WorldAccessor.getInstance().getNodes().get(sprites[idx].getFleet().getPosition());
             PointF point = getPos(node.getX(), node.getY());
             float x = point.x + deltas[idx].x - sprites[idx].getWidth() / 2;
             float y = point.y + deltas[idx].y - sprites[idx].getHeight() / 2;

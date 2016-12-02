@@ -12,9 +12,8 @@ import com.games.andromeda.multiplayer.Client;
 import com.games.andromeda.ui.UI;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 public class LevelPreparationStrategy extends ListStrategy<Node, Boolean>{
@@ -60,24 +59,20 @@ public class LevelPreparationStrategy extends ListStrategy<Node, Boolean>{
         Random random = new Random();
         WorldAccessor world = WorldAccessor.getInstance();
 
-        Collection<Base> bases = new LinkedList<>(world.getBases());
-        //удаление баз противника из списка
-        Iterator<Base> baseIterator = bases.iterator();
-        while (baseIterator.hasNext()) {
-            Base base = baseIterator.next();
-            if (base.getSide() != Phases.getInstance().side)
-                baseIterator.remove();
-        }
+        List<Base> bases = new LinkedList<>();
+        for (Base base : world.getBases().values())
+            if (base.getSide() == Phases.getInstance().side)
+                bases.add(base);
 
         ArrayList<Node> nodes = new ArrayList<>(world.getMap().getNodes());
-        int baseCount = 6 - bases.size(); //количество создаваемых баз TODO change
+        int baseCount = 6 - bases.size(); //количество создаваемых баз, если не успел создать все TODO change
 
         for (int i=0; i<baseCount; i++) {
             while (true) {
                 int ind = random.nextInt(nodes.size());
                 if (nodes.get(ind).getSystemType() == Node.SystemType.EMPTY) {
                     try {
-                        Base base = new Base(Phases.getInstance().side, nodes.get(ind));
+                        Base base = new Base(Phases.getInstance().side, nodes.get(ind).getId());
                         world.setBase(base);
                         bases.add(base);
                     } catch (Base.IncorrectNodeException e) {

@@ -3,7 +3,6 @@ package com.games.andromeda.message;
 import android.util.Log;
 
 import com.games.andromeda.graph.Node;
-import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.WorldAccessor;
@@ -33,20 +32,12 @@ public class SetupFleetsMessage extends SideNodeListMessage {
         int count = pDataInputStream.readInt();
         fleets = new LinkedList<>();
 
-        Collection<Base> bases = WorldAccessor.getInstance().getBases();
-
         for (int i=0; i<count; ++i) {
-            float x = pDataInputStream.readFloat();
-            float y = pDataInputStream.readFloat();
+            int nodeID = pDataInputStream.readInt();
             int shipCount = pDataInputStream.readInt();
             GameObject.Side side = getSide();
-            //костыли (нужен id вершины вместо базы)
-            Base base = null;
-            for (Base b : bases)
-                if (b.getNode().equals(new Node(x, y)))
-                    base = b;
             try {
-                fleets.add(new Fleet(side, shipCount, base));
+                fleets.add(new Fleet(side, shipCount, WorldAccessor.getInstance().getBases().get(nodeID)));
             } catch (Exception e) {
                 Log.wtf("error", e.toString());
             }
@@ -58,8 +49,7 @@ public class SetupFleetsMessage extends SideNodeListMessage {
         super.onWriteTransmissionData(pDataOutputStream);
         pDataOutputStream.writeInt(fleets.size());
         for (Fleet fleet : fleets) {
-            pDataOutputStream.writeFloat(fleet.getPosition().getX());
-            pDataOutputStream.writeFloat(fleet.getPosition().getY());
+            pDataOutputStream.writeInt(fleet.getPosition());
             pDataOutputStream.writeInt(fleet.getShipCount());
         }
     }

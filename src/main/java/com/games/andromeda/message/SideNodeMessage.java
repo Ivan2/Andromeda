@@ -22,16 +22,20 @@ class SideNodeMessage extends SideMessage {
     @Override
     protected void onReadTransmissionData(DataInputStream pDataInputStream) throws IOException {
         super.onReadTransmissionData(pDataInputStream);
+        int id = pDataInputStream.readInt();
         float x = pDataInputStream.readFloat();
         float y = pDataInputStream.readFloat();
-        node = new Node(x, y);
+        int type = pDataInputStream.readInt();
+        node = new Node(id, x, y, Node.SystemType.values()[type]);
     }
 
     @Override
     protected void onWriteTransmissionData(DataOutputStream pDataOutputStream) throws IOException {
         super.onWriteTransmissionData(pDataOutputStream);
+        pDataOutputStream.writeInt(node.getId());
         pDataOutputStream.writeFloat(node.getX());
         pDataOutputStream.writeFloat(node.getY());
+        pDataOutputStream.writeInt(node.getSystemType().ordinal());
     }
 
     @Override

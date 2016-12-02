@@ -31,11 +31,10 @@ public class SetupBasesMessage extends SideNodeListMessage{
         int count = pDataInputStream.readInt();
         bases = new LinkedList<>();
         for (int i=0; i<count; ++i){
-            float x = pDataInputStream.readFloat();
-            float y = pDataInputStream.readFloat();
+            int nodeID = pDataInputStream.readInt();
             GameObject.Side side = getSide();
             try {
-                bases.add(new Base(side, new Node(x, y)));
+                bases.add(new Base(side, nodeID));
             } catch (Base.IncorrectNodeException e) {
                 Log.wtf("error", e.toString());
             }
@@ -47,8 +46,7 @@ public class SetupBasesMessage extends SideNodeListMessage{
         super.onWriteTransmissionData(pDataOutputStream);
         pDataOutputStream.writeInt(bases.size());
         for (Base base: bases) {
-            pDataOutputStream.writeFloat(base.getNode().getX());
-            pDataOutputStream.writeFloat(base.getNode().getY());
+            pDataOutputStream.writeInt(base.getNodeID());
         }
     }
 

@@ -30,14 +30,16 @@ public class WorldAccessor {
     // storage part
     private Fleet[] fleets;
     private MyGraph map;
-    private Map<Node, Base> bases;
+    private Map<Integer, Base> bases;
+    private Map<Integer, Node> nodes;
     private Pocket empirePocket;
     private Pocket federationPocket;
     private Set<FleetObserver> fleetObservers;
     private Set<BaseObserver> baseObservers;
 
-    protected WorldAccessor(){
+    protected WorldAccessor() {
         bases = new HashMap<>();
+        nodes = new HashMap<>();
         fleets = new Fleet[6];
         baseObservers = new HashSet<>();
         fleetObservers = new HashSet<>();
@@ -45,6 +47,13 @@ public class WorldAccessor {
 
     public void setMap(MyGraph graph){
         map = graph;
+        nodes.clear();
+        for (Node node : graph.getNodes())
+            nodes.put(node.getId(), node);
+    }
+
+    public Map<Integer, Node> getNodes() {
+        return nodes;
     }
 
     public Fleet[] getAllFleets() {
@@ -71,16 +80,8 @@ public class WorldAccessor {
     }
 
     public void setBase(Base base) {
-        Collection<Node> nodes = getMap().getNodes();
-        Node node = null;
-        for (Node n : nodes)
-            if (n.equals(base.getNode())) {//TODO добавить в Node id и сравнивать по id, а не по координатам
-                node = n;
-                break;
-            }
-        if (node == null)
-            node = base.getNode();
-        bases.put(node, base);
+        bases.put(base.getNodeID(), base);
+        Node node = nodes.get(base.getNodeID());
         if (base.getSide() == Phases.getInstance().side)
             node.setSystemType(Node.SystemType.FRIENDLY);
         else
@@ -90,19 +91,19 @@ public class WorldAccessor {
         }
     }
 
-    public Collection<Base> getBases() {
-        return bases.values();
+    public Map<Integer, Base> getBases() {
+        return bases;
     }
 
-    public void destroyBase(Node node){
-        bases.remove(node);
+    public void destroyBase(int nodeID){
+        bases.remove(nodeID);
         for(BaseObserver observer: baseObservers){
-            observer.onBaseDestroyed(node);
+            observer.onBaseDestroyed(nodeID);
         }
     }
 
     public void destroyBase(Base base){
-        destroyBase(base.getNode());
+        destroyBase(base.getNodeID());
     }
 
     private int calcFleetIndex(GameObject.Side side, int number){
@@ -122,9 +123,9 @@ public class WorldAccessor {
         }
     }
 
-    public void moveFleet(GameObject.Side side, int number, Node position){
+    public void moveFleet(GameObject.Side side, int number, int nodeID){
         Fleet fleet = getFleet(side, number);
-        fleet.setPosition(position); // todo makeMove
+        fleet.setPosition(nodeID); // todo makeMove
 
         for(FleetObserver observer: fleetObservers){
             observer.onFleetChanged(fleet, number);

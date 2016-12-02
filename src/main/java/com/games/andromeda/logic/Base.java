@@ -5,7 +5,7 @@ import com.games.andromeda.graph.Node;
 public class Base extends GameObject {
     public class IncorrectNodeException extends Exception {}
     public static class NoFriendlyFleetException extends Exception {}
-    private Node node;
+    private int nodeID;
     private BaseProperties properties;
 
     /**
@@ -15,7 +15,7 @@ public class Base extends GameObject {
      * @param node
      */
     @Deprecated
-    public Base(Side side, Node node) throws IncorrectNodeException{
+    public Base(Side side, int nodeID) throws IncorrectNodeException{
         super(side);
         switch (side){
             case EMPIRE:
@@ -25,7 +25,7 @@ public class Base extends GameObject {
                 properties = new BasicFederationBaseProperties();
                 break;
         }
-        this.node = node;
+        this.nodeID = nodeID;
         if (false){
             // TODO: проверка на корректность вершины
             throw new IncorrectNodeException();
@@ -51,8 +51,8 @@ public class Base extends GameObject {
         return result;
     }
 
-    public Node getNode(){
-        return node;
+    public int getNodeID(){
+        return nodeID;
     }
 
     public int getProfit(){

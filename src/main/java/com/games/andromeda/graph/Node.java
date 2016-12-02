@@ -4,20 +4,26 @@ public class Node {
     //типы системы
     public static enum SystemType {EMPTY, FRIENDLY, ENEMY, MINI, HYPER}
 
+    private int id;
     //Относительные координаты 0..1
     private float x;
     private float y;
 
     private SystemType systemType;
 
-    public Node(float x, float y){
+    public Node(int id, float x, float y) {
+        this.id = id;
         this.x = x;
         this.y = y;
     }
 
-    public Node(float x, float y, SystemType systemType) {
-        this(x, y);
+    public Node(int id, float x, float y, SystemType systemType) {
+        this(id, x, y);
         this.systemType = systemType;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public float getX() {
@@ -38,7 +44,7 @@ public class Node {
 
     @Override
     public int hashCode() {
-        return (int)(x*1000000+y*1000000);
+        return id;
     }
 
     @Override
@@ -46,11 +52,11 @@ public class Node {
         if (!(obj instanceof Node))
             return false;
         Node node = (Node)obj;
-        return node.x == x && node.y == y;
+        return node.id == id;
     }
 
     @Override
     public String toString() {
-        return String.format("%.2f %.2f", x, y);
+        return String.format("%d(%.2f; %.2f)", id, x, y);
     }
 }

@@ -6,12 +6,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class FleetDestructionMessage extends SideNodeMessage implements  MessageFlags{
+public class FleetDestructionMessage extends SideMessage implements  MessageFlags{
     protected int number;
 
     public FleetDestructionMessage(){}
     public FleetDestructionMessage(Fleet fleet, int number){
-        super(fleet.getSide(), fleet.getPosition());
+        super(fleet.getSide());
         this.number = number;
     }
 

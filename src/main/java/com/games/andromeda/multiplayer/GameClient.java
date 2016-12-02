@@ -109,14 +109,12 @@ public class GameClient implements Runnable,MessageFlags {
             connector.registerServerMessage(SIDE_MESSAGE, SideMessage.class, new IServerMessageHandler<SocketConnection>() {
                 @Override
                 public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
+                    if (messageReceiver == null)
+                        Client.getInstance();
+                    messageReceiver.onMessageReceive(SIDE_MESSAGE, iServerMessage);
+
                     Intent start = new Intent(activity, GameActivity.class);
                     activity.startActivity(start);
-                    if (messageReceiver != null)
-                        messageReceiver.onMessageReceive(SIDE_MESSAGE, iServerMessage);
-                    else {
-                        Client.getInstance();
-                        messageReceiver.onMessageReceive(SIDE_MESSAGE, iServerMessage);
-                    }
                 }
             });
             /*connector.registerServerMessage(BASE_CREATION_MESSAGE, BaseCreationMessage.class, new IServerMessageHandler<SocketConnection>() {

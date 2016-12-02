@@ -59,7 +59,6 @@ public class GameActivity extends SimpleBaseGameActivity{
 
     @Override
     protected Scene onCreateScene() {
-        //this.mEngine.registerUpdateHandler(new FPSLogger());
         PxDpConverter.createInstance(this);
         Scene scene = new Scene();
 
@@ -70,8 +69,6 @@ public class GameActivity extends SimpleBaseGameActivity{
         } catch (LevelLoader.MapFormatException e) {
             Log.wtf("loadMap: csv content error", e.toString());
         }
-
-        WorldAccessor world = WorldAccessor.getInstance();
 
         ShipsLayer.IOnFleetMove onFleetMove = new ShipsLayer.IOnFleetMove() {
             @Override
@@ -89,7 +86,7 @@ public class GameActivity extends SimpleBaseGameActivity{
 
 
         UI.createInstance(this, scene, camera, textureLoader, mEngine.getVertexBufferObjectManager(),
-                world, onFleetMove,onFleetFight);
+                onFleetMove,onFleetFight);
 
         GameTimer gameTimer = new GameTimer() {
             @Override
