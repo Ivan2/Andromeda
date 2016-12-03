@@ -27,17 +27,18 @@ public class LevelPreparationStrategy extends ListStrategy<Node, Boolean>{
     }
 
     @Override
-    public Boolean handlePhaseEvent(Node input) {
-        // !!! call SystemsLayer.repaint after that
+    public Boolean handlePhaseEvent(Node input) throws Exception {
         if (input.getSystemType() == Node.SystemType.FRIENDLY){
             results.remove(input);
             input.setSystemType(Node.SystemType.EMPTY);
             return true;
         }
         else if (input.getSystemType() == Node.SystemType.EMPTY){
-            if (maxSize <= results.size()) return false;
+            if (maxSize <= results.size())
+                throw new Exception("Превышено максимальное количество");
             results.add(input);
             input.setSystemType(Node.SystemType.FRIENDLY);
+            return true;
         }
         return false;
     }
@@ -49,11 +50,16 @@ public class LevelPreparationStrategy extends ListStrategy<Node, Boolean>{
         // -side
         // -nodes
 
-        WorldAccessor world = WorldAccessor.getInstance();
         List<Base> bases = new LinkedList<>();
-        for (Base base : world.getBases().values())
-            if (base.getSide() == Phases.getInstance().side)
+        for (Node node : results) {
+            try {
+                Base base = new Base(Phases.getInstance().side, node.getId());
+                WorldAccessor.getInstance().setBase(base);
                 bases.add(base);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         Client.getInstance().sendSetupBaseMessage(bases);
         return true;
     }
@@ -65,12 +71,18 @@ public class LevelPreparationStrategy extends ListStrategy<Node, Boolean>{
         WorldAccessor world = WorldAccessor.getInstance();
 
         List<Base> bases = new LinkedList<>();
-        for (Base base : world.getBases().values())
-            if (base.getSide() == Phases.getInstance().side)
+        for (Node node : results) {
+            try {
+                Base base = new Base(Phases.getInstance().side, node.getId());
+                WorldAccessor.getInstance().setBase(base);
                 bases.add(base);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         ArrayList<Node> nodes = new ArrayList<>(world.getMap().getNodes());
-        int baseCount = 6 - bases.size(); //количество создаваемых баз (если не успел создать все) TODO change
+        int baseCount = maxSize - bases.size();
 
         for (int i=0; i<baseCount; i++) {
             while (true) {

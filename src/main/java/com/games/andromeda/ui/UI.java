@@ -7,7 +7,6 @@ import com.games.andromeda.GameActivity;
 import com.games.andromeda.Phases;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.graph.PathManager;
-import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.logic.phases.FleetPreparationStrategy;
 import com.games.andromeda.logic.phases.LevelPreparationStrategy;
@@ -111,26 +110,31 @@ public class UI {
             public void onClick(Node node) {
                 //TODO handlePhaseEvent
                 if (Phases.getInstance().getPhase() instanceof LevelPreparationStrategy) {
-                    if (node.getSystemType() == Node.SystemType.EMPTY) {
-                        try {
-                            Base base = new Base(Phases.getInstance().side, node.getId()); //TODO check base count
-                            WorldAccessor.getInstance().setBase(base);
-                            getSystemsLayer().repaint(); //TODO перерисовка только одной ноды
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    } else if (node.getSystemType() == Node.SystemType.FRIENDLY) {
-                        try {
-                            Base base = WorldAccessor.getInstance().getBases().get(node.getId());
-                            WorldAccessor.getInstance().destroyBase(base);
-                            getSystemsLayer().repaint(); //TODO перерисовка только одной ноды
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                    try {
+                        boolean res = ((LevelPreparationStrategy)Phases.getInstance().
+                                getPhase()).handlePhaseEvent(node);
+                        if (res)
+                            getSystemsLayer().repaint();
+                    } catch (Exception e) {
+                        UI.toast(e.getMessage());
                     }
                 } else if (Phases.getInstance().getPhase() instanceof FleetPreparationStrategy) {
-                    if (node.getSystemType() == Node.SystemType.FRIENDLY) {
-                        //TODO create fleet
+                    /*if (node.getSystemType() == Node.SystemType.FRIENDLY) {
+                        try {
+                            WorldAccessor.getInstance().addFleet(new Fleet(Phases.getInstance().side,
+                                    5, WorldAccessor.getInstance().getBases().get(node.getId())));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }*/
+                    try {
+                        boolean res = ((FleetPreparationStrategy)Phases.getInstance().
+                                getPhase()).handlePhaseEvent(node);
+                        if (res) {
+                            getShipsLayer().repaint();
+                        }
+                    } catch (Exception e) {
+                        UI.toast(e.getMessage());
                     }
                 } else
                     systemInfoLayer.show(node);
