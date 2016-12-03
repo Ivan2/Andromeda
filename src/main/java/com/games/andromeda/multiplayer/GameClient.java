@@ -8,8 +8,14 @@ import com.games.andromeda.GameActivity;
 import com.games.andromeda.MainActivity;
 import com.games.andromeda.level.LevelLoader;
 import com.games.andromeda.logic.WorldAccessor;
+import com.games.andromeda.message.BasesCreationMessage;
 import com.games.andromeda.message.ConnectionCloseServerMessage;
+import com.games.andromeda.message.EndFightMessage;
+import com.games.andromeda.message.FleetsCreationMessage;
 import com.games.andromeda.message.MessageFlags;
+import com.games.andromeda.message.MoveFleetMessage;
+import com.games.andromeda.message.PocketChangesMessage;
+import com.games.andromeda.message.RandomEventMessage;
 import com.games.andromeda.message.SetupBasesMessage;
 import com.games.andromeda.message.SetupFleetsMessage;
 import com.games.andromeda.message.StartGameMessage;
@@ -75,39 +81,6 @@ public class GameClient implements Runnable,MessageFlags {
                 }
             });
 
-            /*connector.registerServerMessage(FLAG_MESSAGE_SERVER_SHOW, MoveShipServerMessage.class,
-                    new IServerMessageHandler<SocketConnection>() {
-                @Override
-                public void onHandleMessage(ServerConnector<SocketConnection> pServerConnector,
-                                            IServerMessage pServerMessage) throws IOException {
-                    if (messageReceiver != null)
-                        messageReceiver.onMessageReceive(FLAG_MESSAGE_SERVER_SHOW, pServerMessage);
-                    //MoveShipServerMessage moveShipServerMessage = (MoveShipServerMessage) pServerMessage;
-                    //activity.MoveShip(moveShipServerMessage.getX(), moveShipServerMessage.getY());
-                }
-            });
-
-            connector.registerServerMessage(MessageFlags.START_GAME_MESSAGE, StartGameMessage.class,
-                    new IServerMessageHandler<SocketConnection>() {
-                        @Override
-                        public void onHandleMessage(ServerConnector<SocketConnection> pServerConnector,
-                                                    IServerMessage pServerMessage) throws IOException {
-                        }
-                    });
-            connector.registerServerMessage(END_PHASE_MESSAGE, EndPhaseMessage.class, new IServerMessageHandler<SocketConnection>() {
-                @Override
-                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
-                    if (messageReceiver != null)
-                        messageReceiver.onMessageReceive(END_PHASE_MESSAGE, iServerMessage);
-                }
-            });
-            connector.registerServerMessage(FIGHT_MESSAGE, FightMessage.class, new IServerMessageHandler<SocketConnection>() {
-                @Override
-                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
-                    if (messageReceiver != null)
-                        messageReceiver.onMessageReceive(FIGHT_MESSAGE, iServerMessage);
-                }
-            });*/
             connector.registerServerMessage(START_GAME_MESSAGE, StartGameMessage.class, new IServerMessageHandler<SocketConnection>() {
                 @Override
                 public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
@@ -120,48 +93,7 @@ public class GameClient implements Runnable,MessageFlags {
                     activity.startActivity(start);
                 }
             });
-            /*connector.registerServerMessage(BASE_CREATION_MESSAGE, BaseCreationMessage.class, new IServerMessageHandler<SocketConnection>() {
-                @Override
-                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
-                    if (messageReceiver != null)
-                        messageReceiver.onMessageReceive(BASE_CREATION_MESSAGE, iServerMessage);
-                }
-            });
-            connector.registerServerMessage(BASE_DESTRUCTION_MESSAGE, BaseDestructionMessage.class, new IServerMessageHandler<SocketConnection>() {
-                @Override
-                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
-                    if (messageReceiver != null)
-                        messageReceiver.onMessageReceive(BASE_DESTRUCTION_MESSAGE, iServerMessage);
-                }
-            });
-            connector.registerServerMessage(FLEET_CREATION_MESSAGE, FleetCreationMessage.class, new IServerMessageHandler<SocketConnection>() {
-                @Override
-                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
-                    if (messageReceiver != null)
-                        messageReceiver.onMessageReceive(FLEET_CREATION_MESSAGE, iServerMessage);
-                }
-            });
-            connector.registerServerMessage(FLEET_DESTRUCTION_MESSAGE, FleetDestructionMessage.class, new IServerMessageHandler<SocketConnection>() {
-                @Override
-                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
-                    if (messageReceiver != null)
-                        messageReceiver.onMessageReceive(FLEET_DESTRUCTION_MESSAGE, iServerMessage);
-                }
-            });
-            connector.registerServerMessage(POCKET_CHANGE_MESSAGE, PocketChangesMessage.class, new IServerMessageHandler<SocketConnection>() {
-                @Override
-                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
-                    if (messageReceiver != null)
-                        messageReceiver.onMessageReceive(POCKET_CHANGE_MESSAGE, iServerMessage);
-                }
-            });
-            connector.registerServerMessage(RANDOM_EVENT_MESSAGE, RandomEventMessage.class, new IServerMessageHandler<SocketConnection>() {
-                @Override
-                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
-                    if (messageReceiver != null)
-                        messageReceiver.onMessageReceive(RANDOM_EVENT_MESSAGE, iServerMessage);
-                }
-            });*/
+
             connector.registerServerMessage(SETUP_BASE_MESSAGE, SetupBasesMessage.class, new IServerMessageHandler<SocketConnection>() {
                 @Override
                 public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
@@ -169,6 +101,7 @@ public class GameClient implements Runnable,MessageFlags {
                         messageReceiver.onMessageReceive(SETUP_BASE_MESSAGE, iServerMessage);
                 }
             });
+
             connector.registerServerMessage(SETUP_FLEET_MESSAGE, SetupFleetsMessage.class, new IServerMessageHandler<SocketConnection>() {
                 @Override
                 public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
@@ -176,6 +109,55 @@ public class GameClient implements Runnable,MessageFlags {
                         messageReceiver.onMessageReceive(SETUP_FLEET_MESSAGE, iServerMessage);
                 }
             });
+
+            connector.registerServerMessage(RANDOM_EVENT_MESSAGE, RandomEventMessage.class, new IServerMessageHandler<SocketConnection>() {
+                @Override
+                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
+                    if (messageReceiver != null)
+                        messageReceiver.onMessageReceive(RANDOM_EVENT_MESSAGE, iServerMessage);
+                }
+            });
+
+            connector.registerServerMessage(POCKET_CHANGE_MESSAGE, PocketChangesMessage.class, new IServerMessageHandler<SocketConnection>() {
+                @Override
+                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
+                    if (messageReceiver != null)
+                        messageReceiver.onMessageReceive(POCKET_CHANGE_MESSAGE, iServerMessage);
+                }
+            });
+
+            connector.registerServerMessage(BASES_CREATION_MESSAGE, BasesCreationMessage.class, new IServerMessageHandler<SocketConnection>() {
+                @Override
+                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
+                    if (messageReceiver != null)
+                        messageReceiver.onMessageReceive(BASES_CREATION_MESSAGE, iServerMessage);
+                }
+            });
+
+            connector.registerServerMessage(FLEETS_CREATION_MESSAGE, FleetsCreationMessage.class, new IServerMessageHandler<SocketConnection>() {
+                @Override
+                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
+                    if (messageReceiver != null)
+                        messageReceiver.onMessageReceive(FLEETS_CREATION_MESSAGE, iServerMessage);
+                }
+            });
+
+            connector.registerServerMessage(MOVE_FLEET_MESSAGE, MoveFleetMessage.class, new IServerMessageHandler<SocketConnection>() {
+                @Override
+                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
+                    if (messageReceiver != null)
+                        messageReceiver.onMessageReceive(MOVE_FLEET_MESSAGE, iServerMessage);
+                }
+            });
+
+            connector.registerServerMessage(END_FIGHT_MESSAGE, EndFightMessage.class, new IServerMessageHandler<SocketConnection>() {
+                @Override
+                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
+                    if (messageReceiver != null)
+                        messageReceiver.onMessageReceive(END_FIGHT_MESSAGE, iServerMessage);
+                }
+            });
+
             connector.getConnection().start();
         } catch (Throwable t) {
             Debug.e(t);

@@ -1,7 +1,5 @@
 package com.games.andromeda;
 
-import android.util.Log;
-
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.phases.GamePhases;
 import com.games.andromeda.logic.phases.HandlingStrategy;
@@ -34,8 +32,6 @@ public class Phases {
 
     public void startGame(GameTimer gameTimer) {
         this.gameTimer = gameTimer;
-
-        Log.wtf("side", side+"");
         nextPhase();
     }
 
@@ -43,16 +39,19 @@ public class Phases {
         return strategy;
     }
 
+    //вызывается сообщением с сервера об окончании времени хода
     public void serverEndPhase() {
         strategy.autoApplyChanges();
         endPhase();
     }
 
+    //вызывается нажатием кнопки
     public void clientEndPhase() {
-        strategy.autoApplyChanges();//TODO applyChanges()
+        strategy.applyChanges();
         endPhase();
     }
 
+    //вызывается сообщением с сервера об окончании фазы
     public void endPhase() {
         UI.getInstance().setEnabled(false);
         gameTimer.stop();
@@ -61,7 +60,8 @@ public class Phases {
 
     private void nextPhase() {
         strategy = iterator.next();
-        UI.getInstance().repaintPhaseName(strategy.getTextDescription());
+        UI.getInstance().getPanel().repaintPhaseName(strategy.getTextDescription());
+        //Log.wtf(strategy.getClass().toString(), strategy.getSide()+" "+side);
         if (strategy.getSide() == side) {
             gameTimer.restart();
             UI.getInstance().setEnabled(true);
@@ -69,9 +69,5 @@ public class Phases {
             UI.getInstance().setEnabled(false);
         }
     }
-
-    /*public void onOtherEndPhase() {
-        Log.wtf(strategy.getSide()+" "+ WorldAccessor.getInstance().side, "end phase");
-    }*/
 
 }

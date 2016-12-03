@@ -44,18 +44,23 @@ public class LevelPreparationStrategy extends ListStrategy<Node, Boolean>{
 
     @Override
     public boolean applyChanges() {
-        if (maxSize != results.size()) return false;
+        //if (maxSize != results.size()) return false;
         // todo send results to server
         // -side
         // -nodes
-        //Client.getInstance().sendSetupBaseMessage();
+
+        WorldAccessor world = WorldAccessor.getInstance();
+        List<Base> bases = new LinkedList<>();
+        for (Base base : world.getBases().values())
+            if (base.getSide() == Phases.getInstance().side)
+                bases.add(base);
+        Client.getInstance().sendSetupBaseMessage(bases);
         return true;
     }
 
     @Override
     public void autoApplyChanges() {
         // todo set maxSize - result.size() random empty systems to friendly
-        //applyChanges();.
         Random random = new Random();
         WorldAccessor world = WorldAccessor.getInstance();
 
@@ -65,7 +70,7 @@ public class LevelPreparationStrategy extends ListStrategy<Node, Boolean>{
                 bases.add(base);
 
         ArrayList<Node> nodes = new ArrayList<>(world.getMap().getNodes());
-        int baseCount = 6 - bases.size(); //количество создаваемых баз, если не успел создать все TODO change
+        int baseCount = 6 - bases.size(); //количество создаваемых баз (если не успел создать все) TODO change
 
         for (int i=0; i<baseCount; i++) {
             while (true) {

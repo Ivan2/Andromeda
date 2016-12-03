@@ -6,16 +6,21 @@ import com.games.andromeda.Phases;
 import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.WorldAccessor;
+import com.games.andromeda.message.EndFightMessage;
 import com.games.andromeda.message.MessageFlags;
+import com.games.andromeda.message.MoveFleetMessage;
+import com.games.andromeda.message.PocketChangesMessage;
+import com.games.andromeda.message.RandomEventMessage;
 import com.games.andromeda.message.SetupBasesMessage;
 import com.games.andromeda.message.SetupFleetsMessage;
 import com.games.andromeda.message.StartGameMessage;
+import com.games.andromeda.message.BasesCreationMessage;
+import com.games.andromeda.message.FleetsCreationMessage;
 import com.games.andromeda.ui.UI;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 
 
@@ -41,9 +46,6 @@ public class Client implements MessageFlags {
                         //Log.wtf("nfgnfn","gfn");
 
                         break;
-                    case END_PHASE_MESSAGE:
-                        onEndPhaseMessage();
-                        break;
                     case FIGHT_MESSAGE:
                         FightMessage fightMessage = (FightMessage) message;
                         onFightMessage(fightMessage.getFleet1(),fightMessage.getFleet2(),fightMessage.getNumber1(),fightMessage.getNumber2());
@@ -52,18 +54,22 @@ public class Client implements MessageFlags {
                     case START_GAME_MESSAGE:
                         StartGameMessage sideMessage = (StartGameMessage) message;
                         Phases.getInstance().side = sideMessage.getSide();
-                        Phases.getInstance().side = sideMessage.getSide();
                         break;
+
                     case SETUP_BASE_MESSAGE:
+                    case BASES_CREATION_MESSAGE:
                         SetupBasesMessage setupBasesMessage = (SetupBasesMessage) message;
                         for (Base base : setupBasesMessage.getBases()) {
                             WorldAccessor.getInstance().setBase(base);
                         }
 
                         UI.getInstance().getSystemsLayer().repaint();
-                        Phases.getInstance().endPhase();
+                        if (flag == SETUP_BASE_MESSAGE)
+                            Phases.getInstance().endPhase();
                         break;
+
                     case SETUP_FLEET_MESSAGE:
+                    case FLEETS_CREATION_MESSAGE:
                         SetupFleetsMessage setupFleetsMessage = (SetupFleetsMessage) message;
                         int i = 1;
                         for (Fleet fleet : setupFleetsMessage.getFleets()) {
@@ -72,21 +78,36 @@ public class Client implements MessageFlags {
                         }
 
                         UI.getInstance().getShipsLayer().repaint();
-                        UI.getInstance().repaintShipInfo();
+                        UI.getInstance().getPanel().repaintShipInfo();
+                        if (flag == SETUP_FLEET_MESSAGE)
+                            Phases.getInstance().endPhase();
+                        break;
+
+                    case RANDOM_EVENT_MESSAGE:
+                        //RandomEventMessage randomEventMessage = (RandomEventMessage) message;
+                        //TODO read message
                         Phases.getInstance().endPhase();
                         break;
-                    //case BASE_CREATION_MESSAGE:
-                    //case BASE_DESTRUCTION_MESSAGE:
-                    //case FLEET_CREATION_MESSAGE:
-                    //case FLEET_DESTRUCTION_MESSAGE:
-                    //case POCKET_CHANGE_MESSAGE:
-                    //case RANDOM_EVENT_MESSAGE:
-                    //case SIDE_NODE_LIST_MESSAGE:
-                    //case SIDE_NODE_MESSAGE:
 
+                    case POCKET_CHANGE_MESSAGE:
+                        PocketChangesMessage pocketChangesMessage = (PocketChangesMessage) message;
+                        WorldAccessor.getInstance().getPocket(pocketChangesMessage.getSide())
+                                .increase(pocketChangesMessage.getDelta());
+                        Phases.getInstance().endPhase();
+                        break;
+
+                    case MOVE_FLEET_MESSAGE:
+                        //MoveFleetMessage moveFleetMessage = (MoveFleetMessage) message;
+                        //TODO read message
+                        Phases.getInstance().endPhase();
+                        break;
+
+                    case END_FIGHT_MESSAGE:
+                        //EndFightMessage endFightMessage = (EndFightMessage) message;
+                        //TODO read message
+                        Phases.getInstance().endPhase();
+                        break;
                 }
-
-
             }
         });
     }
@@ -94,10 +115,7 @@ public class Client implements MessageFlags {
     public void sendSetupBaseMessage(Collection<Base> bases) {
         try {
             GameClient.getInstance().sendMessage(new SetupBasesMessage(
-                    Phases.getInstance().side,
-                    new ArrayList<>(WorldAccessor.getInstance().getMap().getNodes()),
-                    bases
-            ));
+                    Phases.getInstance().side, bases));
         } catch (IOException e) {
             Log.wtf("PATH", e.toString());
         }
@@ -106,10 +124,55 @@ public class Client implements MessageFlags {
     public void sendSetupFleetMessage(Collection<Fleet> fleets) {
         try {
             GameClient.getInstance().sendMessage(new SetupFleetsMessage(
-                    Phases.getInstance().side,
-                    new ArrayList<>(WorldAccessor.getInstance().getMap().getNodes()),
-                    fleets
-            ));
+                    Phases.getInstance().side, fleets));
+        } catch (IOException e) {
+            Log.wtf("PATH", e.toString());
+        }
+    }
+
+    public void sendRandomEventMessage() {
+        try {
+            GameClient.getInstance().sendMessage(new RandomEventMessage(Phases.getInstance().side));
+        } catch (IOException e) {
+            Log.wtf("PATH", e.toString());
+        }
+    }
+
+    public void sendPocketChangesMessage(int delta) {
+        try {
+            GameClient.getInstance().sendMessage(new PocketChangesMessage
+                    (Phases.getInstance().side, delta));
+        } catch (IOException e) {
+            Log.wtf("PATH", e.toString());
+        }
+    }
+
+    public void sendMoneySpendingMessage(Collection<Base> bases, Collection<Fleet> fleets, int delta) {
+        try {
+            GameClient.getInstance().sendMessage(new BasesCreationMessage
+                    (Phases.getInstance().side, bases));
+            GameClient.getInstance().sendMessage(new FleetsCreationMessage
+                    (Phases.getInstance().side, fleets));
+            GameClient.getInstance().sendMessage(new PocketChangesMessage
+                    (Phases.getInstance().side, delta));
+        } catch (IOException e) {
+            Log.wtf("PATH", e.toString());
+        }
+    }
+
+    public void sendMoveFleetMessage() {
+        try {
+            GameClient.getInstance().sendMessage(new MoveFleetMessage
+                    (Phases.getInstance().side));
+        } catch (IOException e) {
+            Log.wtf("PATH", e.toString());
+        }
+    }
+
+    public void sendEndFightMessage() {
+        try {
+            GameClient.getInstance().sendMessage(new EndFightMessage
+                    (Phases.getInstance().side));
         } catch (IOException e) {
             Log.wtf("PATH", e.toString());
         }
@@ -121,14 +184,6 @@ public class Client implements MessageFlags {
             GameClient.getInstance().sendMessage(new MoveShipClientMessage(
                     fleet.getPosition().getX(),
                     fleet.getPosition().getY(),num, side));
-        } catch (IOException e) {
-            Log.wtf("PATH", e.toString());
-        }
-    }
-
-    public void sendEndPhaseMessage() {
-        try {
-            GameClient.getInstance().sendMessage(new EndPhaseMessage());
         } catch (IOException e) {
             Log.wtf("PATH", e.toString());
         }
@@ -153,10 +208,6 @@ public class Client implements MessageFlags {
             e.printStackTrace();
             Log.wtf("my stupid exception: ", e.toString());
         }
-    }
-
-    private void onEndPhaseMessage()
-    {
     }
 
     private void onFightMessage(Fleet firstFleet,  Fleet secondFleet, int num, int num2)

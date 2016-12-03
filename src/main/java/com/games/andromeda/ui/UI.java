@@ -9,6 +9,7 @@ import com.games.andromeda.graph.Node;
 import com.games.andromeda.graph.PathManager;
 import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.WorldAccessor;
+import com.games.andromeda.logic.phases.FleetPreparationStrategy;
 import com.games.andromeda.logic.phases.LevelPreparationStrategy;
 import com.games.andromeda.threads.Scrolling;
 import com.games.andromeda.ui.hud.PanelHUD;
@@ -108,15 +109,28 @@ public class UI {
         systemsLayer.setLayerListener(new SystemsLayer.LayerListener() {
             @Override
             public void onClick(Node node) {
+                //TODO handlePhaseEvent
                 if (Phases.getInstance().getPhase() instanceof LevelPreparationStrategy) {
-                    if (node.getSystemType() != Node.SystemType.EMPTY)
-                        return;
-                    try {
-                        Base base = new Base(Phases.getInstance().side, node.getId()); //TODO check base count
-                        WorldAccessor.getInstance().setBase(base);
-                        getSystemsLayer().repaint(); //TODO перерисовка только одной ноды
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    if (node.getSystemType() == Node.SystemType.EMPTY) {
+                        try {
+                            Base base = new Base(Phases.getInstance().side, node.getId()); //TODO check base count
+                            WorldAccessor.getInstance().setBase(base);
+                            getSystemsLayer().repaint(); //TODO перерисовка только одной ноды
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else if (node.getSystemType() == Node.SystemType.FRIENDLY) {
+                        try {
+                            Base base = WorldAccessor.getInstance().getBases().get(node.getId());
+                            WorldAccessor.getInstance().destroyBase(base);
+                            getSystemsLayer().repaint(); //TODO перерисовка только одной ноды
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else if (Phases.getInstance().getPhase() instanceof FleetPreparationStrategy) {
+                    if (node.getSystemType() == Node.SystemType.FRIENDLY) {
+                        //TODO create fleet
                     }
                 } else
                     systemInfoLayer.show(node);
@@ -147,22 +161,14 @@ public class UI {
 
     public void setEnabled(boolean enabled) {
         if (enabled) {
-            messageLayer.show("Ход противника");
-        } else {
             messageLayer.hide();
+        } else {
+            messageLayer.show("Ход противника");
         }
     }
 
-    public void repaintPhaseName(String phaseName) {
-        panel.repaintPhaseName(phaseName);
-    }
-
-    public void repaintShipInfo() {
-        panel.repaintShipInfo();
-    }
-
-    public void repaintTimer(int time) {
-        panel.repaintTime(time);
+    public PanelHUD getPanel() {
+        return panel;
     }
 
     public BackgroundLayer getBackgroundLayer() {

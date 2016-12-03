@@ -1,40 +1,34 @@
 package com.games.andromeda.message;
 
+import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 
-public class PocketChangesMessage extends SideMessage implements MessageFlags {
-    private int delta;
+public class FleetsCreationMessage extends SetupFleetsMessage implements MessageFlags {
 
-    public PocketChangesMessage() {
-    }
+    public FleetsCreationMessage() {}
 
-    public PocketChangesMessage(GameObject.Side side, int delta) {
-        super(side);
-        this.delta = delta;
+    public FleetsCreationMessage(GameObject.Side side, Collection<Fleet> fleets) {
+        super(side, fleets);
     }
 
     @Override
     protected void onReadTransmissionData(DataInputStream pDataInputStream) throws IOException {
         super.onReadTransmissionData(pDataInputStream);
-        delta = pDataInputStream.readInt();
     }
 
     @Override
     protected void onWriteTransmissionData(DataOutputStream pDataOutputStream) throws IOException {
         super.onWriteTransmissionData(pDataOutputStream);
-        pDataOutputStream.writeInt(delta);
     }
 
     @Override
     public short getFlag() {
-        return POCKET_CHANGE_MESSAGE;
+        return FLEETS_CREATION_MESSAGE;
     }
 
-    public int getDelta() {
-        return delta;
-    }
 }

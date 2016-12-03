@@ -2,7 +2,6 @@ package com.games.andromeda.message;
 
 import android.util.Log;
 
-import com.games.andromeda.graph.Node;
 import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.GameObject;
 
@@ -11,17 +10,16 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 
-public class SetupBasesMessage extends SideNodeListMessage{
+public class SetupBasesMessage extends SideMessage {
 
     private Collection<Base> bases;
 
     public SetupBasesMessage() {
     }
 
-    public SetupBasesMessage(GameObject.Side side, List<Node> nodes, Collection<Base> bases) {
-        super(side, nodes);
+    public SetupBasesMessage(GameObject.Side side, Collection<Base> bases) {
+        super(side);
         this.bases = bases;
     }
 

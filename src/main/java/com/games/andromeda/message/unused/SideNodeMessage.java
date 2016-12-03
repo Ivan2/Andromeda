@@ -1,14 +1,15 @@
-package com.games.andromeda.message;
+package com.games.andromeda.message.unused;
 
 
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.logic.GameObject;
+import com.games.andromeda.message.SideMessage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-class SideNodeMessage extends SideMessage {
+public class SideNodeMessage extends SideMessage {
     private Node node;
 
     public SideNodeMessage() {

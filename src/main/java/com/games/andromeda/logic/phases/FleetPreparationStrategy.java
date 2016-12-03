@@ -34,8 +34,10 @@ public class FleetPreparationStrategy extends ListStrategy<Node, Boolean> {
 
     @Override
     public boolean applyChanges() {
-        if (results.size() != 3) return false;
+        //if (results.size() != 3) return false;
         // todo send side and new fleet locations
+        Collection<Fleet> fleets = new LinkedList<>();
+        Client.getInstance().sendSetupFleetMessage(fleets);
         return true;
     }
 
@@ -66,7 +68,7 @@ public class FleetPreparationStrategy extends ListStrategy<Node, Boolean> {
         }
 
         UI.getInstance().getShipsLayer().repaint();
-        UI.getInstance().repaintShipInfo();
+        UI.getInstance().getPanel().repaintShipInfo();
         Client.getInstance().sendSetupFleetMessage(fleets);
     }
 }

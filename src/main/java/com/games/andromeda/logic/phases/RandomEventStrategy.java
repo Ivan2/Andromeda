@@ -1,5 +1,7 @@
 package com.games.andromeda.logic.phases;
 
+import com.games.andromeda.multiplayer.Client;
+
 public class RandomEventStrategy extends CommonHandlingStrategy<Void, Void> {
 
     @Override
@@ -11,6 +13,7 @@ public class RandomEventStrategy extends CommonHandlingStrategy<Void, Void> {
     @Override
     public boolean applyChanges() {
         // todo сотворить какую-то рандомную дичь
+        Client.getInstance().sendRandomEventMessage();
         return true;
     }
 

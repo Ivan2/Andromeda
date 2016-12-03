@@ -20,11 +20,11 @@ public abstract class GameTimer {
         this(50, 1000);
     }
 
-    public void restart() {
+    synchronized public void restart() {
         time = 50;
     }
 
-    public void stop() {
+    synchronized public void stop() {
         time = 0;
         onTime(0);
     }

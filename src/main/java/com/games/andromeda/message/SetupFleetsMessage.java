@@ -2,7 +2,6 @@ package com.games.andromeda.message;
 
 import android.util.Log;
 
-import com.games.andromeda.graph.Node;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.WorldAccessor;
@@ -12,17 +11,16 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 
-public class SetupFleetsMessage extends SideNodeListMessage {
+public class SetupFleetsMessage extends SideMessage {
 
     private Collection<Fleet> fleets;
 
     public SetupFleetsMessage() {
     }
 
-    public SetupFleetsMessage(GameObject.Side side, List<Node> nodes, Collection<Fleet> fleets) {
-        super(side, nodes);
+    public SetupFleetsMessage(GameObject.Side side, Collection<Fleet> fleets) {
+        super(side);
         this.fleets = fleets;
     }
 

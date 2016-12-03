@@ -60,19 +60,29 @@ public class WorldAccessor {
         return fleets;
     }
 
-    public Fleet getFleet(GameObject.Side side, int number){
+    public Fleet getFleet(GameObject.Side side, int number) {
         return fleets[calcFleetIndex(side, number)];
     }
 
-    public void setFleet(Fleet fleet, int number){
+    public void setFleet(Fleet fleet, int number) {
         this.fleets[calcFleetIndex(fleet.getSide(), number)] = fleet;
-        for(FleetObserver observer: fleetObservers){
+        for (FleetObserver observer : fleetObservers) {
             observer.onFleetChanged(fleet, number);
         }
     }
 
     public void setAllFleets(Fleet[] fleets) {
         this.fleets = fleets;
+    }
+
+    public boolean addFleet(Fleet fleet) {
+        for (int i=1; i<=3; i++) {
+            if (fleets[calcFleetIndex(fleet.getSide(), i)] == null) {
+                setFleet(fleet, i);
+                return true;
+            }
+        }
+        return false;
     }
 
     public MyGraph getMap() {

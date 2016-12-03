@@ -89,7 +89,7 @@ public class GameActivity extends SimpleBaseGameActivity{
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        UI.getInstance().repaintTimer(time);
+                        UI.getInstance().getPanel().repaintTime(time);
                     }
                 });
             }

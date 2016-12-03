@@ -1,8 +1,8 @@
-package com.games.andromeda.message;
+package com.games.andromeda.message.unused;
 
 import com.games.andromeda.logic.GameObject;
-
-import org.andengine.extension.multiplayer.protocol.adt.message.server.ServerMessage;
+import com.games.andromeda.message.MessageFlags;
+import com.games.andromeda.message.SideMessage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * Created by eugeny on 20.10.16.
  */
-public class MoveShipServerMessage extends SideMessage implements MessageFlags {
+public class MoveShipClientMessage extends SideMessage implements MessageFlags {
 
 
 
@@ -19,26 +19,16 @@ public class MoveShipServerMessage extends SideMessage implements MessageFlags {
     private float y;
     private int num;
 
-    public MoveShipServerMessage() {
-
+    public MoveShipClientMessage()
+    {
     }
 
-    public MoveShipServerMessage(final float x, final float y, final int num, final GameObject.Side side)
+    public MoveShipClientMessage(final float x, final float y, final int num, final GameObject.Side side)
     {
         super(side);
         this.x = x;
         this.y = y;
         this.num = num;
-    }
-
-    public void set(final float x, final float y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    @Override
-    public short getFlag() {
-        return FLAG_MESSAGE_SERVER_SHOW;
     }
 
     @Override
@@ -65,6 +55,11 @@ public class MoveShipServerMessage extends SideMessage implements MessageFlags {
     public float getY()
     {
         return y;
+    }
+
+    public short getFlag()
+    {
+        return FLAG_MESSAGE_CLIENT_SHOW;
     }
 
     public int getNum()

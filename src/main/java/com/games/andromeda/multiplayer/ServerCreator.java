@@ -6,7 +6,13 @@ import com.games.andromeda.MainActivity;
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.level.LevelLoader;
 import com.games.andromeda.logic.GameObject;
+import com.games.andromeda.message.BasesCreationMessage;
+import com.games.andromeda.message.EndFightMessage;
+import com.games.andromeda.message.FleetsCreationMessage;
 import com.games.andromeda.message.MessageFlags;
+import com.games.andromeda.message.MoveFleetMessage;
+import com.games.andromeda.message.PocketChangesMessage;
+import com.games.andromeda.message.RandomEventMessage;
 import com.games.andromeda.message.SetupBasesMessage;
 import com.games.andromeda.message.SetupFleetsMessage;
 import com.games.andromeda.message.SideMessage;
@@ -46,42 +52,7 @@ public class ServerCreator implements MessageFlags {
             protected SocketConnectionClientConnector newClientConnector(final SocketConnection pSocketConnection) throws IOException {
                 SocketConnectionClientConnector connector = new SocketConnectionClientConnector(pSocketConnection);
 
-                /*connector.registerClientMessage(FLAG_MESSAGE_CLIENT_SHOW, MoveShipClientMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> pClientConnector, IClientMessage pClientMessage) throws IOException {
-                        try {
-                            MoveShipClientMessage moveShipClientMessage = (MoveShipClientMessage) pClientMessage;
-                            MoveShipServerMessage moveShipServerMessage = new MoveShipServerMessage
-                                    (moveShipClientMessage.getX(), moveShipClientMessage.getY(),moveShipClientMessage.getNum(),moveShipClientMessage.getSide());
-                            //server.sendBroadcastServerMessage(moveShipServerMessage);
-                            if (moveShipClientMessage.getSide() == GameObject.Side.EMPIRE)
-                                federation.sendServerMessage(moveShipServerMessage);
-                            else
-                                empire.sendServerMessage(moveShipServerMessage);
-                        } catch (IOException e) {
-                            Debug.e(e);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                connector.registerClientMessage(END_PHASE_MESSAGE, EndPhaseMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        try {
-                            EndPhaseMessage message = (EndPhaseMessage) iClientMessage;
-
-                            if (message.getSide() == GameObject.Side.EMPIRE)
-                                federation.sendServerMessage(message);
-                            else
-                                empire.sendServerMessage(message);
-                        } catch (IOException e) {
-                            Debug.e(e);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+                /*
                 connector.registerClientMessage(FIGHT_MESSAGE, FightMessage.class, new IClientMessageHandler<SocketConnection>() {
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
@@ -104,98 +75,6 @@ public class ServerCreator implements MessageFlags {
                             e.printStackTrace();
                         }
                     }
-                });
-                connector.registerClientMessage(BASE_CREATION_MESSAGE, BaseCreationMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        try {
-                            BaseCreationMessage message = (BaseCreationMessage)iClientMessage;
-                            if (message.getSide() == GameObject.Side.EMPIRE)
-                                federation.sendServerMessage(message);
-                            else
-                                empire.sendServerMessage(message);
-                        } catch (IOException e) {
-                            Debug.e(e);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                connector.registerClientMessage(BASE_DESTRUCTION_MESSAGE, BaseDestructionMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        try {
-                            BaseDestructionMessage message = (BaseDestructionMessage) iClientMessage;
-                            if (message.getSide() == GameObject.Side.EMPIRE)
-                                federation.sendServerMessage(message);
-                            else
-                                empire.sendServerMessage(message);
-                        } catch (IOException e) {
-                            Debug.e(e);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                connector.registerClientMessage(FLEET_CREATION_MESSAGE, FleetCreationMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        try {
-                            FleetCreationMessage message = (FleetCreationMessage) iClientMessage;
-                            if (message.getSide() == GameObject.Side.EMPIRE)
-                                federation.sendServerMessage(message);
-                            else
-                                empire.sendServerMessage(message);
-                        } catch (IOException e) {
-                            Debug.e(e);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                connector.registerClientMessage(FLEET_DESTRUCTION_MESSAGE, FleetDestructionMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        try {
-                            FleetDestructionMessage message = (FleetDestructionMessage) iClientMessage;
-                            if (message.getSide() == GameObject.Side.EMPIRE)
-                                federation.sendServerMessage(message);
-                            else
-                                empire.sendServerMessage(message);
-                        } catch (IOException e) {
-                            Debug.e(e);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                connector.registerClientMessage(POCKET_CHANGE_MESSAGE, PocketChangesMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        try {
-                            PocketChangesMessage message = (PocketChangesMessage) iClientMessage;
-                            if (message.getSide() == GameObject.Side.EMPIRE)
-                                federation.sendServerMessage(message);
-                            else
-                                empire.sendServerMessage(message);
-                        } catch (IOException e) {
-                            Debug.e(e);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                connector.registerClientMessage(RANDOM_EVENT_MESSAGE, RandomEventMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        try {
-                            server.sendBroadcastServerMessage((RandomEventMessage)iClientMessage);
-                        } catch (IOException e) {
-                            Debug.e(e);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
                 });*/
                 connector.registerClientMessage(SETUP_BASE_MESSAGE, SetupBasesMessage.class, new IClientMessageHandler<SocketConnection>() {
                     @Override
@@ -204,6 +83,42 @@ public class ServerCreator implements MessageFlags {
                     }
                 });
                 connector.registerClientMessage(SETUP_FLEET_MESSAGE, SetupFleetsMessage.class, new IClientMessageHandler<SocketConnection>() {
+                    @Override
+                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
+                        sendMessageToEnemy(iClientMessage);
+                    }
+                });
+                connector.registerClientMessage(RANDOM_EVENT_MESSAGE, RandomEventMessage.class, new IClientMessageHandler<SocketConnection>() {
+                    @Override
+                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
+                        sendMessageToEnemy(iClientMessage);
+                    }
+                });
+                connector.registerClientMessage(POCKET_CHANGE_MESSAGE, PocketChangesMessage.class, new IClientMessageHandler<SocketConnection>() {
+                    @Override
+                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
+                        sendMessageToEnemy(iClientMessage);
+                    }
+                });
+                connector.registerClientMessage(BASES_CREATION_MESSAGE, BasesCreationMessage.class, new IClientMessageHandler<SocketConnection>() {
+                    @Override
+                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
+                        sendMessageToEnemy(iClientMessage);
+                    }
+                });
+                connector.registerClientMessage(FLEETS_CREATION_MESSAGE, FleetsCreationMessage.class, new IClientMessageHandler<SocketConnection>() {
+                    @Override
+                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
+                        sendMessageToEnemy(iClientMessage);
+                    }
+                });
+                connector.registerClientMessage(MOVE_FLEET_MESSAGE, MoveFleetMessage.class, new IClientMessageHandler<SocketConnection>() {
+                    @Override
+                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
+                        sendMessageToEnemy(iClientMessage);
+                    }
+                });
+                connector.registerClientMessage(END_FIGHT_MESSAGE, EndFightMessage.class, new IClientMessageHandler<SocketConnection>() {
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
                         sendMessageToEnemy(iClientMessage);
@@ -266,7 +181,6 @@ public class ServerCreator implements MessageFlags {
                     int rand = random.nextInt(2);
                     int i = 0;
                     for (ClientConnector client : clients) {
-                        //client.sendServerMessage(new StartGameMessage());
                         if (i == rand) {
                             client.sendServerMessage(new StartGameMessage(GameObject.Side.EMPIRE,
                                     new LinkedList<>(graph.getNodes()),
@@ -289,7 +203,6 @@ public class ServerCreator implements MessageFlags {
         @Override
         public void onTerminated(final ClientConnector<SocketConnection> pConnector) {
             // MainActivity.this.toast("SERVER: Client disconnected: " + pConnector.getConnection().getSocket().getInetAddress().getHostAddress());
-
         }
 
     }

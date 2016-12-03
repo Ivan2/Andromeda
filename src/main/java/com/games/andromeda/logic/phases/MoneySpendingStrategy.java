@@ -4,6 +4,10 @@ import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.Pocket;
 import com.games.andromeda.logic.Purchase;
+import com.games.andromeda.multiplayer.Client;
+
+import java.util.LinkedList;
+
 public class MoneySpendingStrategy extends ListStrategy<Purchase, Boolean> {
 
     @Override
@@ -17,11 +21,15 @@ public class MoneySpendingStrategy extends ListStrategy<Purchase, Boolean> {
     @Override
     public boolean applyChanges() {
         // send result and side
+        Client.getInstance().sendMoneySpendingMessage(new LinkedList<Base>(),
+                new LinkedList<Fleet>(), 0); //TODO
         return false;
     }
 
     @Override
     public void autoApplyChanges() {
-        applyChanges();
+        //applyChanges();
+        Client.getInstance().sendMoneySpendingMessage(new LinkedList<Base>(),
+                new LinkedList<Fleet>(), 0);
     }
 }

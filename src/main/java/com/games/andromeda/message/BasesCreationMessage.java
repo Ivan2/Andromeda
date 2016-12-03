@@ -1,39 +1,34 @@
 package com.games.andromeda.message;
 
-import com.games.andromeda.logic.Fleet;
+import com.games.andromeda.logic.Base;
+import com.games.andromeda.logic.GameObject;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 
+public class BasesCreationMessage extends SetupBasesMessage implements MessageFlags {
 
-public class FleetCreationMessage extends FleetDestructionMessage implements MessageFlags {
-    private int shipCount;
+    public BasesCreationMessage() {}
 
-    public FleetCreationMessage(){}
-    public FleetCreationMessage(Fleet fleet, int number){
-        super(fleet, number);
-        shipCount = fleet.getShipCount();
+    public BasesCreationMessage(GameObject.Side side, Collection<Base> bases) {
+        super(side, bases);
     }
 
     @Override
     protected void onReadTransmissionData(DataInputStream pDataInputStream) throws IOException {
         super.onReadTransmissionData(pDataInputStream);
-        shipCount = pDataInputStream.readInt();
     }
 
     @Override
     protected void onWriteTransmissionData(DataOutputStream pDataOutputStream) throws IOException {
         super.onWriteTransmissionData(pDataOutputStream);
-        pDataOutputStream.writeInt(shipCount);
     }
 
     @Override
     public short getFlag() {
-        return FLEET_CREATION_MESSAGE;
+        return BASES_CREATION_MESSAGE;
     }
 
-    public int getShipCount() {
-        return shipCount;
-    }
 }

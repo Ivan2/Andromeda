@@ -8,7 +8,6 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.games.andromeda.message.ConnectionCloseServerMessage;
-import com.games.andromeda.message.MoveShipServerMessage;
 import com.games.andromeda.multiplayer.GameClient;
 import com.games.andromeda.multiplayer.ServerCreator;
 import com.games.andromeda.ui.dialogs.InputIPDialog;
@@ -17,9 +16,7 @@ import com.games.andromeda.ui.dialogs.WarningDialog;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.IMessage;
 import org.andengine.extension.multiplayer.protocol.server.SocketServer;
-import org.andengine.extension.multiplayer.protocol.server.connector.ClientConnector;
 import org.andengine.extension.multiplayer.protocol.server.connector.SocketConnectionClientConnector;
-import org.andengine.extension.multiplayer.protocol.shared.SocketConnection;
 import org.andengine.extension.multiplayer.protocol.util.MessagePool;
 import org.andengine.extension.multiplayer.protocol.util.WifiUtils;
 import org.andengine.util.debug.Debug;
@@ -45,12 +42,12 @@ public class MainActivity extends AppCompatActivity {
     private SocketServer<SocketConnectionClientConnector> mSocketServer;
     private GameClient client;
     private final MessagePool<IMessage> mMessagePool = new MessagePool<IMessage>();
-    private ClientConnector<SocketConnection> clientConnector;
+    //private ClientConnector<SocketConnection> clientConnector;
 
 
-    private void initMessagePool() {
+    /*private void initMessagePool() {
         this.mMessagePool.registerMessage(FLAG_MESSAGE_SERVER_SHOW, MoveShipServerMessage.class);
-    }
+    }*/
 
     private void initServer() {
         start.setEnabled(false);
@@ -87,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             mSocketServer.terminate();
         }
 
-        //if (client != null)
+        if (client != null)
             if (client.getConnector() != null) {
                 client.getConnector().terminate();
             }
