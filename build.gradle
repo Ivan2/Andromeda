@@ -24,7 +24,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'eu.codlab:andengine:1.7.6'
-    compile 'net.sf.jung:jung2:2.0.1'
     compile 'net.sf.jung:jung-graph-impl:2.0.1'
-    compile files('libs/andenginemultiplayerextension.jar')
+    compile group: 'net.sf.jung', name: 'jung-algorithms', version: '2.0.1'
+    //    compile files('libs/andenginemultiplayerextension.jar')
+    compile project(':andengine-gles2-multiplayer')
 }

@@ -3,6 +3,7 @@ package com.games.andromeda.logic;
 import android.util.Log;
 
 import com.games.andromeda.draw.Drawer;
+import com.games.andromeda.graph.PathInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class Fleet extends GameObject {
     private static Random random = new Random();
     private float energy;  // 0..1
     private int nodeID;
+    private Integer prevNodeId;
     private static float CURRENCY = 0.0000001f;
 
     public void setEnergy(float energy) {
@@ -57,7 +59,7 @@ public class Fleet extends GameObject {
 //        ships = Stream.generate(SpaceShip::new)
 //                .limit(shipCount).collect(Collectors.toList());
         ships = new ArrayList<>();
-        for (int i=0; i<shipCount; ++i){
+        for (int i = 0; i < shipCount; ++i){
             ships.add(new SpaceShip());
         }
         if (base.getSide() != side){
@@ -126,7 +128,7 @@ public class Fleet extends GameObject {
      * @return true, если флот уничтожен
      */
     private boolean splitDamage(int damage){
-        for(int i=0; i<damage; ++i){
+        for(int i = 0; i < damage; ++i){
             int size = getShipCount();
             if (size == 0) return true;
             hitShip(ships.get(random.nextInt(size)));
@@ -144,10 +146,7 @@ public class Fleet extends GameObject {
         Boolean result = null;
         while (result == null){
             if (another.splitDamage(this.properties.getAttack(this.getShipCount()))) {
-                result = true;
-                if (this.splitDamage(another.properties.getAttack(another.getShipCount()))){
-                    result = false;
-                }
+                result = !this.splitDamage(another.properties.getAttack(another.getShipCount()));
             }
             drawer.drawFleets(this, another);
             this.tryToRestoreShields();
@@ -183,32 +182,33 @@ public class Fleet extends GameObject {
         return nodeID;
     }
 
+    public Integer getPrevPosition(){
+        return prevNodeId;
+    }
+
     /**
      * Выполняется перемещение флота, если оно возможно
      * @param path результат пользовательского ввода
      */
-    public void makeMove(List<Integer> path) throws InvalidPathException, InvalidPositionException,
-            NotEnoughEnergyException {
-        if (false) {
-            // todo проверка валидности последовательности вершин. лучше в пакете graph ?
-            throw new InvalidPathException();
-        }
-
-        if (!path.get(0).equals(nodeID)){
-            throw new InvalidPositionException();
-        }
-        if (path.size() == 0){
+    public void makeMove(PathInfo path) throws InvalidPathException,
+            InvalidPositionException, NotEnoughEnergyException {
+        List<Integer> nodes = path.getNodeIds();
+        if (nodes.size() < 2){
             return;
         }
-        float requiredEnergy =(float) (path.size()-1)/properties.getSpeed(ships.size()) - CURRENCY;
+        if (!nodes.get(0).equals(nodeID)){
+            throw new InvalidPositionException();
+        }
+        float requiredEnergy =(float) (path.getLength())/properties.getSpeed(ships.size()) - CURRENCY;
         if (requiredEnergy > energy){
             throw new NotEnoughEnergyException();
         }
-        Log.wtf("path_len", String.valueOf(path.size()));
+        Log.wtf("path", path.toString());
         Log.wtf("required_energy", String.valueOf(requiredEnergy));
         Log.wtf("energy", String.valueOf(energy));
         energy -= requiredEnergy;
-        nodeID = path.get(path.size()-1);
+        nodeID = nodes.get(nodes.size() - 1);
+        prevNodeId = nodes.get(nodes.size() - 2);
     }
 
     @Deprecated
@@ -219,7 +219,7 @@ public class Fleet extends GameObject {
     public void destroyShips(int amount)
     {
         for (int i = 0; i < amount; i++)
-            ships.remove(ships.size()-1);
+            ships.remove(ships.size() - 1);
     }
 
 }
