@@ -12,7 +12,7 @@ public class Base extends GameObject {
      * Базы сами по себе не появляются, поэтому конструктор deprecated.
      * Для создания базы следует использовать buy
      * @param side
-     * @param node
+     * @param nodeID
      */
     @Deprecated
     public Base(Side side, int nodeID) throws IncorrectNodeException{
