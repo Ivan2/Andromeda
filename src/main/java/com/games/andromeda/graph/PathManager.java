@@ -2,8 +2,7 @@ package com.games.andromeda.graph;
 
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.WorldAccessor;
-
-import org.apache.commons.collections15.Transformer;
+import com.google.common.base.Function;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,12 @@ public class PathManager {
     public PathManager(){
         solver = new DijkstraShortestPath<>(
                 WorldAccessor.getInstance().getMap().getRepresentation(),
-                new EdgeTransformer(),
+                new Function<Edge, Number>() {
+                    @Override
+                    public Number apply(Edge edge) {
+                        return edge.getWeight();
+                    }
+                },
                 true);
     }
 
@@ -95,10 +99,4 @@ public class PathManager {
         return (int) ((double) num);
     }
 
-    private class EdgeTransformer implements Transformer<Edge, Integer> {
-        @Override
-        public Integer transform(Edge edge) {
-            return edge.getWeight();
-        }
-    }
 }
