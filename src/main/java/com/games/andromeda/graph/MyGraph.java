@@ -39,4 +39,8 @@ public class MyGraph {
         return graph.getEdges();
     }
 
+    public SparseGraph<Node, Edge> getRepresentation(){
+        return graph;
+    }
+
 }
