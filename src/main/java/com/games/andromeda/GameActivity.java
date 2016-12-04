@@ -127,6 +127,18 @@ public class GameActivity extends SimpleBaseGameActivity{
         }
         ui.repaintHUD();*/
 
+
+        /*Node node = WorldAccessor.getInstance().getNodes().get(1);
+        try {
+            Base base = new Base(GameObject.Side.EMPIRE, node.getId());
+            WorldAccessor.getInstance().setBase(base);
+            WorldAccessor.getInstance().setFleet(new Fleet(Phases.getInstance().side, 5, base), 1);
+        } catch (Exception e) {
+            Log.wtf("my stupid exception: ", e.toString());
+        }*/
+
+
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

@@ -11,4 +11,11 @@ public class GameObject {
     public Side getSide() {
         return side;
     }
+
+    public static Side getOtherSide(Side side) {
+        if (side == Side.EMPIRE)
+            return Side.FEDERATION;
+        else
+            return Side.EMPIRE;
+    }
 }

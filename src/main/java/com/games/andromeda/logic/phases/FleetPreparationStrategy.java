@@ -18,16 +18,17 @@ import java.util.Random;
 public class FleetPreparationStrategy extends ListStrategy<Node, Boolean> {
 
     @Override
-    public Boolean handlePhaseEvent(Node input) {
-        if (input.getSystemType() == Node.SystemType.FRIENDLY){
-            if (results.contains(input)){
+    public Boolean handlePhaseEvent(Node input) throws Exception {
+        if (input.getSystemType() == Node.SystemType.FRIENDLY) {
+            if (results.contains(input)) {
                 results.remove(input);
                 return true;
             }
-            if (results.size() <= 3){
+            if (results.size() <= 3) {
                 results.add(input);
                 return true;
-            }
+            } else
+                throw new Exception("Превышено максимальное количество");
         }
         return false;
     }
@@ -36,7 +37,18 @@ public class FleetPreparationStrategy extends ListStrategy<Node, Boolean> {
     public boolean applyChanges() {
         //if (results.size() != 3) return false;
         // todo send side and new fleet locations
+        //пока фаза не закончится флоты не отображаются
         Collection<Fleet> fleets = new LinkedList<>();
+        for (Node node : results) {
+            try {
+                Fleet fleet = new Fleet(Phases.getInstance().side, 5,
+                        WorldAccessor.getInstance().getBases().get(node.getId()));
+                WorldAccessor.getInstance().addFleet(fleet);
+                fleets.add(fleet);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         Client.getInstance().sendSetupFleetMessage(fleets);
         return true;
     }

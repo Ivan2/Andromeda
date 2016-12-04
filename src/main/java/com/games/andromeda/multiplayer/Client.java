@@ -117,7 +117,7 @@ public class Client implements MessageFlags {
             GameClient.getInstance().sendMessage(new SetupBasesMessage(
                     Phases.getInstance().side, bases));
         } catch (IOException e) {
-            Log.wtf("PATH", e.toString());
+            Log.wtf("sendSetupBaseMessage error", e.toString());
         }
     }
 
@@ -126,7 +126,7 @@ public class Client implements MessageFlags {
             GameClient.getInstance().sendMessage(new SetupFleetsMessage(
                     Phases.getInstance().side, fleets));
         } catch (IOException e) {
-            Log.wtf("PATH", e.toString());
+            Log.wtf("sendSetupFleetMessage error", e.toString());
         }
     }
 
@@ -134,7 +134,7 @@ public class Client implements MessageFlags {
         try {
             GameClient.getInstance().sendMessage(new RandomEventMessage(Phases.getInstance().side));
         } catch (IOException e) {
-            Log.wtf("PATH", e.toString());
+            Log.wtf("sendRandomEventMessage error", e.toString());
         }
     }
 
@@ -143,7 +143,7 @@ public class Client implements MessageFlags {
             GameClient.getInstance().sendMessage(new PocketChangesMessage
                     (Phases.getInstance().side, delta));
         } catch (IOException e) {
-            Log.wtf("PATH", e.toString());
+            Log.wtf("sendPocketChangesMessage error", e.toString());
         }
     }
 
@@ -156,7 +156,7 @@ public class Client implements MessageFlags {
             GameClient.getInstance().sendMessage(new PocketChangesMessage
                     (Phases.getInstance().side, delta));
         } catch (IOException e) {
-            Log.wtf("PATH", e.toString());
+            Log.wtf("sendMoneySpendingMessage error", e.toString());
         }
     }
 
@@ -165,7 +165,7 @@ public class Client implements MessageFlags {
             GameClient.getInstance().sendMessage(new MoveFleetMessage
                     (Phases.getInstance().side));
         } catch (IOException e) {
-            Log.wtf("PATH", e.toString());
+            Log.wtf("sendMoveFleetMessage error", e.toString());
         }
     }
 
@@ -174,7 +174,7 @@ public class Client implements MessageFlags {
             GameClient.getInstance().sendMessage(new EndFightMessage
                     (Phases.getInstance().side));
         } catch (IOException e) {
-            Log.wtf("PATH", e.toString());
+            Log.wtf("sendEndFightMessage error", e.toString());
         }
     }
 

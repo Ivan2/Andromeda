@@ -31,7 +31,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
         void onFleetFight(Fleet attackingFleet, Fleet anotherFleet, int number, int secondNumber);
     }
     private static float SHIP_SCALE = 0.3f; // масштаб иконки корабля
-    private static int SHIP_MARGIN = 20;  // вынос иконки корабля относительно системы в px
+    private static int SHIP_MARGIN = 200;  // вынос иконки корабля относительно системы в px
     // разные флоты смещены внутри системы в разные стороны, чтобы не перекрывать друг друга
     private static double[] SHIP_ANGLES = {
         -2*Math.PI/3, Math.PI, 2*Math.PI/3, -Math.PI/3, 0, Math.PI/3
@@ -109,7 +109,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
                                 }
                             }
                             for (int i = 0; i < 6; i++) {
-                                if (world.getAllFleets()[i] != activeSprite.getFleet() &&
+                                if (world.getAllFleets()[i] != null && world.getAllFleets()[i] != activeSprite.getFleet() &&
                                         world.getAllFleets()[i].getPosition() == activeSprite.getFleet().getPosition() &&
                                         activeSprite.getFleet().getSide() != world.getAllFleets()[i].getSide()
                                         ) {
@@ -120,6 +120,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
                             }
                         } catch (Exception e) {
                             Log.wtf("PATH", e.toString());
+                            e.printStackTrace();
                         }
                         activeSprite = null;
                         manager.reset();
