@@ -11,6 +11,7 @@ import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.BasesCreationMessage;
 import com.games.andromeda.message.ConnectionCloseServerMessage;
 import com.games.andromeda.message.EndFightMessage;
+import com.games.andromeda.message.FightMessage;
 import com.games.andromeda.message.FleetsCreationMessage;
 import com.games.andromeda.message.MessageFlags;
 import com.games.andromeda.message.MoveFleetMessage;
@@ -150,6 +151,14 @@ public class GameClient implements Runnable,MessageFlags {
                 public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
                     if (messageReceiver != null)
                         messageReceiver.onMessageReceive(MOVE_FLEET_MESSAGE, iServerMessage);
+                }
+            });
+
+            connector.registerServerMessage(FIGHT_MESSAGE, FightMessage.class, new IServerMessageHandler<SocketConnection>() {
+                @Override
+                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
+                    if (messageReceiver != null)
+                        messageReceiver.onMessageReceive(FIGHT_MESSAGE, iServerMessage);
                 }
             });
 

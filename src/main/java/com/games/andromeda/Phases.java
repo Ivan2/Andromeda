@@ -1,8 +1,11 @@
 package com.games.andromeda;
 
 import com.games.andromeda.logic.GameObject;
+import com.games.andromeda.logic.phases.FleetBattleStrategy;
 import com.games.andromeda.logic.phases.GamePhases;
 import com.games.andromeda.logic.phases.HandlingStrategy;
+import com.games.andromeda.logic.phases.IncomeEarningStrategy;
+import com.games.andromeda.logic.phases.RandomEventStrategy;
 import com.games.andromeda.threads.GameTimer;
 import com.games.andromeda.ui.UI;
 
@@ -53,21 +56,27 @@ public class Phases {
 
     //вызывается сообщением с сервера об окончании фазы
     public void endPhase() {
-        UI.getInstance().setEnabled(false);
+        //UI.getInstance().setEnabled(false);
         gameTimer.stop();
         nextPhase();
     }
 
     private void nextPhase() {
         strategy = iterator.next();
-        UI.getInstance().getPanel().repaintPhaseName(strategy.getTextDescription());
-        //Log.wtf(strategy.getClass().toString(), strategy.getSide()+" "+side);
         if (strategy.getSide() == side) {
             gameTimer.restart();
             UI.getInstance().setEnabled(true);
+
+            if (strategy instanceof RandomEventStrategy || strategy instanceof IncomeEarningStrategy ||
+                    strategy instanceof FleetBattleStrategy) {
+                strategy.autoApplyChanges();
+                nextPhase();
+                return;
+            }
         } else {
             UI.getInstance().setEnabled(false);
         }
+        UI.getInstance().getPanel().repaintPhaseName(strategy.getTextDescription());
     }
 
 }

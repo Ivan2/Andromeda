@@ -1,6 +1,8 @@
 package com.games.andromeda.logic.phases;
 
 
+import com.games.andromeda.Phases;
+import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.multiplayer.Client;
 
 public class IncomeEarningStrategy extends CommonHandlingStrategy<Void, Void>{
@@ -12,8 +14,9 @@ public class IncomeEarningStrategy extends CommonHandlingStrategy<Void, Void>{
     @Override
     public boolean applyChanges() {
         // todo get money from bases and increase player's pocket
-        int delta = 10;
-        Client.getInstance().sendPocketChangesMessage(delta);
+        WorldAccessor.getInstance().getPocket(Phases.getInstance().side).increase(100);
+        Client.getInstance().sendPocketChangesMessage(
+                WorldAccessor.getInstance().getPocket(Phases.getInstance().side).getTotal());
         return true;
     }
 

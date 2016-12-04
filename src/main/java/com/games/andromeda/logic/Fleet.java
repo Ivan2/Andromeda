@@ -18,6 +18,7 @@ public class Fleet extends GameObject {
     private FleetProperties properties;
     private List<SpaceShip> ships;
     private static Random random = new Random();
+    private int id;
     private float energy;  // 0..1
     private int nodeID;
     private static float CURRENCY = 0.0000001f;
@@ -38,7 +39,7 @@ public class Fleet extends GameObject {
      * @param base
      */
     @Deprecated
-    public Fleet(Side side, int shipCount, Base base) throws InvalidPositionException,
+    public Fleet(int id, Side side, int shipCount, Base base) throws InvalidPositionException,
             TooMuchShipsException{
         super(side);
         switch (side){
@@ -63,15 +64,20 @@ public class Fleet extends GameObject {
         if (base.getSide() != side){
             throw new InvalidPositionException();
         }
+        this.id = id;
         this.nodeID = base.getNodeID();
     }
 
-    public static Fleet buy(int shipCount, Base base, Pocket pocket)
+    public static Fleet buy(int id, int shipCount, Base base, Pocket pocket)
             throws Pocket.NotEnoughMoneyException, InvalidPositionException, TooMuchShipsException{
         // todo проверять количество флотов игрока. возможно, не здесь
-        Fleet result = new Fleet(pocket.getSide(), shipCount, base);
+        Fleet result = new Fleet(id, pocket.getSide(), shipCount, base);
         pocket.decrease(result.getCost());
         return result;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public void buyShips(int shipCount, Pocket pocket) throws TooMuchShipsException,
@@ -108,6 +114,14 @@ public class Fleet extends GameObject {
      */
     public int getShipCount(){
         return ships.size();
+    }
+
+    public List<SpaceShip> getShips() {
+        return ships;
+    }
+
+    public void setShips(List<SpaceShip> ships) {
+        this.ships = ships;
     }
 
     /**

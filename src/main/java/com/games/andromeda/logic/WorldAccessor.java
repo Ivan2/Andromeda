@@ -64,6 +64,14 @@ public class WorldAccessor {
         return fleets[calcFleetIndex(side, number)];
     }
 
+    public Fleet getFleetByNode(GameObject.Side side, int nodeID) {
+        for (int i=1; i<=3; i++)
+            if (fleets[calcFleetIndex(side, i)] != null &&
+                    fleets[calcFleetIndex(side, i)].getPosition() == nodeID)
+                    return fleets[calcFleetIndex(side, i)];
+        return null;
+    }
+
     public void setFleet(Fleet fleet, int number) {
         this.fleets[calcFleetIndex(fleet.getSide(), number)] = fleet;
         for (FleetObserver observer : fleetObservers) {
@@ -75,14 +83,20 @@ public class WorldAccessor {
         this.fleets = fleets;
     }
 
-    public boolean addFleet(Fleet fleet) {
+    public int getFreeFleetInd(GameObject.Side side) {
+        for (int i=1; i<=3; i++)
+            if (fleets[calcFleetIndex(side, i)] == null)
+                return i;
+        return 0;
+    }
+
+    public void removeFleet(Fleet fleet) {
         for (int i=1; i<=3; i++) {
-            if (fleets[calcFleetIndex(fleet.getSide(), i)] == null) {
-                setFleet(fleet, i);
-                return true;
+            if (fleets[calcFleetIndex(fleet.getSide(), i)].getId() == fleet.getId()) {
+                fleets[calcFleetIndex(fleet.getSide(), i)] = null;
+                break;
             }
         }
-        return false;
     }
 
     public MyGraph getMap() {

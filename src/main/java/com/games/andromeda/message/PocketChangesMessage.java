@@ -7,26 +7,27 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class PocketChangesMessage extends SideMessage implements MessageFlags {
-    private int delta;
+
+    private int total;
 
     public PocketChangesMessage() {
     }
 
-    public PocketChangesMessage(GameObject.Side side, int delta) {
+    public PocketChangesMessage(GameObject.Side side, int total) {
         super(side);
-        this.delta = delta;
+        this.total = total;
     }
 
     @Override
     protected void onReadTransmissionData(DataInputStream pDataInputStream) throws IOException {
         super.onReadTransmissionData(pDataInputStream);
-        delta = pDataInputStream.readInt();
+        total = pDataInputStream.readInt();
     }
 
     @Override
     protected void onWriteTransmissionData(DataOutputStream pDataOutputStream) throws IOException {
         super.onWriteTransmissionData(pDataOutputStream);
-        pDataOutputStream.writeInt(delta);
+        pDataOutputStream.writeInt(total);
     }
 
     @Override
@@ -34,7 +35,7 @@ public class PocketChangesMessage extends SideMessage implements MessageFlags {
         return POCKET_CHANGE_MESSAGE;
     }
 
-    public int getDelta() {
-        return delta;
+    public int getTotal() {
+        return total;
     }
 }

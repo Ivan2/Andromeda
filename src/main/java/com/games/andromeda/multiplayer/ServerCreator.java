@@ -8,6 +8,7 @@ import com.games.andromeda.level.LevelLoader;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.message.BasesCreationMessage;
 import com.games.andromeda.message.EndFightMessage;
+import com.games.andromeda.message.FightMessage;
 import com.games.andromeda.message.FleetsCreationMessage;
 import com.games.andromeda.message.MessageFlags;
 import com.games.andromeda.message.MoveFleetMessage;
@@ -143,11 +144,15 @@ public class ServerCreator implements MessageFlags {
                         sendMessageToEnemy(iClientMessage);
                     }
                 });
+                connector.registerClientMessage(FIGHT_MESSAGE, FightMessage.class, new IClientMessageHandler<SocketConnection>() {
+                    @Override
+                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
+                        sendMessageToEnemy(iClientMessage);
+                    }
+                });
                 connector.registerClientMessage(END_FIGHT_MESSAGE, EndFightMessage.class, new IClientMessageHandler<SocketConnection>() {
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        timeThread.restart(40,
-                                GameObject.getOtherSide(((SideMessage)iClientMessage).getSide()));
                         sendMessageToEnemy(iClientMessage);
                     }
                 });

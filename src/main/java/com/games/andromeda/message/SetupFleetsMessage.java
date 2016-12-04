@@ -31,11 +31,12 @@ public class SetupFleetsMessage extends SideMessage {
         fleets = new LinkedList<>();
 
         for (int i=0; i<count; ++i) {
+            int id = pDataInputStream.readInt();
             int nodeID = pDataInputStream.readInt();
             int shipCount = pDataInputStream.readInt();
             GameObject.Side side = getSide();
             try {
-                fleets.add(new Fleet(side, shipCount, WorldAccessor.getInstance().getBases().get(nodeID)));
+                fleets.add(new Fleet(id, side, shipCount, WorldAccessor.getInstance().getBases().get(nodeID)));
             } catch (Exception e) {
                 Log.wtf("error", e.toString());
             }
@@ -47,6 +48,7 @@ public class SetupFleetsMessage extends SideMessage {
         super.onWriteTransmissionData(pDataOutputStream);
         pDataOutputStream.writeInt(fleets.size());
         for (Fleet fleet : fleets) {
+            pDataOutputStream.writeInt(fleet.getId());
             pDataOutputStream.writeInt(fleet.getPosition());
             pDataOutputStream.writeInt(fleet.getShipCount());
         }

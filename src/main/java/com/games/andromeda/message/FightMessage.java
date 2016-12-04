@@ -2,33 +2,56 @@ package com.games.andromeda.message;
 
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
-
-import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
-import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
+import com.games.andromeda.logic.SpaceShip;
+import com.games.andromeda.logic.WorldAccessor;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class FightMessage extends SideMessage implements IClientMessage, IServerMessage, MessageFlags{
-    private Fleet fleet1;
+public class FightMessage extends SideMessage implements MessageFlags {
+
+    private Fleet fleet;
+    /*private Fleet fleet1;
     private Fleet fleet2;
     private int number1;
-    private int number2;
+    private int number2;*/
 
     public FightMessage() {}
-    public FightMessage(GameObject.Side side, final Fleet fleet1, final Fleet fleet2, int number1, int number2)
-    {
+
+    //public FightMessage(GameObject.Side side, final Fleet fleet1, final Fleet fleet2, int number1, int number2) {
+    public FightMessage(GameObject.Side side, Fleet fleet) {
         super(side);
-        this.fleet1 = fleet1;
+        this.fleet = fleet;
+        /*this.fleet1 = fleet1;
         this.fleet2 = fleet2;
         this.number1 = number1;
-        this.number2 = number2;
+        this.number2 = number2;*/
     }
 
     @Override
     protected void onReadTransmissionData(DataInputStream pDataInputStream) throws IOException {
         super.onReadTransmissionData(pDataInputStream);
+        int id = pDataInputStream.readInt();
+        float energy = pDataInputStream.readFloat();
+        GameObject.Side side = GameObject.Side.values()[pDataInputStream.readInt()];
+        int count = pDataInputStream.readInt();
+        List<SpaceShip> ships = new ArrayList<>(count);
+        for (int i=0; i<count; i++)
+            ships.add(new SpaceShip(pDataInputStream.readBoolean()));
+
+        Fleet fleet = WorldAccessor.getInstance().getFleet(side, id);
+        if (fleet != null) {
+            if (count == 0) {
+                WorldAccessor.getInstance().removeFleet(fleet);
+                return;
+            }
+            fleet.setEnergy(energy);
+            fleet.setShips(ships);
+        }
+
         /*float   fleet1X = pDataInputStream.readFloat(),
                 fleet1Y = pDataInputStream.readFloat();
         int fleet1Side = pDataInputStream.readInt(),
@@ -66,6 +89,14 @@ public class FightMessage extends SideMessage implements IClientMessage, IServer
     @Override
     protected void onWriteTransmissionData(DataOutputStream pDataOutputStream) throws IOException {
         super.onWriteTransmissionData(pDataOutputStream);
+        pDataOutputStream.writeInt(fleet.getId());
+        pDataOutputStream.writeFloat(fleet.getEnergy());
+        pDataOutputStream.writeInt(fleet.getSide().ordinal());
+        pDataOutputStream.writeInt(fleet.getShipCount());
+        for (SpaceShip ship : fleet.getShips()) {
+            pDataOutputStream.writeBoolean(ship.getShield());
+        }
+
         /*pDataOutputStream.writeFloat(fleet1.getPosition().getX());
         pDataOutputStream.writeFloat(fleet1.getPosition().getY());
         if (fleet1.getSide() == GameObject.Side.EMPIRE)
@@ -89,7 +120,7 @@ public class FightMessage extends SideMessage implements IClientMessage, IServer
         return FIGHT_MESSAGE;
     }
 
-    public Fleet getFleet1()
+    /*public Fleet getFleet1()
     {
         return fleet1;
     }
@@ -105,5 +136,6 @@ public class FightMessage extends SideMessage implements IClientMessage, IServer
 
     public int getNumber2(){
         return number2;
-    }
+    }*/
+
 }

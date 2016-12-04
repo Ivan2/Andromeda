@@ -3,10 +3,15 @@ package com.games.andromeda.multiplayer;
 import android.util.Log;
 
 import com.games.andromeda.Phases;
+import com.games.andromeda.graph.Node;
 import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
+import com.games.andromeda.logic.Pair;
 import com.games.andromeda.logic.WorldAccessor;
+import com.games.andromeda.message.BasesCreationMessage;
 import com.games.andromeda.message.EndFightMessage;
+import com.games.andromeda.message.FightMessage;
+import com.games.andromeda.message.FleetsCreationMessage;
 import com.games.andromeda.message.MessageFlags;
 import com.games.andromeda.message.MoveFleetMessage;
 import com.games.andromeda.message.PocketChangesMessage;
@@ -14,8 +19,6 @@ import com.games.andromeda.message.RandomEventMessage;
 import com.games.andromeda.message.SetupBasesMessage;
 import com.games.andromeda.message.SetupFleetsMessage;
 import com.games.andromeda.message.StartGameMessage;
-import com.games.andromeda.message.BasesCreationMessage;
-import com.games.andromeda.message.FleetsCreationMessage;
 import com.games.andromeda.ui.UI;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
@@ -71,11 +74,8 @@ public class Client implements MessageFlags {
                     case SETUP_FLEET_MESSAGE:
                     case FLEETS_CREATION_MESSAGE:
                         SetupFleetsMessage setupFleetsMessage = (SetupFleetsMessage) message;
-                        int i = 1;
-                        for (Fleet fleet : setupFleetsMessage.getFleets()) {
-                            WorldAccessor.getInstance().setFleet(fleet, i);
-                            i++;
-                        }
+                        for (Fleet fleet : setupFleetsMessage.getFleets())
+                            WorldAccessor.getInstance().setFleet(fleet, fleet.getId());
 
                         UI.getInstance().getShipsLayer().repaint();
                         UI.getInstance().getPanel().repaintShipInfo();
@@ -92,19 +92,28 @@ public class Client implements MessageFlags {
                     case POCKET_CHANGE_MESSAGE:
                         PocketChangesMessage pocketChangesMessage = (PocketChangesMessage) message;
                         WorldAccessor.getInstance().getPocket(pocketChangesMessage.getSide())
-                                .increase(pocketChangesMessage.getDelta());
+                                .setTotal(pocketChangesMessage.getTotal());
                         Phases.getInstance().endPhase();
                         break;
 
                     case MOVE_FLEET_MESSAGE:
                         //MoveFleetMessage moveFleetMessage = (MoveFleetMessage) message;
                         //TODO read message
+                        UI.getInstance().getShipsLayer().repaint();
+                        UI.getInstance().getPanel().repaintShipInfo();
                         Phases.getInstance().endPhase();
+                        break;
+
+                    case FIGHT_MESSAGE:
+                        //FightMessage fightMessage = (FightMessage) message;
+                        //TODO read message
                         break;
 
                     case END_FIGHT_MESSAGE:
                         //EndFightMessage endFightMessage = (EndFightMessage) message;
                         //TODO read message
+                        UI.getInstance().getShipsLayer().repaint();
+                        UI.getInstance().getPanel().repaintShipInfo();
                         Phases.getInstance().endPhase();
                         break;
                 }
@@ -138,34 +147,43 @@ public class Client implements MessageFlags {
         }
     }
 
-    public void sendPocketChangesMessage(int delta) {
+    public void sendPocketChangesMessage(int total) {
         try {
             GameClient.getInstance().sendMessage(new PocketChangesMessage
-                    (Phases.getInstance().side, delta));
+                    (Phases.getInstance().side, total));
         } catch (IOException e) {
             Log.wtf("sendPocketChangesMessage error", e.toString());
         }
     }
 
-    public void sendMoneySpendingMessage(Collection<Base> bases, Collection<Fleet> fleets, int delta) {
+    public void sendMoneySpendingMessage(Collection<Base> bases, Collection<Fleet> fleets, int total) {
         try {
             GameClient.getInstance().sendMessage(new BasesCreationMessage
                     (Phases.getInstance().side, bases));
             GameClient.getInstance().sendMessage(new FleetsCreationMessage
                     (Phases.getInstance().side, fleets));
             GameClient.getInstance().sendMessage(new PocketChangesMessage
-                    (Phases.getInstance().side, delta));
+                    (Phases.getInstance().side, total));
         } catch (IOException e) {
             Log.wtf("sendMoneySpendingMessage error", e.toString());
         }
     }
 
-    public void sendMoveFleetMessage() {
+    public void sendMoveFleetMessage(Collection<Pair<Fleet, Node>> moves) {
         try {
             GameClient.getInstance().sendMessage(new MoveFleetMessage
-                    (Phases.getInstance().side));
+                    (Phases.getInstance().side, moves));
         } catch (IOException e) {
             Log.wtf("sendMoveFleetMessage error", e.toString());
+        }
+    }
+
+    public void sendFightMessage(Fleet fleet) {
+        try {
+            GameClient.getInstance().sendMessage(new FightMessage
+                    (Phases.getInstance().side, fleet));
+        } catch (IOException e) {
+            Log.wtf("sendEndFightMessage error", e.toString());
         }
     }
 

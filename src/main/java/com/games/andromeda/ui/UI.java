@@ -119,20 +119,8 @@ public class UI {
                         UI.toast(e.getMessage());
                     }
                 } else if (Phases.getInstance().getPhase() instanceof FleetPreparationStrategy) {
-                    /*if (node.getSystemType() == Node.SystemType.FRIENDLY) {
-                        try {
-                            WorldAccessor.getInstance().addFleet(new Fleet(Phases.getInstance().side,
-                                    5, WorldAccessor.getInstance().getBases().get(node.getId())));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }*/
                     try {
-                        boolean res = ((FleetPreparationStrategy)Phases.getInstance().
-                                getPhase()).handlePhaseEvent(node);
-                        if (res) {
-                            getShipsLayer().repaint();
-                        }
+                        ((FleetPreparationStrategy)Phases.getInstance().getPhase()).createFleet(node);
                     } catch (Exception e) {
                         UI.toast(e.getMessage());
                     }

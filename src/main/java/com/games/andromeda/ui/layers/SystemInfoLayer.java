@@ -2,10 +2,14 @@ package com.games.andromeda.ui.layers;
 
 import android.content.res.Resources;
 
+import com.games.andromeda.Phases;
 import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.logic.Fleet;
+import com.games.andromeda.logic.Purchase;
 import com.games.andromeda.logic.WorldAccessor;
+import com.games.andromeda.logic.phases.MoneySpendingStrategy;
+import com.games.andromeda.ui.UI;
 import com.games.andromeda.ui.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
@@ -21,6 +25,7 @@ import org.andengine.util.HorizontalAlign;
 import org.andengine.util.color.Color;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public abstract class SystemInfoLayer extends DialogLayer {
 
@@ -125,6 +130,15 @@ public abstract class SystemInfoLayer extends DialogLayer {
             @Override
             public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
                 //TODO построить базу
+                if (Phases.getInstance().getPhase() instanceof MoneySpendingStrategy) {
+                    Purchase purchase = new Purchase(Purchase.Kind.BUILD_BASE, node);
+                    try {
+                        ((MoneySpendingStrategy) Phases.getInstance().getPhase()).handlePhaseEvent(purchase);
+                        setVisibility(false);
+                    } catch (Exception e) {
+                        UI.toast(e.getMessage());
+                    }
+                }
             }
         });
         buildButton.setSize(PxDpConverter.dpToPx(50), PxDpConverter.dpToPx(50));
@@ -146,7 +160,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
         parent.attachChild(systemSprite);
 
 
-        float shipRowHeight = PxDpConverter.dpToPx(90);
+        float shipRowHeight = PxDpConverter.dpToPx(70);
 
         ArrayList<Fleet> fleets = new ArrayList<>(3);
         for (Fleet fleet : WorldAccessor.getInstance().getAllFleets())
@@ -203,7 +217,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
                 energySprite.getX()+energySprite.getWidth()+PxDpConverter.dpToPx(10),
                 energySprite.getY(),
                 font,
-                fleet.getEnergy()+"",
+                String.format(Locale.ENGLISH, "%.2f%%", fleet.getEnergy()*100),
                 vertexBufferObjectManager
         );
 
@@ -211,7 +225,6 @@ public abstract class SystemInfoLayer extends DialogLayer {
         shipRow.attachChild(shipCountText);
         shipRow.attachChild(energySprite);
         shipRow.attachChild(energyText);
-
 /*
         ///Создание кнопки патча
         ButtonSprite patchButton = new ButtonSprite(0, 0, textureLoader.loadPatchTexture(),
@@ -260,7 +273,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
         parent.attachChild(systemSprite);
 
 
-        float shipRowHeight = PxDpConverter.dpToPx(150);
+        float shipRowHeight = PxDpConverter.dpToPx(70);
 
         ArrayList<Fleet> fleets = new ArrayList<>(3);
         for (Fleet fleet : WorldAccessor.getInstance().getAllFleets())
@@ -281,6 +294,37 @@ public abstract class SystemInfoLayer extends DialogLayer {
             parent.attachChild(shipRow);
 
             createShipRow(shipRow, fleet);
+        }
+
+        if (fleets.size() < 3) {
+            ButtonSprite addShipRow = new ButtonSprite(
+                    parent.getWidth()/2+margin,
+                    margin*(fleets.size()+1)+shipRowHeight*fleets.size(),
+                    textureLoader.loadEmptyTexture(new Color(1, 1, 1, 0.05f).getARGBPackedInt()),
+                    vertexBufferObjectManager);
+            addShipRow.setSize(parent.getWidth()/2-margin*2, shipRowHeight);
+            addShipRow.setOnClickListener(new ButtonSprite.OnClickListener() {
+                @Override
+                public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+                    //TODO check (после первого нажатия иногда что-то ломается)
+                    if (Phases.getInstance().getPhase() instanceof MoneySpendingStrategy) {
+                        try {
+                            ((MoneySpendingStrategy) Phases.getInstance().getPhase()).
+                                    handlePhaseEvent(new Purchase(Purchase.Kind.BUY_FLEET, node));
+                            setVisibility(false);
+                        } catch (Exception e) {
+                            UI.toast(e.getMessage());
+                        }
+                    }
+                }
+            });
+            parent.attachChild(addShipRow);
+            scene.registerTouchArea(addShipRow);
+
+            Font font = textureLoader.loadDialogTexture();
+            Text text = new Text(margin, (addShipRow.getHeight()-font.getLineHeight())/2,
+                    font, "Создать флот", vertexBufferObjectManager);
+            addShipRow.attachChild(text);
         }
     }
 
