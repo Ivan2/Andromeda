@@ -33,14 +33,22 @@ public class PathManager {
      */
     public PathInfo getPath(){
         List<Integer> result = goToNearestSystem();
-        Node newStart = WorldAccessor.getInstance().getNodes().get(result.get(result.size()-1));
+        Node newStart = WorldAccessor.getInstance().getNodes().get(last(result));
         List<Edge> edges = solver.getPath(newStart, end);
-        Integer weight = distanceToInt(solver.getDistance(start, newStart)) +
+        int weight = distanceToInt(solver.getDistance(start, newStart)) +
                          distanceToInt(solver.getDistance(newStart, end));
         for (Edge edge: edges) {
-            result.add(edge.getNode2().getId());
+            result.add(getAnotherVertex(last(result), edge));
         }
         return new PathInfo(result, weight);
+    }
+
+    private int getAnotherVertex(int prev, Edge edge){
+        return (prev == edge.getNode1().getId()) ? edge.getNode2().getId(): edge.getNode1().getId();
+    }
+
+    private int last(List<Integer> list){
+        return list.get(list.size() - 1);
     }
 
     /**
@@ -75,7 +83,8 @@ public class PathManager {
         previous = getNode(fleet.getPrevPosition());
     }
 
-    private Node getNode(int id){
+    private Node getNode(Integer id){
+        if (id == null) return null;
         return WorldAccessor.getInstance().getNodes().get(id);
     }
 
@@ -83,7 +92,7 @@ public class PathManager {
         if (num == null){
             return 0;
         }
-        return (int) num;
+        return (int) ((double) num);
     }
 
     private class EdgeTransformer implements Transformer<Edge, Integer> {
