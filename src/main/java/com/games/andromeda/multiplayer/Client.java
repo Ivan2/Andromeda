@@ -3,10 +3,8 @@ package com.games.andromeda.multiplayer;
 import android.util.Log;
 
 import com.games.andromeda.Phases;
-import com.games.andromeda.graph.Node;
 import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
-import com.games.andromeda.logic.Pair;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.BasesCreationMessage;
 import com.games.andromeda.message.EndFightMessage;
@@ -97,16 +95,37 @@ public class Client implements MessageFlags {
                         break;
 
                     case MOVE_FLEET_MESSAGE:
-                        //MoveFleetMessage moveFleetMessage = (MoveFleetMessage) message;
-                        //TODO read message
+                        MoveFleetMessage moveFleetMessage = (MoveFleetMessage) message;
+                        Collection<MoveFleetMessage.Move> moves = moveFleetMessage.getMoves();
+                        for (MoveFleetMessage.Move move : moves) {
+                            Fleet fleet = WorldAccessor.getInstance().getFleet
+                                    (moveFleetMessage.getSide(), move.fleetID);
+                            if (fleet != null) {
+                                fleet.setEnergy(move.energy);
+                                fleet.setPosition(move.nodeID);
+                            }
+                        }
+
                         UI.getInstance().getShipsLayer().repaint();
                         UI.getInstance().getPanel().repaintShipInfo();
                         Phases.getInstance().endPhase();
                         break;
 
                     case FIGHT_MESSAGE:
-                        //FightMessage fightMessage = (FightMessage) message;
-                        //TODO read message
+                        FightMessage fightMessage = (FightMessage) message;
+                        FightMessage.Fight fight = fightMessage.getFight();
+
+                        Fleet fleet = WorldAccessor.getInstance().getFleet(fight.side,
+                                fight.fleetID);
+                        if (fleet != null) {
+                            fleet.setEnergy(fight.energy);
+                            fleet.setShips(fight.ships);
+                            if (fleet.getShipCount() == 0) {
+                                WorldAccessor.getInstance().removeFleet(fleet);
+                            }
+                        }
+                        UI.getInstance().getShipsLayer().repaint();
+                        UI.getInstance().getPanel().repaintShipInfo();
                         break;
 
                     case END_FIGHT_MESSAGE:
@@ -169,7 +188,7 @@ public class Client implements MessageFlags {
         }
     }
 
-    public void sendMoveFleetMessage(Collection<Pair<Fleet, Node>> moves) {
+    public void sendMoveFleetMessage(Collection<MoveFleetMessage.Move> moves) {
         try {
             GameClient.getInstance().sendMessage(new MoveFleetMessage
                     (Phases.getInstance().side, moves));
@@ -180,8 +199,10 @@ public class Client implements MessageFlags {
 
     public void sendFightMessage(Fleet fleet) {
         try {
+            FightMessage.Fight fight = new FightMessage.Fight(fleet.getId(),
+                    fleet.getEnergy(), fleet.getSide(), fleet.getShips());
             GameClient.getInstance().sendMessage(new FightMessage
-                    (Phases.getInstance().side, fleet));
+                    (Phases.getInstance().side, fight));
         } catch (IOException e) {
             Log.wtf("sendEndFightMessage error", e.toString());
         }

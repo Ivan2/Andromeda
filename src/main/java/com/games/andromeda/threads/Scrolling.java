@@ -41,7 +41,7 @@ public class Scrolling implements Runnable {
             } catch (InterruptedException e) {
             }
 
-            if (layer.isShipMoves()) {
+            /*if (layer.isShipMoves()) {
                 float x = scrollEntity.getX();
                 float y = scrollEntity.getY();
 
@@ -61,7 +61,7 @@ public class Scrolling implements Runnable {
                     scrollEntity.setY(screenHeight/2);
 
                 layer.move(scrollEntity.getX()+dx, scrollEntity.getY()+dy);
-            }
+            }*/
         }
     }
 
@@ -88,9 +88,9 @@ public class Scrolling implements Runnable {
 
                 float x = scrollEntity.getX();
                 float y = scrollEntity.getY();
-                if (layer.isShipMoves())
-                    scrollEntity.setPosition(x + dx, y + dy);
-                else
+                //if (layer.isShipMoves())
+                //    scrollEntity.setPosition(x + dx, y + dy);
+                //else
                     scrollEntity.setPosition(x - dx, y - dy);
 
                 if (scrollEntity.getX() + screenWidth / 2 > camera.getWidth())

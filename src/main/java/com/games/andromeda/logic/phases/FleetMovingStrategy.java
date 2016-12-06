@@ -1,15 +1,13 @@
 package com.games.andromeda.logic.phases;
 
-import com.games.andromeda.graph.Node;
-import com.games.andromeda.logic.Fleet;
-import com.games.andromeda.logic.Pair;
+import com.games.andromeda.message.MoveFleetMessage;
 import com.games.andromeda.multiplayer.Client;
 
 //пока только конечная точка
-public class FleetMovingStrategy extends ListStrategy<Pair<Fleet, Node>, Void> {
+public class FleetMovingStrategy extends ListStrategy<MoveFleetMessage.Move, Void> {
 
     @Override
-    public Void handlePhaseEvent(Pair<Fleet, Node> input) {
+    public Void handlePhaseEvent(MoveFleetMessage.Move input) {
         results.add(input);
         return null;
     }

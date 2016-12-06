@@ -35,18 +35,18 @@ public class TextureLoader {
 
     public ITextureRegion loadSystemTexture(Node.SystemType systemType) {
         int size = 256;
-        float radius = 50;
+        float radius = 120;
         Bitmap bitmap = android.graphics.Bitmap.createBitmap(size, size,
                 android.graphics.Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();
-        paint.setStrokeWidth(16);
+        paint.setStrokeWidth(24);
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         if (systemType == Node.SystemType.MINI)
             radius *= 0.4;
         canvas.drawCircle(bitmap.getWidth()/2, bitmap.getHeight()/2, radius, paint);
-        switch (systemType) {
+        /*switch (systemType) {
             case EMPTY:
                 paint.setColor(Color.GRAY);
                 break;
@@ -58,7 +58,8 @@ public class TextureLoader {
                 break;
             default:
                 paint.setColor(Color.GRAY);
-        }
+        }*/
+        paint.setColor(Color.GRAY);
         paint.setStyle(Paint.Style.STROKE);
         canvas.drawCircle(bitmap.getWidth()/2, bitmap.getHeight()/2, radius, paint);
 

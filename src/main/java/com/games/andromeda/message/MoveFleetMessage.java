@@ -1,10 +1,6 @@
 package com.games.andromeda.message;
 
-import com.games.andromeda.graph.Node;
-import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
-import com.games.andromeda.logic.Pair;
-import com.games.andromeda.logic.WorldAccessor;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -14,11 +10,23 @@ import java.util.Collection;
 
 public class MoveFleetMessage extends SideMessage implements MessageFlags {
 
-    private Collection<Pair<Fleet, Node>> moves;
+    public static class Move {
+        public int fleetID;
+        public float energy;
+        public int nodeID;
+
+        public Move(int fleetID, float energy, int nodeID) {
+            this.fleetID = fleetID;
+            this.energy = energy;
+            this.nodeID = nodeID;
+        }
+    }
+
+    private Collection<Move> moves;
 
     public MoveFleetMessage() {}
 
-    public MoveFleetMessage(GameObject.Side side, Collection<Pair<Fleet, Node>> moves) {
+    public MoveFleetMessage(GameObject.Side side, Collection<Move> moves) {
         super(side);
         this.moves = moves;
     }
@@ -29,15 +37,10 @@ public class MoveFleetMessage extends SideMessage implements MessageFlags {
         int size = pDataInputStream.readInt();
         moves = new ArrayList<>(size);
         for (int i=0; i<size; i++) {
-            int id = pDataInputStream.readInt();
+            int fleetID = pDataInputStream.readInt();
             float energy = pDataInputStream.readFloat();
-            int node = pDataInputStream.readInt();
-
-            Fleet fleet = WorldAccessor.getInstance().getFleet(getSide(), id);
-            if (fleet != null) {
-                fleet.setEnergy(energy);
-                fleet.setPosition(node);
-            }
+            int nodeID = pDataInputStream.readInt();
+            moves.add(new Move(fleetID, energy, nodeID));
         }
     }
 
@@ -45,10 +48,10 @@ public class MoveFleetMessage extends SideMessage implements MessageFlags {
     protected void onWriteTransmissionData(DataOutputStream pDataOutputStream) throws IOException {
         super.onWriteTransmissionData(pDataOutputStream);
         pDataOutputStream.writeInt(moves.size());
-        for (Pair<Fleet, Node> entry : moves) {
-            pDataOutputStream.writeInt(entry.getKey().getId());
-            pDataOutputStream.writeFloat(entry.getKey().getEnergy());
-            pDataOutputStream.writeInt(entry.getValue().getId());
+        for (Move move : moves) {
+            pDataOutputStream.writeInt(move.fleetID);
+            pDataOutputStream.writeFloat(move.energy);
+            pDataOutputStream.writeInt(move.nodeID);
         }
     }
 
@@ -57,4 +60,7 @@ public class MoveFleetMessage extends SideMessage implements MessageFlags {
         return MOVE_FLEET_MESSAGE;
     }
 
+    public Collection<Move> getMoves() {
+        return moves;
+    }
 }

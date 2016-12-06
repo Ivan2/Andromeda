@@ -3,12 +3,14 @@ package com.games.andromeda.ui.layers;
 import android.graphics.PointF;
 import android.util.Log;
 
+import com.games.andromeda.Phases;
 import com.games.andromeda.graph.Node;
-import com.games.andromeda.graph.PathManager;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.FleetObserver;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.WorldAccessor;
+import com.games.andromeda.logic.phases.FleetMovingStrategy;
+import com.games.andromeda.ui.UI;
 import com.games.andromeda.ui.sprites.ShipSprite;
 import com.games.andromeda.ui.texture.TextureLoader;
 
@@ -31,13 +33,13 @@ public class ShipsLayer extends Layer implements FleetObserver {
         void onFleetFight(Fleet attackingFleet, Fleet anotherFleet, int number, int secondNumber);
     }
     private static float SHIP_SCALE = 0.3f; // масштаб иконки корабля
-    private static int SHIP_MARGIN = 200;  // вынос иконки корабля относительно системы в px
+    private static int SHIP_MARGIN = 60;  // вынос иконки корабля относительно системы в px
     // разные флоты смещены внутри системы в разные стороны, чтобы не перекрывать друг друга
     private static double[] SHIP_ANGLES = {
         -2*Math.PI/3, Math.PI, 2*Math.PI/3, -Math.PI/3, 0, Math.PI/3
     };
     // первые 3 - цвета империи, последние 3 - федерации
-    private static String[] SHIP_COLORS = {
+    public static String[] SHIP_COLORS = {
         "red", "green", "blue", "gray", "pink", "brown"
     };
 
@@ -47,9 +49,9 @@ public class ShipsLayer extends Layer implements FleetObserver {
 //    private Fleet[] fleets;  // флоты - та часть, которая вносит изменения
 
 
-    private ShipSprite activeSprite;
+    public static ShipSprite activeSprite;
 
-    private PathManager pathManager;
+    //private PathManager pathManager;
 
     private Rectangle layer;
 
@@ -79,19 +81,19 @@ public class ShipsLayer extends Layer implements FleetObserver {
 
 
     public ShipsLayer(Scene scene, Camera camera, TextureLoader textureLoader,
-                      VertexBufferObjectManager vertexBufferObjectManager, final PathManager manager,
+                      VertexBufferObjectManager vertexBufferObjectManager,// final PathManager manager,
                       final IOnFleetMove onFleetMove, final IOnFleetFight onFleetFight) {
         super(scene, camera, textureLoader, vertexBufferObjectManager);
 
-        pathManager = manager;
+        //pathManager = manager;
 
         // todo refacor this using magic layerListener ???
         layer = new Rectangle(0, 0, camera.getWidth(), camera.getHeight(),
                 vertexBufferObjectManager){
             @Override
             public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                if (activeSprite != null) {
-                    if (pSceneTouchEvent.isActionMove()) {
+                /*if (activeSprite != null) {
+                    //if (pSceneTouchEvent.isActionMove()) {
                         activeSprite.setX(pSceneTouchEvent.getX() - activeSprite.getWidth() / 2);
                         activeSprite.setY(pSceneTouchEvent.getY() - activeSprite.getHeight() / 2);
                     } else if (pSceneTouchEvent.isActionUp()) {
@@ -126,7 +128,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
                         manager.reset();
                         ShipsLayer.this.repaint();
                     }
-                }
+                }*/
                 return super.onAreaTouched(pSceneTouchEvent, pTouchAreaLocalX, pTouchAreaLocalY);
             }
         };
@@ -144,11 +146,16 @@ public class ShipsLayer extends Layer implements FleetObserver {
             sprites[i] = new ShipSprite(0, 0, textures[i],vertexBufferObjectManager){
                 @Override
                 public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                    if (pSceneTouchEvent.isActionDown()){
-                        activeSprite = this;
-//                        activeSprite.getFleet().setEnergy(100500);
-                        manager.start(this.getFleet());
-                    }
+                    if (Phases.getInstance().getPhase() instanceof FleetMovingStrategy)
+                        if (pSceneTouchEvent.isActionUp()){
+                            if (activeSprite == null) {
+                                UI.toast("Выберите систему для перемещения флота");
+                                activeSprite = this;
+                            } else
+                                activeSprite = null;
+    //                        activeSprite.getFleet().setEnergy(100500);
+                            //manager.start(this.getFleet());
+                        }
                     return super.onAreaTouched(pSceneTouchEvent, pTouchAreaLocalX, pTouchAreaLocalY);
                 }
             };
@@ -191,6 +198,11 @@ public class ShipsLayer extends Layer implements FleetObserver {
         for(int i=0; i<6; ++i){
             if (sprites[i].getFleet() != null){
                 if (sprites[i].getFleet().getShipCount() == 0){
+                    sprites[i].setFleet(null);
+                    layer.detachChild(sprites[i]);
+                }
+            } else {
+                if (sprites[i].getFleet() != null) {
                     sprites[i].setFleet(null);
                     layer.detachChild(sprites[i]);
                 }

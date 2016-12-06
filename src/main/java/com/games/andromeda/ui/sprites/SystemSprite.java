@@ -4,14 +4,13 @@ import android.view.MotionEvent;
 
 import com.games.andromeda.graph.Node;
 
-import org.andengine.entity.sprite.ButtonSprite;
+import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
-public abstract class SystemSprite extends ButtonSprite {
+public abstract class SystemSprite extends Sprite {
 
-    public abstract void onClick();
     public abstract void onMove();
     public abstract void onUp();
 
@@ -21,13 +20,13 @@ public abstract class SystemSprite extends ButtonSprite {
                         VertexBufferObjectManager pVertexBufferObjectManager) {
         super(pX, pY, pTextureRegion, pVertexBufferObjectManager);
         this.node = node;
-        setOnClickListener(new OnClickListener() {
+        /*setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                SystemSprite.this.onClick();
+
                 //runnable.run();
             }
-        });
+        });*/
     }
 
     @Override

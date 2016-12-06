@@ -92,7 +92,8 @@ public class WorldAccessor {
 
     public void removeFleet(Fleet fleet) {
         for (int i=1; i<=3; i++) {
-            if (fleets[calcFleetIndex(fleet.getSide(), i)].getId() == fleet.getId()) {
+            if (fleets[calcFleetIndex(fleet.getSide(), i)] != null &&
+                    fleets[calcFleetIndex(fleet.getSide(), i)].getId() == fleet.getId()) {
                 fleets[calcFleetIndex(fleet.getSide(), i)] = null;
                 break;
             }

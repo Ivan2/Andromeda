@@ -6,10 +6,11 @@ import android.widget.Toast;
 import com.games.andromeda.GameActivity;
 import com.games.andromeda.Phases;
 import com.games.andromeda.graph.Node;
-import com.games.andromeda.graph.PathManager;
 import com.games.andromeda.logic.WorldAccessor;
+import com.games.andromeda.logic.phases.FleetMovingStrategy;
 import com.games.andromeda.logic.phases.FleetPreparationStrategy;
 import com.games.andromeda.logic.phases.LevelPreparationStrategy;
+import com.games.andromeda.message.MoveFleetMessage;
 import com.games.andromeda.threads.Scrolling;
 import com.games.andromeda.ui.hud.PanelHUD;
 import com.games.andromeda.ui.layers.BackgroundLayer;
@@ -17,6 +18,7 @@ import com.games.andromeda.ui.layers.MessageLayer;
 import com.games.andromeda.ui.layers.ShipsLayer;
 import com.games.andromeda.ui.layers.SystemInfoLayer;
 import com.games.andromeda.ui.layers.SystemsLayer;
+import com.games.andromeda.ui.sprites.ShipSprite;
 import com.games.andromeda.ui.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
@@ -39,7 +41,7 @@ public class UI {
 
     private static UI instance;
 
-    public static void createInstance(Activity activity, Scene scene, Camera camera, TextureLoader textureLoader,
+    public static void createInstance(GameActivity activity, Scene scene, Camera camera, TextureLoader textureLoader,
                                       VertexBufferObjectManager vertexBufferObjectManager,
                                       ShipsLayer.IOnFleetMove onFleetMove,ShipsLayer.IOnFleetFight onFleetFight) {
         instance = new UI(activity, scene, camera, textureLoader, vertexBufferObjectManager,
@@ -50,7 +52,7 @@ public class UI {
         return instance;
     }
 
-    private PathManager manager;
+    //private PathManager manager;
     private PanelHUD panel;
     private final BackgroundLayer backgroundLayer;
     private final SystemsLayer systemsLayer;
@@ -60,11 +62,11 @@ public class UI {
 
     public Activity activity;
 
-    private UI(Activity activity, Scene scene, Camera camera, TextureLoader textureLoader,
+    private UI(GameActivity activity, Scene scene, Camera camera, TextureLoader textureLoader,
               VertexBufferObjectManager vertexBufferObjectManager,
               ShipsLayer.IOnFleetMove onFleetMove,ShipsLayer.IOnFleetFight onFleetFight) {
         this.activity = activity;
-        manager = new PathManager();
+        //manager = new PathManager();
 
         scene.setBackground(new Background(Color.BLACK));
         //scene.setTouchAreaBindingOnActionDownEnabled(true);//Без этого не будет работать нормально перетаскивание спрайтов
@@ -76,13 +78,13 @@ public class UI {
         backgroundLayer.repaint();
 
         //слой с системами
-        systemsLayer = new SystemsLayer(scene, camera, textureLoader,
+        systemsLayer = new SystemsLayer(activity, scene, camera, textureLoader,
                 vertexBufferObjectManager, WorldAccessor.getInstance().getMap());
         systemsLayer.repaint();
 
         //слой с кораблями
         shipsLayer = new ShipsLayer(scene, camera, textureLoader,
-                vertexBufferObjectManager, manager, onFleetMove,onFleetFight);
+                vertexBufferObjectManager, onFleetMove,onFleetFight);
         WorldAccessor.getInstance().addFleetObserver(shipsLayer);
         shipsLayer.repaint();
 
@@ -106,8 +108,14 @@ public class UI {
         };
 
         systemsLayer.setLayerListener(new SystemsLayer.LayerListener() {
+
             @Override
-            public void onClick(Node node) {
+            public void onMove(Node node) {
+                //manager.addNode(node.getId());
+            }
+
+            @Override
+            public void onUp(Node node) {
                 //TODO handlePhaseEvent
                 if (Phases.getInstance().getPhase() instanceof LevelPreparationStrategy) {
                     try {
@@ -124,18 +132,47 @@ public class UI {
                     } catch (Exception e) {
                         UI.toast(e.getMessage());
                     }
+                } else if (Phases.getInstance().getPhase() instanceof FleetMovingStrategy) {
+                    ShipSprite activeSprite = ShipsLayer.activeSprite;
+                    if (activeSprite != null && activeSprite.getFleet().getId() != node.getId()) {
+                        //TODO show ask dialog (in beta?)
+                        //TODO check energy and calc path
+                        activeSprite.getFleet().setPosition(node.getId());
+                        ((FleetMovingStrategy)Phases.getInstance().getPhase()).handlePhaseEvent(
+                                new MoveFleetMessage.Move(activeSprite.getFleet().getId(),
+                                        activeSprite.getFleet().getEnergy(), node.getId()));
+                        /*try {
+                            activeSprite.getFleet().makeMove(manager.getPath());
+                            WorldAccessor world = WorldAccessor.getInstance();
+                            int fleetNum = -1;
+                            for (int i = 0; i < 6; i++) {
+                                if (world.getAllFleets()[i] == activeSprite.getFleet()) {
+                                    if (i > 2) i -=3;
+                                    fleetNum = i+1;
+                                    onFleetMove.onFleetMove(activeSprite.getFleet(), fleetNum);
+                                    break;
+                                }
+                            }
+                            for (int i = 0; i < 6; i++) {
+                                if (world.getAllFleets()[i] != null && world.getAllFleets()[i] != activeSprite.getFleet() &&
+                                        world.getAllFleets()[i].getPosition() == activeSprite.getFleet().getPosition() &&
+                                        activeSprite.getFleet().getSide() != world.getAllFleets()[i].getSide()
+                                        ) {
+                                    if (i > 2) i -=3;
+                                    onFleetFight.onFleetFight(activeSprite.getFleet(),world.getAllFleets()[i],fleetNum,i+1);
+                                    break;
+                                }
+                            }
+                        } catch (Exception e) {
+                            Log.wtf("PATH", e.toString());
+                            e.printStackTrace();
+                        }*/
+                        ShipsLayer.activeSprite = null;
+                        //manager.reset();
+                        getShipsLayer().repaint();
+                    }
                 } else
                     systemInfoLayer.show(node);
-            }
-
-            @Override
-            public void onMove(Node node) {
-                manager.addNode(node.getId());
-            }
-
-            @Override
-            public void onUp(Node node) {
-
             }
         });
 

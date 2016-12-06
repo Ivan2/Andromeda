@@ -8,6 +8,7 @@ import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.R;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.WorldAccessor;
+import com.games.andromeda.ui.layers.ShipsLayer;
 import com.games.andromeda.ui.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
@@ -69,7 +70,7 @@ public class PanelHUD {
     private void createGUI() {
         float top = 0;
         float left = PxDpConverter.dpToPx(4);
-        String[] colors = new String[]{"red", "gray", "blue", "brown", "pink", "green"};
+        String[] colors = ShipsLayer.SHIP_COLORS;
         shipSprites = new Rectangle[6];
         shipCountTexts = new Text[6];
         shipEnergySprites = new Sprite[6];

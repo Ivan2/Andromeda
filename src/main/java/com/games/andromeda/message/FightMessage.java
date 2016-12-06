@@ -1,9 +1,7 @@
 package com.games.andromeda.message;
 
-import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.SpaceShip;
-import com.games.andromeda.logic.WorldAccessor;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -13,7 +11,21 @@ import java.util.List;
 
 public class FightMessage extends SideMessage implements MessageFlags {
 
-    private Fleet fleet;
+    public static class Fight {
+        public int fleetID;
+        public float energy;
+        public GameObject.Side side;
+        public List<SpaceShip> ships;
+
+        public Fight(int fleetID, float energy, GameObject.Side side, List<SpaceShip> ships) {
+            this.fleetID = fleetID;
+            this.energy = energy;
+            this.side = side;
+            this.ships = ships;
+        }
+    }
+
+    private Fight fight;
     /*private Fleet fleet1;
     private Fleet fleet2;
     private int number1;
@@ -22,9 +34,9 @@ public class FightMessage extends SideMessage implements MessageFlags {
     public FightMessage() {}
 
     //public FightMessage(GameObject.Side side, final Fleet fleet1, final Fleet fleet2, int number1, int number2) {
-    public FightMessage(GameObject.Side side, Fleet fleet) {
+    public FightMessage(GameObject.Side side, Fight fight) {
         super(side);
-        this.fleet = fleet;
+        this.fight = fight;
         /*this.fleet1 = fleet1;
         this.fleet2 = fleet2;
         this.number1 = number1;
@@ -34,23 +46,14 @@ public class FightMessage extends SideMessage implements MessageFlags {
     @Override
     protected void onReadTransmissionData(DataInputStream pDataInputStream) throws IOException {
         super.onReadTransmissionData(pDataInputStream);
-        int id = pDataInputStream.readInt();
+        int fleetID = pDataInputStream.readInt();
         float energy = pDataInputStream.readFloat();
         GameObject.Side side = GameObject.Side.values()[pDataInputStream.readInt()];
         int count = pDataInputStream.readInt();
         List<SpaceShip> ships = new ArrayList<>(count);
         for (int i=0; i<count; i++)
             ships.add(new SpaceShip(pDataInputStream.readBoolean()));
-
-        Fleet fleet = WorldAccessor.getInstance().getFleet(side, id);
-        if (fleet != null) {
-            if (count == 0) {
-                WorldAccessor.getInstance().removeFleet(fleet);
-                return;
-            }
-            fleet.setEnergy(energy);
-            fleet.setShips(ships);
-        }
+        fight = new Fight(fleetID, energy, side, ships);
 
         /*float   fleet1X = pDataInputStream.readFloat(),
                 fleet1Y = pDataInputStream.readFloat();
@@ -89,11 +92,12 @@ public class FightMessage extends SideMessage implements MessageFlags {
     @Override
     protected void onWriteTransmissionData(DataOutputStream pDataOutputStream) throws IOException {
         super.onWriteTransmissionData(pDataOutputStream);
-        pDataOutputStream.writeInt(fleet.getId());
-        pDataOutputStream.writeFloat(fleet.getEnergy());
-        pDataOutputStream.writeInt(fleet.getSide().ordinal());
-        pDataOutputStream.writeInt(fleet.getShipCount());
-        for (SpaceShip ship : fleet.getShips()) {
+
+        pDataOutputStream.writeInt(fight.fleetID);
+        pDataOutputStream.writeFloat(fight.energy);
+        pDataOutputStream.writeInt(fight.side.ordinal());
+        pDataOutputStream.writeInt(fight.ships.size());
+        for (SpaceShip ship : fight.ships) {
             pDataOutputStream.writeBoolean(ship.getShield());
         }
 
@@ -138,4 +142,7 @@ public class FightMessage extends SideMessage implements MessageFlags {
         return number2;
     }*/
 
+    public Fight getFight() {
+        return fight;
+    }
 }

@@ -2,6 +2,7 @@ package com.games.andromeda.ui.layers;
 
 import android.graphics.PointF;
 
+import com.games.andromeda.GameActivity;
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.ui.sprites.SystemSprite;
@@ -18,11 +19,11 @@ import org.andengine.util.color.Color;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 public class SystemsLayer extends Layer {
 
     public static abstract class LayerListener {
-        public abstract void onClick(Node node);
         public abstract void onMove(Node node);
         public abstract void onUp(Node node);
     }
@@ -30,13 +31,15 @@ public class SystemsLayer extends Layer {
     private MyGraph graph;
     private Rectangle layer;
     private HashMap<Node.SystemType, ITextureRegion> systemTextures;
+    private GameActivity activity;
 
     private LayerListener layerListener;
 
-    public SystemsLayer(Scene scene, Camera camera, TextureLoader textureLoader,
+    public SystemsLayer(GameActivity activity, Scene scene, Camera camera, TextureLoader textureLoader,
                         VertexBufferObjectManager vertexBufferObjectManager, MyGraph graph) {
         super(scene, camera, textureLoader, vertexBufferObjectManager);
         this.graph = graph;
+        this.activity = activity;
 
         systemTextures = new HashMap<>();
         systemTextures.put(Node.SystemType.EMPTY,
@@ -54,20 +57,32 @@ public class SystemsLayer extends Layer {
                 vertexBufferObjectManager);
         layer.setColor(Color.TRANSPARENT);
         scene.attachChild(layer);
+
+        sprites = new LinkedList<>();
     }
+
+    private LinkedList<Sprite> sprites;
 
     @Override
     public void repaint() {
-        //TODO удалить все спрайты со слоя
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                for (Sprite sprite : sprites) {
+                    scene.unregisterTouchArea(sprite);
+                    layer.detachChild(sprite);
+                }
 
-        Collection<Node> nodes = graph.getNodes();
-        Iterator<Node> nodeIterator = nodes.iterator();
-        while (nodeIterator.hasNext()) {
-            final Node node = nodeIterator.next();
-            float size = 100;
-            PointF pos = getPos(node.getX(), node.getY());
+                //TODO удалить все спрайты со слоя
 
-            //TODO цвет системы по наличию базы?
+                Collection<Node> nodes = graph.getNodes();
+                Iterator<Node> nodeIterator = nodes.iterator();
+                while (nodeIterator.hasNext()) {
+                    final Node node = nodeIterator.next();
+                    float size = 50;
+                    PointF pos = getPos(node.getX(), node.getY());
+
+                    //TODO цвет системы по наличию базы?
             /*ITextureRegion textureRegion;
             if (node.getSystemType() == Node.SystemType.MINI || node.getSystemType() == Node.SystemType.HYPER)
                 textureRegion = systemTextures.get(node.getSystemType());
@@ -89,32 +104,46 @@ public class SystemsLayer extends Layer {
                 }
             }*/
 
-            Sprite sprite = new SystemSprite(node, pos.x - size / 2, pos.y - size / 2,
-                    systemTextures.get(node.getSystemType()), vertexBufferObjectManager) {
+                    Sprite sprite = new SystemSprite(node, pos.x - size / 2, pos.y - size / 2,
+                            systemTextures.get(node.getSystemType()), vertexBufferObjectManager) {
 
-                @Override
-                public void onClick() {
-                    if (layerListener != null)
-                        layerListener.onClick(node);
+                        @Override
+                        public void onMove() {
+                            if (layerListener != null)
+                                layerListener.onMove(node);
+                        }
+
+                        @Override
+                        public void onUp() {
+                            if (layerListener != null)
+                                layerListener.onUp(node);
+                        }
+
+                    };
+                    //это как-то работает
+                    switch (node.getSystemType()) {
+                        case EMPTY:
+                            sprite.setColor(new Color(0.8f, 0.8f, 0.8f));
+                            break;
+                        case FRIENDLY:
+                            sprite.setColor(Color.GREEN);
+                            break;
+                        case ENEMY:
+                            sprite.setColor(Color.RED);
+                            break;
+                        default:
+                            sprite.setColor(new Color(0.8f, 0.8f, 0.8f));
+                    }
+                    if (node.getSystemType() == Node.SystemType.HYPER)
+                        sprite.setSize(size*2, size*2);
+                    else
+                        sprite.setSize(size, size);
+                    layer.attachChild(sprite);
+                    scene.registerTouchArea(sprite);
+                    sprites.add(sprite);
                 }
-
-                @Override
-                public void onMove() {
-                    if (layerListener != null)
-                        layerListener.onMove(node);
-                }
-
-                @Override
-                public void onUp() {
-                    if (layerListener != null)
-                        layerListener.onUp(node);
-                }
-
-            };
-            sprite.setSize(size, size);
-            layer.attachChild(sprite);
-            scene.registerTouchArea(sprite);
-        }
+            }
+        });
     }
 
     public void setLayerListener(LayerListener layerListener) {

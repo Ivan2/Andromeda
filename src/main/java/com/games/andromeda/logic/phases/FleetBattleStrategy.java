@@ -3,8 +3,10 @@ package com.games.andromeda.logic.phases;
 import com.games.andromeda.Phases;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
+import com.games.andromeda.logic.Pair;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.multiplayer.Client;
+import com.games.andromeda.ui.UI;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -23,7 +25,7 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
     public boolean applyChanges() {
         // todo show battle, fix fleet changes
 
-        HashMap<Integer, AbstractMap.SimpleEntry<List<Fleet>, List<Fleet>>> battles = new HashMap<>();
+        HashMap<Integer, Pair<List<Fleet>, List<Fleet>>> battles = new HashMap<>();
         GameObject.Side side = Phases.getInstance().side;
         GameObject.Side otherSide = (side== GameObject.Side.EMPIRE) ? GameObject.Side.FEDERATION :
                 GameObject.Side.EMPIRE;
@@ -42,8 +44,8 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
                                 fleets1.add(fleet1);
                                 List<Fleet> fleets2 = new LinkedList<>();
                                 fleets2.add(fleet2);
-                                AbstractMap.SimpleEntry<List<Fleet>, List<Fleet>> fleets =
-                                        new AbstractMap.SimpleEntry<>(fleets1, fleets2);
+                                Pair<List<Fleet>, List<Fleet>> fleets =
+                                        new Pair<>(fleets1, fleets2);
                                 battles.put(nodeID, fleets);
                             } else {
                                 AbstractMap.SimpleEntry<List<Fleet>, List<Fleet>> fleets = battles.get(nodeID);
@@ -58,7 +60,7 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
                 }
         }
 
-        for (Map.Entry<Integer, AbstractMap.SimpleEntry<List<Fleet>, List<Fleet>>> entry : battles.entrySet()) {
+        for (Map.Entry<Integer, Pair<List<Fleet>, List<Fleet>>> entry : battles.entrySet()) {
             int nodeID = entry.getKey();
             AbstractMap.SimpleEntry<List<Fleet>, List<Fleet>> fleets = entry.getValue();
             List<Fleet> fleets1 = fleets.getKey();
@@ -69,7 +71,6 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
                     for (Fleet fleet2: fleets2)
                         if (fleet2.getShipCount() > 0)
                             fleet1.attack(fleet2);
-
 
             for (Fleet fleet: fleets1) {
                 Client.getInstance().sendFightMessage(fleet);
@@ -83,6 +84,8 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
             }
         }
 
+        UI.getInstance().getShipsLayer().repaint();
+        UI.getInstance().getPanel().repaintShipInfo();
         Client.getInstance().sendEndFightMessage();
         return true;
     }
