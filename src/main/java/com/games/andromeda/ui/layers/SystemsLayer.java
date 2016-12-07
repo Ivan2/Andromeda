@@ -5,21 +5,20 @@ import android.graphics.PointF;
 import com.games.andromeda.GameActivity;
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;
+import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.ui.sprites.SystemSprite;
 import com.games.andromeda.ui.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
-import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.color.Color;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.Map;
 
 public class SystemsLayer extends Layer {
 
@@ -58,91 +57,62 @@ public class SystemsLayer extends Layer {
         layer.setColor(Color.TRANSPARENT);
         scene.attachChild(layer);
 
-        sprites = new LinkedList<>();
+        sprites = new HashMap<>();
+        Collection<Node> nodes = graph.getNodes();
+        for (final Node node : nodes) {
+            float size = 50;
+            PointF pos = getPos(node.getX(), node.getY());
+            SystemSprite sprite = new SystemSprite(node, pos.x - size / 2, pos.y - size / 2,
+                    systemTextures.get(node.getSystemType()), vertexBufferObjectManager) {
+
+                @Override
+                public void onMove() {
+                    if (layerListener != null)
+                        layerListener.onMove(node);
+                }
+
+                @Override
+                public void onUp() {
+                    if (layerListener != null)
+                        layerListener.onUp(node);
+                }
+            };
+
+            if (node.getSystemType() == Node.SystemType.HYPER)
+                sprite.setSize(size * 2, size * 2);
+            else
+                sprite.setSize(size, size);
+            layer.attachChild(sprite);
+            scene.registerTouchArea(sprite);
+            sprites.put(sprite, node.getId());
+        }
     }
 
-    private LinkedList<Sprite> sprites;
+    private Map<SystemSprite, Integer> sprites;
 
     @Override
     public void repaint() {
         activity.runOnUpdateThread(new Runnable() {
             @Override
             public void run() {
-                for (Sprite sprite : sprites) {
-                    scene.unregisterTouchArea(sprite);
-                    layer.detachChild(sprite);
-                }
-
-                //TODO удалить все спрайты со слоя
-
-                Collection<Node> nodes = graph.getNodes();
-                Iterator<Node> nodeIterator = nodes.iterator();
-                while (nodeIterator.hasNext()) {
-                    final Node node = nodeIterator.next();
-                    float size = 50;
-                    PointF pos = getPos(node.getX(), node.getY());
-
-                    //TODO цвет системы по наличию базы?
-            /*ITextureRegion textureRegion;
-            if (node.getSystemType() == Node.SystemType.MINI || node.getSystemType() == Node.SystemType.HYPER)
-                textureRegion = systemTextures.get(node.getSystemType());
-            else {
-                Collection<Base> bases = WorldAccessor.getInstance().getBases();
-                Base base = null;
-                for (Base b : bases)
-                    if (b.getNode().equals(node)) {
-                        base = b;
-                        break;
-                    }
-                if (base == null)
-                    textureRegion = systemTextures.get(Node.SystemType.EMPTY);
-                else {
-                    if (base.getSide() == Phases.getInstance().side)
-                        textureRegion = systemTextures.get(Node.SystemType.FRIENDLY);
-                    else
-                        textureRegion = systemTextures.get(Node.SystemType.ENEMY);
-                }
-            }*/
-
-                    Sprite sprite = new SystemSprite(node, pos.x - size / 2, pos.y - size / 2,
-                            systemTextures.get(node.getSystemType()), vertexBufferObjectManager) {
-
-                        @Override
-                        public void onMove() {
-                            if (layerListener != null)
-                                layerListener.onMove(node);
-                        }
-
-                        @Override
-                        public void onUp() {
-                            if (layerListener != null)
-                                layerListener.onUp(node);
-                        }
-
-                    };
-                    //это как-то работает
-                    switch (node.getSystemType()) {
+                Map<Integer, Node> nodes = WorldAccessor.getInstance().getNodes();
+                for(Map.Entry<SystemSprite, Integer> entry: sprites.entrySet()){
+                    switch (nodes.get(entry.getValue()).getSystemType()){
                         case EMPTY:
-                            sprite.setColor(new Color(0.8f, 0.8f, 0.8f));
+                            entry.getKey().setColor(new Color(0.8f, 0.8f, 0.8f));
                             break;
                         case FRIENDLY:
-                            sprite.setColor(Color.GREEN);
+                            entry.getKey().setColor(Color.GREEN);
                             break;
                         case ENEMY:
-                            sprite.setColor(Color.RED);
+                            entry.getKey().setColor(Color.RED);
                             break;
                         default:
-                            sprite.setColor(new Color(0.8f, 0.8f, 0.8f));
+                            entry.getKey().setColor(new Color(0.8f, 0.8f, 0.8f));
                     }
-                    if (node.getSystemType() == Node.SystemType.HYPER)
-                        sprite.setSize(size*2, size*2);
-                    else
-                        sprite.setSize(size, size);
-                    layer.attachChild(sprite);
-                    scene.registerTouchArea(sprite);
-                    sprites.add(sprite);
                 }
             }
+
         });
     }
 
