@@ -96,7 +96,7 @@ public class Fleet extends GameObject {
     /**
      * Восстановление щитов после боя
      */
-    private void restoreShields(){
+    public void restoreShields(){
         for(SpaceShip x: ships){
             x.restoreShield();
         }
@@ -236,4 +236,8 @@ public class Fleet extends GameObject {
             ships.remove(ships.size() - 1);
     }
 
+    public float restoreEnergy(){
+        energy = (float) Math.min(properties.getEnergyRestore() + energy, 1.0);
+        return energy;
+    }
 }

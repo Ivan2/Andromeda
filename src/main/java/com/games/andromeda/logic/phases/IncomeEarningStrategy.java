@@ -2,8 +2,12 @@ package com.games.andromeda.logic.phases;
 
 
 import com.games.andromeda.Phases;
+import com.games.andromeda.logic.Base;
+import com.games.andromeda.logic.Fleet;
+import com.games.andromeda.logic.Pocket;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.multiplayer.Client;
+import com.games.andromeda.ui.UI;
 
 public class IncomeEarningStrategy extends CommonHandlingStrategy<Void, Void>{
     @Override
@@ -13,10 +17,24 @@ public class IncomeEarningStrategy extends CommonHandlingStrategy<Void, Void>{
 
     @Override
     public boolean applyChanges() {
-        // todo get money from bases and increase player's pocket
-        WorldAccessor.getInstance().getPocket(Phases.getInstance().side).increase(100);
-        Client.getInstance().sendPocketChangesMessage(
-                WorldAccessor.getInstance().getPocket(Phases.getInstance().side).getTotal());
+        // доходы от баз
+        Pocket pocket = WorldAccessor.getInstance().getPocket(Phases.getInstance().side);
+        int start = pocket.getTotal();
+        for(Base base: WorldAccessor.getInstance().getBases().values()){
+            if (base.getSide() == pocket.getSide()){
+                pocket.increase(base.getProfit());
+            }
+        }
+        // восстановление энергии и щитов
+        for(int fleetNumber = 1; fleetNumber <= 3; ++fleetNumber) {
+            Fleet fleet = WorldAccessor.getInstance().getFleet(pocket.getSide(), fleetNumber);
+            if (fleet != null) {
+                fleet.restoreShields();
+                fleet.restoreEnergy();
+            }
+        }
+        UI.toast("Получен доход от баз: " + (pocket.getTotal() - start));
+        Client.getInstance().sendPocketChangesMessage(pocket.getTotal());
         return true;
     }
 
