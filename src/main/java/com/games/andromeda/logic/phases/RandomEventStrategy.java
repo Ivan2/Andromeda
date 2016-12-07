@@ -34,10 +34,19 @@ public class RandomEventStrategy extends CommonHandlingStrategy<Void, Void> {
                     money = -1 * currMoney;
                     world.getPocket(Phases.getInstance().side).increase(money);
                     Client.getInstance().sendRandomEventMessage(money,-1,-1);
+                    if (money > 0)
+                        UI.toast("Обнаружен золотой рудник в одной из систем. Вы получаете: " + money);
+                    else
+                        if (money < 0)
+                            UI.toast("На восстановление урона после катаклизма вы тратите " + -1*money);
                     return true;
                 }
+                if (money > 0)
+                    UI.toast("Обнаружен золотой рудник в одной из систем. Вы получаете: " + money);
+                else
+                    if (money < 0)
+                        UI.toast("На восстановление урона после катаклизма вы тратите " + -1*money);
                 world.getPocket(Phases.getInstance().side).increase(money);
-                Log.wtf("Money","" + world.getPocket(Phases.getInstance().side).getTotal());
                 Client.getInstance().sendRandomEventMessage(money,-1,-1);
                 return true;
             }
@@ -57,6 +66,7 @@ public class RandomEventStrategy extends CommonHandlingStrategy<Void, Void> {
                     WorldAccessor.getInstance().getFleet(Phases.getInstance().side,i).destroyShips(1);
                     UI.getInstance().getShipsLayer().repaint();
                     UI.getInstance().getPanel().repaintShipInfo();
+                    UI.toast("Один из ваших кораблей столкнулся с метеоритом");
                     Client.getInstance().sendRandomEventMessage(0, i, -1);
                     return true;
                 }
