@@ -57,6 +57,7 @@ public class ServerCreator implements MessageFlags {
 
             @Override
             public void onTime(GameObject.Side side) {
+
                 sendMessage(new TimeOverMessage(side));
             }
         };
