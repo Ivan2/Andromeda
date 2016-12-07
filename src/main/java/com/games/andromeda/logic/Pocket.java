@@ -1,5 +1,8 @@
 package com.games.andromeda.logic;
 
+import com.games.andromeda.Phases;
+import com.games.andromeda.ui.UI;
+
 public class Pocket extends GameObject {
     public class NotEnoughMoneyException extends Exception {
         @Override
@@ -17,6 +20,8 @@ public class Pocket extends GameObject {
 
     public void setTotal(int total) {
         this.total = total;
+        if (getSide() == Phases.getInstance().side)
+            UI.getInstance().getPanel().repaintMoney(total);
     }
 
     public int getTotal() {
@@ -25,11 +30,15 @@ public class Pocket extends GameObject {
 
     public void increase(int sum){
         total += sum;
+        if (getSide() == Phases.getInstance().side)
+            UI.getInstance().getPanel().repaintMoney(total);
     }
 
     public void decrease(int sum) throws NotEnoughMoneyException{
         if (total < sum)
             throw new NotEnoughMoneyException();
         total -= sum;
+        if (getSide() == Phases.getInstance().side)
+            UI.getInstance().getPanel().repaintMoney(total);
     }
 }

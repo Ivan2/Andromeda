@@ -90,6 +90,9 @@ public class GameActivity extends SimpleBaseGameActivity{
                     @Override
                     public void run() {
                         UI.getInstance().getPanel().repaintTime(time);
+                        if (time == 0) {
+                            Phases.getInstance().serverEndPhase();
+                        }
                     }
                 });
             }

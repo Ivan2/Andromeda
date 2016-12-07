@@ -40,7 +40,8 @@ public class ShipsLayer extends Layer implements FleetObserver {
     };
     // первые 3 - цвета империи, последние 3 - федерации
     public static String[] SHIP_COLORS = {
-        "red", "green", "blue", "gray", "pink", "brown"
+        //"red", "green", "blue", "gray", "pink", "brown"
+        "red1", "red2", "red3", "green1", "green2", "green3"
     };
 
     private PointF[] deltas;  // запоминаем смещения
@@ -147,12 +148,16 @@ public class ShipsLayer extends Layer implements FleetObserver {
                 @Override
                 public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
                     if (Phases.getInstance().getPhase() instanceof FleetMovingStrategy)
-                        if (pSceneTouchEvent.isActionUp()){
-                            if (activeSprite == null) {
-                                UI.toast("Выберите систему для перемещения флота");
-                                activeSprite = this;
-                            } else
-                                activeSprite = null;
+                        if (pSceneTouchEvent.isActionUp()) {
+                            if (this.getFleet().getSide() == Phases.getInstance().side) {
+                                if (activeSprite == null) {
+                                    UI.toast("Выберите систему для перемещения флота");
+                                    activeSprite = this;
+                                } else
+                                    activeSprite = null;
+                            } else {
+                                UI.toast("Вы не можете перемещать не свои флоты");
+                            }
     //                        activeSprite.getFleet().setEnergy(100500);
                             //manager.start(this.getFleet());
                         }

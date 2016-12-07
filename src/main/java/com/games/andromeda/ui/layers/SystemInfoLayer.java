@@ -6,6 +6,7 @@ import com.games.andromeda.Phases;
 import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.logic.Fleet;
+import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.Purchase;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.logic.phases.MoneySpendingStrategy;
@@ -187,13 +188,14 @@ public abstract class SystemInfoLayer extends DialogLayer {
     private void createShipRow(Rectangle shipRow, Fleet fleet) {
         float shipSize = PxDpConverter.dpToPx(70);
 
+        String color = (fleet.getSide() == GameObject.Side.EMPIRE) ? "red1" : "green1";
         Sprite shipSprite = new Sprite(0, (shipRow.getHeight()-shipSize)/2,
-                textureLoader.loadColoredShipTexture("red"),
+                textureLoader.loadColoredShipTexture(color),
                 vertexBufferObjectManager);
         shipSprite.setSize(shipSize, shipSize);
         shipRow.attachChild(shipSprite);
 
-        ITextureRegion shipCountTexture = textureLoader.loadColoredShipTexture("red");
+        ITextureRegion shipCountTexture = textureLoader.loadColoredShipTexture(color);
         Sprite shipCountSprite = new Sprite(shipSize+PxDpConverter.dpToPx(20),
                 shipSprite.getY(), shipCountTexture, vertexBufferObjectManager);
         shipCountSprite.setSize(PxDpConverter.dpToPx(30), PxDpConverter.dpToPx(30));

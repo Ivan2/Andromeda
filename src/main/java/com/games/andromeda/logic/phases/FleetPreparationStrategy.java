@@ -97,4 +97,9 @@ public class FleetPreparationStrategy extends ListStrategy<Fleet, Boolean> {
         UI.getInstance().getPanel().repaintShipInfo();
         Client.getInstance().sendSetupFleetMessage(results);
     }
+
+    @Override
+    public String getTextDescription() {
+        return "Расстановка флотов";
+    }
 }

@@ -23,4 +23,9 @@ public class FleetMovingStrategy extends ListStrategy<MoveFleetMessage.Move, Voi
     public void autoApplyChanges() {
         Client.getInstance().sendMoveFleetMessage(results);
     }
+
+    @Override
+    public String getTextDescription() {
+        return "Передвижение флота";
+    }
 }

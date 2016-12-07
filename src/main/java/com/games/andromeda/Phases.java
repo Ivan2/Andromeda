@@ -1,6 +1,7 @@
 package com.games.andromeda;
 
 import com.games.andromeda.logic.GameObject;
+import com.games.andromeda.logic.phases.FleetBattleStrategy;
 import com.games.andromeda.logic.phases.GamePhases;
 import com.games.andromeda.logic.phases.HandlingStrategy;
 import com.games.andromeda.logic.phases.IncomeEarningStrategy;
@@ -43,8 +44,10 @@ public class Phases {
 
     //вызывается сообщением с сервера об окончании времени хода
     public void serverEndPhase() {
-        strategy.autoApplyChanges();
-        endPhase();
+        //if (strategy.getSide() != side)
+        //return;
+        //strategy.autoApplyChanges();
+        //endPhase();
     }
 
     //вызывается нажатием кнопки
@@ -66,8 +69,8 @@ public class Phases {
             gameTimer.restart();
             UI.getInstance().setEnabled(true);
 
-            if (strategy instanceof RandomEventStrategy || strategy instanceof IncomeEarningStrategy// ||
-                    //strategy instanceof FleetBattleStrategy
+            if (strategy instanceof RandomEventStrategy || strategy instanceof IncomeEarningStrategy ||
+                    strategy instanceof FleetBattleStrategy
                 ) {
                 strategy.autoApplyChanges();
                 nextPhase();

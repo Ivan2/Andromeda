@@ -94,4 +94,9 @@ public class MoneySpendingStrategy extends ListStrategy<Purchase, Boolean> {
                 new LinkedList<Fleet>(),
                 WorldAccessor.getInstance().getPocket(Phases.getInstance().side).getTotal());
     }
+
+    @Override
+    public String getTextDescription() {
+        return "Покупка баз и флотов";
+    }
 }

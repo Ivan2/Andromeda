@@ -104,4 +104,8 @@ public class LevelPreparationStrategy extends ListStrategy<Node, Boolean>{
         Client.getInstance().sendSetupBaseMessage(bases);
     }
 
+    @Override
+    public String getTextDescription() {
+        return "Создание баз";
+    }
 }

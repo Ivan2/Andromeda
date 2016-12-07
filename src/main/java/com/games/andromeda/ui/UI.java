@@ -194,6 +194,7 @@ public class UI {
         } else {
             messageLayer.show("Ход противника");
         }
+        getPanel().setButtonEnabled(enabled);
     }
 
     public PanelHUD getPanel() {

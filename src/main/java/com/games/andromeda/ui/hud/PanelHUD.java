@@ -38,6 +38,7 @@ public class PanelHUD {
     private Sprite[] shipEnergySprites;
     private Text[] shipCountTexts;
     private ButtonSprite endPhaseButton;
+    private Text moneyText;
     private Text phaseText;
     private Text timerText;
 
@@ -109,11 +110,15 @@ public class PanelHUD {
 
         endPhaseButton.setPosition(GameActivity.SCREEN_WIDTH-endPhaseButton.getWidth()-margin*2, margin);
 
+        moneyText = new Text(0,
+                (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
+                font, "Очки: 1000", vertexBufferObjectManager);
+        moneyText.setX(endPhaseButton.getX()-moneyText.getWidth()-margin*4);
 
         timerText = new Text(0,
                 (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
                 font, "00:45", vertexBufferObjectManager);
-        timerText.setX(endPhaseButton.getX()-timerText.getWidth()-margin*4);
+        timerText.setX(moneyText.getX()-timerText.getWidth()-margin*4);
 
         phaseText = new Text(0,
                 (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
@@ -123,6 +128,7 @@ public class PanelHUD {
 
 
         rectangleHorizontal.attachChild(endPhaseButton);
+        rectangleHorizontal.attachChild(moneyText);
         rectangleHorizontal.attachChild(timerText);
         rectangleHorizontal.attachChild(phaseText);
     }
@@ -134,6 +140,10 @@ public class PanelHUD {
 
     public void repaintTime(int time) {
         timerText.setText("00:"+(time<10?"0"+time:time));
+    }
+
+    public void repaintMoney(int money) {
+        moneyText.setText("Очки: "+money);
     }
 
     public void repaintShipInfo() {
@@ -182,6 +192,10 @@ public class PanelHUD {
         rectangle.attachChild(shipCountTexts[ind]);
 
         return rectangle;
+    }
+
+    public void setButtonEnabled(boolean enabled) {
+        endPhaseButton.setEnabled(enabled);
     }
 
 }
