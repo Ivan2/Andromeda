@@ -5,6 +5,7 @@ import android.util.Log;
 import com.games.andromeda.Phases;
 import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
+import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.BasesCreationMessage;
 import com.games.andromeda.message.EndFightMessage;
@@ -63,7 +64,6 @@ public class Client implements MessageFlags {
                         for (Base base : setupBasesMessage.getBases()) {
                             WorldAccessor.getInstance().setBase(base);
                         }
-
                         UI.getInstance().getSystemsLayer().repaint();
                         if (flag == SETUP_BASE_MESSAGE)
                             Phases.getInstance().endPhase();
@@ -74,7 +74,6 @@ public class Client implements MessageFlags {
                         SetupFleetsMessage setupFleetsMessage = (SetupFleetsMessage) message;
                         for (Fleet fleet : setupFleetsMessage.getFleets())
                             WorldAccessor.getInstance().setFleet(fleet, fleet.getId());
-
                         UI.getInstance().getShipsLayer().repaint();
                         UI.getInstance().getPanel().repaintShipInfo();
                         if (flag == SETUP_FLEET_MESSAGE)
@@ -82,8 +81,21 @@ public class Client implements MessageFlags {
                         break;
 
                     case RANDOM_EVENT_MESSAGE:
-                        //RandomEventMessage randomEventMessage = (RandomEventMessage) message;
-                        //TODO read message
+                        RandomEventMessage randomEventMessage = (RandomEventMessage) message;
+                        GameObject.Side side = randomEventMessage.getSide();
+                        int     money = randomEventMessage.getMoney(),
+                                num = randomEventMessage.getFleetNumberWithDestroyedShip(),
+                                id = randomEventMessage.getIdOfDestroyedBase();
+                        WorldAccessor.getInstance().getPocket(side).increase(money);
+                        if (num > -1) {
+                            WorldAccessor.getInstance().getFleet(side, num).destroyShips(1);
+                            UI.getInstance().getShipsLayer().repaint();
+                            UI.getInstance().getPanel().repaintShipInfo();
+                        }
+                        if (id > -1)
+                        {
+
+                        }
                         Phases.getInstance().endPhase();
                         break;
 
@@ -158,9 +170,10 @@ public class Client implements MessageFlags {
         }
     }
 
-    public void sendRandomEventMessage() {
+    public void sendRandomEventMessage(int money, int numOfFleetWithDestroyedShip, int idOfDestroyedBase) {
         try {
-            GameClient.getInstance().sendMessage(new RandomEventMessage(Phases.getInstance().side));
+            GameClient.getInstance().sendMessage(new RandomEventMessage(Phases.getInstance().side,money,
+                    numOfFleetWithDestroyedShip,idOfDestroyedBase));
         } catch (IOException e) {
             Log.wtf("sendRandomEventMessage error", e.toString());
         }
