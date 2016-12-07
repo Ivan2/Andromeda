@@ -4,9 +4,13 @@ import com.games.andromeda.Phases;
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,6 +62,24 @@ public class WorldAccessor {
 
     public Fleet[] getAllFleets() {
         return fleets;
+    }
+
+    public Iterable<Fleet> getFleetsBySide(GameObject.Side side){
+        int start, end;
+        if (side == GameObject.Side.EMPIRE) {
+            start = 0;
+            end = 2;
+        } else {
+            start = 3;
+            end = 5;
+        }
+        List<Fleet> result = new ArrayList<>();
+        for(int i = start; i <= end; ++i){
+            if ((fleets[i] != null) && fleets[i].getShipCount() > 0){
+                result.add(fleets[i]);
+            }
+        }
+        return result;
     }
 
     public Fleet getFleet(GameObject.Side side, int number) {

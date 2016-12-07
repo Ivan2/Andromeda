@@ -160,30 +160,18 @@ public class Fleet extends GameObject {
         Boolean result = null;
         while (result == null){
             if (another.splitDamage(this.properties.getAttack(this.getShipCount()))) {
-                result = !this.splitDamage(another.properties.getAttack(another.getShipCount()));
+                result = true;
+//                WorldAccessor.getInstance().removeFleet(another);
+            } else {
+                if (this.splitDamage(another.properties.getAttack(another.getShipCount()))) {
+                    result = false;
+//                    WorldAccessor.getInstance().removeFleet(this);
+                }
             }
             drawer.drawFleets(this, another);
             this.tryToRestoreShields();
             another.tryToRestoreShields();
             drawer.reDrawFleets(this, another);
-        }
-        return result;
-    }
-
-
-    public boolean attack(Fleet another){
-        Boolean result = null;
-        while (result == null){
-            if (another.splitDamage(this.properties.getAttack(this.getShipCount()))) {
-                result = true;
-                if (this.splitDamage(another.properties.getAttack(another.getShipCount()))){
-                    result = false;
-                }
-            }
-            //drawer.drawFleets(this, another);
-            this.tryToRestoreShields();
-            another.tryToRestoreShields();
-            //drawer.reDrawFleets(this, another);
         }
         return result;
     }
