@@ -18,6 +18,7 @@ import com.games.andromeda.message.RandomEventMessage;
 import com.games.andromeda.message.SetupBasesMessage;
 import com.games.andromeda.message.SetupFleetsMessage;
 import com.games.andromeda.message.StartGameMessage;
+import com.games.andromeda.message.WinMessage;
 import com.games.andromeda.ui.UI;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
@@ -147,6 +148,10 @@ public class Client implements MessageFlags {
                         UI.getInstance().getPanel().repaintShipInfo();
                         Phases.getInstance().endPhase();
                         break;
+                    case WIN_MESSAGE:
+                        UI.toast("Вы проиграли(");
+                        UI.getInstance().finishGame();
+                        break;
                 }
             }
         });
@@ -230,6 +235,15 @@ public class Client implements MessageFlags {
         }
     }
 
+    public void sendWinMessage()
+    {
+        try{
+            GameClient.getInstance().sendMessage(new WinMessage
+                    (Phases.getInstance().side));
+        }catch (IOException e) {
+            Log.wtf("sendWinMessage error", e.toString());
+        }
+    }
     /*public void sendMoveShipMessage(Fleet fleet, int num) {
         try {
             GameObject.Side side = fleet.getSide();

@@ -20,6 +20,7 @@ import com.games.andromeda.message.SideMessage;
 import com.games.andromeda.message.StartGameMessage;
 import com.games.andromeda.message.TimeAlmostOverMessage;
 import com.games.andromeda.message.TimeOverMessage;
+import com.games.andromeda.message.WinMessage;
 import com.games.andromeda.threads.ServerTimeThread;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
@@ -152,6 +153,12 @@ public class ServerCreator implements MessageFlags {
                     }
                 });
                 connector.registerClientMessage(END_FIGHT_MESSAGE, EndFightMessage.class, new IClientMessageHandler<SocketConnection>() {
+                    @Override
+                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
+                        sendMessageToEnemy(iClientMessage);
+                    }
+                });
+                connector.registerClientMessage(WIN_MESSAGE, WinMessage.class, new IClientMessageHandler<SocketConnection>() {
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
                         sendMessageToEnemy(iClientMessage);

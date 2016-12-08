@@ -22,6 +22,7 @@ import com.games.andromeda.message.SetupFleetsMessage;
 import com.games.andromeda.message.StartGameMessage;
 import com.games.andromeda.message.TimeAlmostOverMessage;
 import com.games.andromeda.message.TimeOverMessage;
+import com.games.andromeda.message.WinMessage;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
@@ -168,7 +169,13 @@ public class GameClient implements Runnable,MessageFlags {
                         messageReceiver.onMessageReceive(END_FIGHT_MESSAGE, iServerMessage);
                 }
             });
-
+            connector.registerServerMessage(WIN_MESSAGE, WinMessage.class, new IServerMessageHandler<SocketConnection>() {
+                @Override
+                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
+                    if (messageReceiver != null)
+                        messageReceiver.onMessageReceive(WIN_MESSAGE, iServerMessage);
+                }
+            });
             connector.registerServerMessage(TIME_OVER_MESSAGE, TimeOverMessage.class, new IServerMessageHandler<SocketConnection>() {
                 @Override
                 public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {

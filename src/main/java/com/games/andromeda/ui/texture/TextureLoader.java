@@ -131,7 +131,7 @@ public class TextureLoader {
 
     private Font loadTextTexture(float pixSize) {
         BitmapTextureAtlas fontTexture = new BitmapTextureAtlas(textureManager,
-                1024, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+                1024, 350, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
         Font font = FontFactory.createFromAsset(activity.getFontManager(), fontTexture, activity.getAssets(),
                 "fonts/font.ttf", pixSize, true, android.graphics.Color.WHITE);
         textureManager.loadTexture(fontTexture);

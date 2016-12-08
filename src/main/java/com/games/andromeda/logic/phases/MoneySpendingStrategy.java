@@ -1,5 +1,7 @@
 package com.games.andromeda.logic.phases;
 
+import android.util.Log;
+
 import com.games.andromeda.Phases;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.logic.Base;
@@ -11,8 +13,10 @@ import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.multiplayer.Client;
 import com.games.andromeda.ui.UI;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class MoneySpendingStrategy extends ListStrategy<Purchase, Boolean> {
 
@@ -82,6 +86,33 @@ public class MoneySpendingStrategy extends ListStrategy<Purchase, Boolean> {
                     break;
             }
         }
+        Map<Integer,Base> allBases = WorldAccessor.getInstance().getBases();
+        int basesCount = 0;
+        Iterator<Map.Entry<Integer, Base>> it = allBases.entrySet().iterator();
+        while (it.hasNext())
+        {
+            Map.Entry<Integer, Base> pair = it.next();
+            if (pair.getValue().getSide() == Phases.getInstance().side)
+            {
+                basesCount++;
+            }
+        }
+        if (Phases.getInstance().side == GameObject.Side.EMPIRE)
+        {
+            if (basesCount >= 18)
+            {
+                UI.toast("Вы победили!");
+                Client.getInstance().sendWinMessage();
+                UI.getInstance().finishGame();
+            }
+        }
+        else
+            if (basesCount >= 16)
+            {
+                UI.toast("Вы победили!");
+                Client.getInstance().sendWinMessage();
+                UI.getInstance().finishGame();
+            }
         Client.getInstance().sendMoneySpendingMessage(bases, fleets,
                 WorldAccessor.getInstance().getPocket(Phases.getInstance().side).getTotal());
         return false;
