@@ -216,4 +216,9 @@ public class UI {
     public SystemInfoLayer getSystemInfoLayer() {
         return systemInfoLayer;
     }
+
+    public void finishGame()
+    {
+        activity.finish();
+    }
 }
