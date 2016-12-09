@@ -55,12 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private SocketServer<SocketConnectionClientConnector> mSocketServer;
     private GameClient client;
     private final MessagePool<IMessage> mMessagePool = new MessagePool<IMessage>();
-    //private ClientConnector<SocketConnection> clientConnector;
 
-
-    /*private void initMessagePool() {
-        this.mMessagePool.registerMessage(FLAG_MESSAGE_SERVER_SHOW, MoveShipServerMessage.class);
-    }*/
 
     private void initServer() {
 
@@ -76,19 +71,27 @@ public class MainActivity extends AppCompatActivity {
 
     private void initClient() {
         if (mSocketServer == null) {
-            try {
-                DatagramSocket ds = new DatagramSocket(9999);
-                byte[] buffer = new byte[1024];
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-                ds.receive(packet);
-                client = GameClient.createInstance(this, packet.getAddress().getHostAddress(), SERVER_PORT);
-                Thread thread = new Thread(client);
-                thread.setDaemon(true);
-                thread.start();
-            } catch (IOException e)
-            {
-                e.printStackTrace();
-            }
+            Thread th = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        DatagramSocket ds = new DatagramSocket(9999);
+                        byte[] buffer = new byte[1024];
+                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                        ds.receive(packet);
+                        client = GameClient.createInstance(MainActivity.this, packet.getAddress().getHostAddress(), SERVER_PORT);
+                        Thread thread = new Thread(client);
+                        thread.setDaemon(true);
+                        thread.start();
+                        ds.close();
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            th.start();
+
         }
         else
         {
