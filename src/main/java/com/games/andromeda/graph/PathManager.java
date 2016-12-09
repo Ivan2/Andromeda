@@ -64,11 +64,11 @@ public class PathManager {
         Node current = start;
         SparseGraph<Node, Edge> graph = WorldAccessor.getInstance().getMap().getRepresentation();
         while ((current.getSystemType() == Node.SystemType.MINI) && !current.equals(end)){
-            for (Node neighbour: graph.getNeighbors(start)){
+            for (Node neighbour: graph.getNeighbors(current)){
                 if (!neighbour.equals(previous)){
                     path.add(current.getId());
-                    current = neighbour;
                     previous = current;
+                    current = neighbour;
                     break;
                 }
             }

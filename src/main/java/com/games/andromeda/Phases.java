@@ -1,6 +1,7 @@
 package com.games.andromeda;
 
 import com.games.andromeda.logic.GameObject;
+import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.logic.phases.FleetBattleStrategy;
 import com.games.andromeda.logic.phases.GamePhases;
 import com.games.andromeda.logic.phases.HandlingStrategy;
@@ -80,6 +81,7 @@ public class Phases {
             UI.getInstance().setEnabled(false);
         }
         UI.getInstance().getPanel().repaintPhaseName(strategy.getTextDescription());
+        UI.getInstance().getPanel().repaintShipInfo();
     }
 
 }

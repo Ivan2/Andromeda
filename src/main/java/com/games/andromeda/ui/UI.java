@@ -1,11 +1,14 @@
 package com.games.andromeda.ui;
 
 import android.app.Activity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.games.andromeda.GameActivity;
 import com.games.andromeda.Phases;
 import com.games.andromeda.graph.Node;
+import com.games.andromeda.graph.PathManager;
+import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.logic.phases.FleetMovingStrategy;
 import com.games.andromeda.logic.phases.FleetPreparationStrategy;
@@ -52,7 +55,7 @@ public class UI {
         return instance;
     }
 
-    //private PathManager manager;
+    private PathManager manager;
     private PanelHUD panel;
     private final BackgroundLayer backgroundLayer;
     private final SystemsLayer systemsLayer;
@@ -66,7 +69,7 @@ public class UI {
               VertexBufferObjectManager vertexBufferObjectManager,
               ShipsLayer.IOnFleetMove onFleetMove,ShipsLayer.IOnFleetFight onFleetFight) {
         this.activity = activity;
-        //manager = new PathManager();
+        manager = new PathManager();
 
         scene.setBackground(new Background(Color.BLACK));
         //scene.setTouchAreaBindingOnActionDownEnabled(true);//Без этого не будет работать нормально перетаскивание спрайтов
@@ -135,41 +138,24 @@ public class UI {
                 } else if (Phases.getInstance().getPhase() instanceof FleetMovingStrategy) {
                     ShipSprite activeSprite = ShipsLayer.activeSprite;
                     if (activeSprite != null && activeSprite.getFleet().getId() != node.getId()) {
-                        //TODO show ask dialog (in beta?)
-                        //TODO check energy and calc path
-                        activeSprite.getFleet().setPosition(node.getId());
+                        Fleet fleet = activeSprite.getFleet();
+                        manager.start(fleet);
+                        manager.addNode(node.getId());
+                        try {
+                            fleet.makeMove(manager.getPath());
+                        } catch (Fleet.NotEnoughEnergyException e) {
+                            toast("Недостаточно энергии");
+                        } catch (Exception e){
+                            Log.wtf("moving: ", e.toString());
+                        }
                         ((FleetMovingStrategy)Phases.getInstance().getPhase()).handlePhaseEvent(
-                                new MoveFleetMessage.Move(activeSprite.getFleet().getId(),
-                                        activeSprite.getFleet().getEnergy(), node.getId()));
-                        /*try {
-                            activeSprite.getFleet().makeMove(manager.getPath());
-                            WorldAccessor world = WorldAccessor.getInstance();
-                            int fleetNum = -1;
-                            for (int i = 0; i < 6; i++) {
-                                if (world.getAllFleets()[i] == activeSprite.getFleet()) {
-                                    if (i > 2) i -=3;
-                                    fleetNum = i+1;
-                                    onFleetMove.onFleetMove(activeSprite.getFleet(), fleetNum);
-                                    break;
-                                }
-                            }
-                            for (int i = 0; i < 6; i++) {
-                                if (world.getAllFleets()[i] != null && world.getAllFleets()[i] != activeSprite.getFleet() &&
-                                        world.getAllFleets()[i].getPosition() == activeSprite.getFleet().getPosition() &&
-                                        activeSprite.getFleet().getSide() != world.getAllFleets()[i].getSide()
-                                        ) {
-                                    if (i > 2) i -=3;
-                                    onFleetFight.onFleetFight(activeSprite.getFleet(),world.getAllFleets()[i],fleetNum,i+1);
-                                    break;
-                                }
-                            }
-                        } catch (Exception e) {
-                            Log.wtf("PATH", e.toString());
-                            e.printStackTrace();
-                        }*/
+                                new MoveFleetMessage.Move(fleet.getId(), fleet.getEnergy(), node.getId()));
+
+                        //TODO show ask dialog (in beta?)
                         ShipsLayer.activeSprite = null;
-                        //manager.reset();
+                        manager.reset();
                         getShipsLayer().repaint();
+                        panel.repaintShipInfo();
                     }
                 } else
                     systemInfoLayer.show(node);
