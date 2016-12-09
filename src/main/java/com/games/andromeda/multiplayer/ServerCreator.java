@@ -32,9 +32,17 @@ import org.andengine.extension.multiplayer.protocol.shared.SocketConnection;
 import org.andengine.util.debug.Debug;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.net.Socket;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Set;
 
 public class ServerCreator implements MessageFlags {
@@ -218,6 +226,61 @@ public class ServerCreator implements MessageFlags {
             activity.toast("SERVER: Client connected: " + pConnector.getConnection().getSocket().getInetAddress().getHostAddress());
             clients.add(pConnector);
             connectedCount++;
+            if (connectedCount == 1)
+            {
+                Thread th  = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+
+                            String adr = null;
+                            MulticastSocket ds = new MulticastSocket(9999);
+                            Enumeration e = NetworkInterface.getNetworkInterfaces();
+                            boolean f = true;
+                            while (e.hasMoreElements() && f) {
+                                NetworkInterface n = (NetworkInterface) e.nextElement();
+                                Enumeration ee = n.getInetAddresses();
+                                while (ee.hasMoreElements()) {
+                                    InetAddress i = (InetAddress) ee.nextElement();
+                                        String addr = i.getHostAddress().toString();
+                                        if (addr.length() < 8) continue;
+                                        if (addr.substring(0, 7).equals("192.168")) {
+                                            adr = addr;
+                                            f = false;
+                                            break;
+                                        }
+                                }
+                            }
+
+                            StringBuilder sb = new StringBuilder();
+                            Scanner scaner = new Scanner(adr);
+                            scaner.useDelimiter("\\.");
+                            sb.append(scaner.next() + ".");
+                            sb.append(scaner.next() + ".");
+                            sb.append(scaner.next() + ".");
+                            sb.append(255);
+                            byte[] buffer = new byte[1024];
+                            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(sb.toString()), 9999);
+                            while ( connectedCount == 1) {
+                                try {
+                                    Thread.sleep(2000);
+                                    ds.send(packet);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log.wtf("Error ",""  +ex.toString());
+                                }
+                            }
+                            ds.close();
+                        } catch (Exception e)
+                        {
+                            Log.wtf("Error : ",""  +e.toString());
+                        }
+                    }
+                });
+                th.start();
+            }
+
             if (connectedCount == 2) //Поменять на 2 для двух устройств
                 try {
                     MyGraph graph = null;
@@ -254,7 +317,7 @@ public class ServerCreator implements MessageFlags {
 
         @Override
         public void onTerminated(final ClientConnector<SocketConnection> pConnector) {
-            // MainActivity.this.toast("SERVER: Client disconnected: " + pConnector.getConnection().getSocket().getInetAddress().getHostAddress());
+
         }
 
     }

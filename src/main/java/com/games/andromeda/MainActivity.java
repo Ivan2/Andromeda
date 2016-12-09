@@ -1,7 +1,9 @@
 package com.games.andromeda;
 
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -22,7 +24,18 @@ import org.andengine.extension.multiplayer.protocol.util.WifiUtils;
 import org.andengine.util.debug.Debug;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,18 +63,41 @@ public class MainActivity extends AppCompatActivity {
     }*/
 
     private void initServer() {
-        start.setEnabled(false);
-        join.setEnabled(false);
-        ServerCreator creator = new ServerCreator(this);
-        mSocketServer = creator.getServer(SERVER_PORT);
-        mSocketServer.start();
+
+            start.setEnabled(false);
+
+            join.setEnabled(false);
+
+            ServerCreator creator = new ServerCreator(this);
+            mSocketServer = creator.getServer(SERVER_PORT);
+            mSocketServer.start();
+
     }
 
     private void initClient() {
-        client = GameClient.createInstance(this, serverIp, SERVER_PORT);
-        Thread thread = new Thread(client);
-        thread.setDaemon(true);
-        thread.start();
+        if (mSocketServer == null) {
+            try {
+                DatagramSocket ds = new DatagramSocket(9999);
+                byte[] buffer = new byte[1024];
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                ds.receive(packet);
+                client = GameClient.createInstance(this, packet.getAddress().getHostAddress(), SERVER_PORT);
+                Thread thread = new Thread(client);
+                thread.setDaemon(true);
+                thread.start();
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            client = GameClient.createInstance(this, serverIp, SERVER_PORT);
+            Thread thread = new Thread(client);
+            thread.setDaemon(true);
+            thread.start();
+        }
+
     }
 
     public void toast(final String pMessage) {
@@ -95,6 +131,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         setContentView(R.layout.activity_main);
         LinearLayout main = (LinearLayout) findViewById(R.id.main_menu);
         main.setBackground(getResources().getDrawable(R.drawable.background));
@@ -105,41 +143,19 @@ public class MainActivity extends AppCompatActivity {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                initServer();
                 try {
-                    MessageDialog dialog = new MessageDialog() {
-                        @Override
-                        public void onOk() {
-                            initServer();
-                            try {
-                                Thread.sleep(500);
-                            } catch(InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            initClient();
-                        }
-                    };
-                    dialog.show(MainActivity.this, WifiUtils.getWifiIPv4Address(MainActivity.this));
-                } catch (UnknownHostException e) {
-                    WarningDialog dialog = new WarningDialog() {
-                        @Override
-                        public void onOk() {
-
-                        }
-                    };
-                    dialog.show(MainActivity.this, e.toString());
+                    Thread.sleep(500);
+                } catch(InterruptedException e) {
+                    e.printStackTrace();
                 }
+                initClient();
             }
         });
         join.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new InputIPDialog() {
-                    @Override
-                    public void onOk(String ip) {
-                        serverIp = ip;
-                        initClient();
-                    }
-                }.show(MainActivity.this);
+                initClient();
             }
         });
         options.setOnClickListener(new View.OnClickListener() {
