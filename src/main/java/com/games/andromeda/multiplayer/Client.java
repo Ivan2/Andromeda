@@ -109,19 +109,18 @@ public class Client implements MessageFlags {
 
                     case MOVE_FLEET_MESSAGE:
                         MoveFleetMessage moveFleetMessage = (MoveFleetMessage) message;
-                        Collection<MoveFleetMessage.Move> moves = moveFleetMessage.getMoves();
-                        for (MoveFleetMessage.Move move : moves) {
-                            Fleet fleet = WorldAccessor.getInstance().getFleet
-                                    (moveFleetMessage.getSide(), move.fleetID);
-                            if (fleet != null) {
-                                fleet.setEnergy(move.energy);
-                                fleet.setPosition(move.nodeID);
-                            }
+                        MoveFleetMessage.Move move = moveFleetMessage.getMove();
+                        Fleet enemy_fleet = WorldAccessor.getInstance().getFleet(
+                                moveFleetMessage.getSide(), move.fleetID);
+                        if (enemy_fleet != null) {
+                            enemy_fleet.setEnergy(move.energy);
+                            UI.getInstance().getShipsLayer().moveFleetRemotely(
+                                    move.pathInfo,
+                                    moveFleetMessage.getSide(),
+                                    moveFleetMessage.getMove().fleetID
+                            );
                         }
-
-                        UI.getInstance().getShipsLayer().repaint();
                         UI.getInstance().getPanel().repaintShipInfo();
-                        Phases.getInstance().endPhase();
                         break;
 
                     case FIGHT_MESSAGE:
@@ -206,10 +205,10 @@ public class Client implements MessageFlags {
         }
     }
 
-    public void sendMoveFleetMessage(Collection<MoveFleetMessage.Move> moves) {
+    public void sendMoveFleetMessage(MoveFleetMessage.Move move) {
         try {
             GameClient.getInstance().sendMessage(new MoveFleetMessage
-                    (Phases.getInstance().side, moves));
+                    (Phases.getInstance().side, move));
         } catch (IOException e) {
             Log.wtf("sendMoveFleetMessage error", e.toString());
         }

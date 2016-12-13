@@ -6,7 +6,7 @@ public class PathInfo {
     private List<Integer> nodeIds;
     private Integer length;
 
-    PathInfo(List<Integer> nodes, Integer length) {
+    public PathInfo(List<Integer> nodes, Integer length) {
         this.nodeIds = nodes;
         this.length = length;
     }

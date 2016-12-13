@@ -7,6 +7,7 @@ import android.widget.Toast;
 import com.games.andromeda.GameActivity;
 import com.games.andromeda.Phases;
 import com.games.andromeda.graph.Node;
+import com.games.andromeda.graph.PathInfo;
 import com.games.andromeda.graph.PathManager;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.WorldAccessor;
@@ -139,17 +140,21 @@ public class UI {
                     ShipSprite activeSprite = ShipsLayer.activeSprite;
                     if (activeSprite != null && activeSprite.getFleet().getId() != node.getId()) {
                         Fleet fleet = activeSprite.getFleet();
+
                         manager.start(fleet);
                         manager.addNode(node.getId());
                         try {
-                            getShipsLayer().moveFleet(manager.getPath());
+                            float energy = fleet.getEnergy();
+                            PathInfo path = manager.getPath();
+                            getShipsLayer().moveFleet(path);
+                            ((FleetMovingStrategy)Phases.getInstance().getPhase()).handlePhaseEvent(
+                                    new MoveFleetMessage.Move(fleet.getId(), energy, path));
+
                         } catch (Fleet.NotEnoughEnergyException e) {
                             toast("Недостаточно энергии");
                         } catch (Exception e){
                             Log.wtf("moving: ", e.toString());
                         }
-                        ((FleetMovingStrategy)Phases.getInstance().getPhase()).handlePhaseEvent(
-                                new MoveFleetMessage.Move(fleet.getId(), fleet.getEnergy(), node.getId()));
 
                         //TODO show ask dialog (in beta?)
                         ShipsLayer.activeSprite = null;

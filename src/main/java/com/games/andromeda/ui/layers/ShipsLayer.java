@@ -209,8 +209,12 @@ public class ShipsLayer extends Layer implements FleetObserver {
         layer.attachChild(sprites[idx]);
     }
 
+    private int getIdx(GameObject.Side side, int id){
+        return (side == GameObject.Side.EMPIRE ? -1 : 2) + id;
+    }
+
     private int getIdx(Fleet fleet){
-        return (fleet.getSide() == GameObject.Side.EMPIRE ? -1 : 2) + fleet.getId();
+        return getIdx(fleet.getSide(), fleet.getId());
     }
 
     public void removeDeadFleets(){
@@ -227,6 +231,16 @@ public class ShipsLayer extends Layer implements FleetObserver {
                 }
             }
         }
+    }
+
+    public void moveFleetRemotely(PathInfo path, GameObject.Side side, int fleetId){
+        activeSprite = sprites[getIdx(side, fleetId)];
+        try {
+            moveFleet(path);
+        } catch (Exception e){
+            Log.wtf("moveFleetRemotely", "Прислана дичь. " + e);
+        }
+        activeSprite = null;
     }
 
     public void moveFleet(final PathInfo path) throws Fleet.NotEnoughEnergyException,
