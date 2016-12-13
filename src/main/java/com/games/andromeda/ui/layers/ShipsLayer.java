@@ -181,6 +181,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
             float y = point.y + deltas[idx].y - sprites[idx].getHeight() / 2;
             sprites[idx].setX(x);
             sprites[idx].setY(y);
+            sprites[idx].rotate();
         }
     }
 
