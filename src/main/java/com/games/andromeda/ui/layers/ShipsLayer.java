@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.games.andromeda.Phases;
 import com.games.andromeda.graph.Node;
+import com.games.andromeda.graph.PathInfo;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.FleetObserver;
 import com.games.andromeda.logic.GameObject;
@@ -15,6 +16,8 @@ import com.games.andromeda.ui.sprites.ShipSprite;
 import com.games.andromeda.ui.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
+import org.andengine.entity.IEntity;
+import org.andengine.entity.modifier.PathModifier;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.input.touch.TouchEvent;
@@ -70,8 +73,8 @@ public class ShipsLayer extends Layer implements FleetObserver {
     }
 
     @Override
-    public void onFleetChanged(Fleet fleet, int idx) {
-        addFleet(fleet, idx);
+    public void onFleetChanged(Fleet fleet) {
+        addFleet(fleet);
     }
 
     public static abstract class LayerListener {
@@ -85,6 +88,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
                       VertexBufferObjectManager vertexBufferObjectManager,// final PathManager manager,
                       final IOnFleetMove onFleetMove, final IOnFleetFight onFleetFight) {
         super(scene, camera, textureLoader, vertexBufferObjectManager);
+
 
         //pathManager = manager;
 
@@ -176,28 +180,37 @@ public class ShipsLayer extends Layer implements FleetObserver {
     private void moveToPosition(int idx){
         if ((sprites[idx].getFleet() != null) && (activeSprite != sprites[idx]) ){
             Node node = WorldAccessor.getInstance().getNodes().get(sprites[idx].getFleet().getPosition());
-            PointF point = getPos(node.getX(), node.getY());
-            float x = point.x + deltas[idx].x - sprites[idx].getWidth() / 2;
-            float y = point.y + deltas[idx].y - sprites[idx].getHeight() / 2;
-            sprites[idx].setX(x);
-            sprites[idx].setY(y);
+            PointF point = calcPosition(node, idx);
+            sprites[idx].setX(point.x);
+            sprites[idx].setY(point.y);
             sprites[idx].rotate();
         }
+    }
+
+    private PointF calcPosition(Node node, int idx){
+        PointF point = getPos(node.getX(), node.getY());
+        float x = point.x + deltas[idx].x - sprites[idx].getWidth() / 2;
+        float y = point.y + deltas[idx].y - sprites[idx].getHeight() / 2;
+        point.set(x, y);
+        return point;
     }
 
     /**
      * Добавляем флот на слой
      * @param fleet - "логический флот"
-     * @param number - номер флота (от 1 до 3)
      */
-    public void addFleet(Fleet fleet, int number){
+    public void addFleet(Fleet fleet){
         // сначала хранятся имперские флоты, потом флоты федерации
-        int idx = (fleet.getSide() == GameObject.Side.EMPIRE ? -1 : 2) + number;
+        int idx = getIdx(fleet);
         // todo бросить исключение при перезаписи или выходе за рамки 1..3
         sprites[idx].setFleet(fleet);
         moveToPosition(idx);
         Log.wtf("idx = ","" + idx);
         layer.attachChild(sprites[idx]);
+    }
+
+    private int getIdx(Fleet fleet){
+        return (fleet.getSide() == GameObject.Side.EMPIRE ? -1 : 2) + fleet.getId();
     }
 
     public void removeDeadFleets(){
@@ -214,6 +227,58 @@ public class ShipsLayer extends Layer implements FleetObserver {
                 }
             }
         }
+    }
+
+    public void moveFleet(final PathInfo path) throws Fleet.NotEnoughEnergyException,
+            Fleet.InvalidPositionException, Fleet.InvalidPathException {
+        final ShipSprite sprite = activeSprite;
+        if (sprite != null) {
+            sprite.getFleet().makeMove(path);
+            sprite.clearEntityModifiers();
+            sprite.registerEntityModifier(new PathModifier(0.5f * path.getNodeIds().size(),
+                    convertPath(path), new PathModifier.IPathModifierListener() {
+                private int pointIdx;
+
+                @Override
+                public void onPathStarted(PathModifier pPathModifier, IEntity pEntity) {
+                    pointIdx = 0;
+                }
+
+                @Override
+                public void onPathWaypointStarted(PathModifier pPathModifier, IEntity pEntity, int pWaypointIndex) {
+                    if (pointIdx < path.getNodeIds().size() - 1) {
+                        Node old = getPathNode(pointIdx);
+                        Node current = getPathNode(pointIdx + 1);
+                        sprite.rotate(old.getX(), old.getY(), current.getX(), current.getY());
+                    }
+                    pointIdx++;
+                }
+
+                private Node getPathNode(int idx) {
+                    return WorldAccessor.getInstance().getNodes().get(path.getNodeIds().get(idx));
+                }
+
+                @Override
+                public void onPathWaypointFinished(PathModifier pPathModifier, IEntity pEntity, int pWaypointIndex) {
+
+                }
+
+                @Override
+                public void onPathFinished(PathModifier pPathModifier, IEntity pEntity) {
+
+                }
+            }));
+        }
+    }
+
+    public PathModifier.Path convertPath(PathInfo path){
+        PathModifier.Path result = new PathModifier.Path(path.getNodeIds().size());
+        for(int id: path.getNodeIds()){
+            Node node = WorldAccessor.getInstance().getNodes().get(id);
+            PointF point = calcPosition(node, getIdx(activeSprite.getFleet()));
+            result.to(point.x, point.y);
+        }
+        return result;
     }
 
     @Override

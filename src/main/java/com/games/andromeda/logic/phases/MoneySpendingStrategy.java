@@ -59,7 +59,7 @@ public class MoneySpendingStrategy extends ListStrategy<Purchase, Boolean> {
                 try {
                     Fleet fleet = Fleet.buy(id, 1, world.getBases().get(input.getNode().getId()),
                             world.getPocket(side));
-                    world.setFleet(fleet, id);
+                    world.setFleet(fleet);
                     input.fleet = fleet;
                     results.add(input);
                     UI.getInstance().getShipsLayer().repaint();

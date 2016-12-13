@@ -142,7 +142,7 @@ public class UI {
                         manager.start(fleet);
                         manager.addNode(node.getId());
                         try {
-                            fleet.makeMove(manager.getPath());
+                            getShipsLayer().moveFleet(manager.getPath());
                         } catch (Fleet.NotEnoughEnergyException e) {
                             toast("Недостаточно энергии");
                         } catch (Exception e){

@@ -74,7 +74,7 @@ public class Client implements MessageFlags {
                     case FLEETS_CREATION_MESSAGE:
                         SetupFleetsMessage setupFleetsMessage = (SetupFleetsMessage) message;
                         for (Fleet fleet : setupFleetsMessage.getFleets())
-                            WorldAccessor.getInstance().setFleet(fleet, fleet.getId());
+                            WorldAccessor.getInstance().setFleet(fleet);
                         UI.getInstance().getShipsLayer().repaint();
                         UI.getInstance().getPanel().repaintShipInfo();
                         if (flag == SETUP_FLEET_MESSAGE)

@@ -31,7 +31,7 @@ public class FleetPreparationStrategy extends ListStrategy<Fleet, Boolean> {
         if (id == 0)
             throw new Exception("Нельзя создавать больше 3 флотов");
         Fleet fleet = new Fleet(id, side, 5, base);
-        world.setFleet(fleet, id);
+        world.setFleet(fleet);
         results.add(fleet);
 
         UI.getInstance().getShipsLayer().repaint();
@@ -82,7 +82,7 @@ public class FleetPreparationStrategy extends ListStrategy<Fleet, Boolean> {
                         if (id != 0) {
                             Fleet fleet = new Fleet(id, Phases.getInstance().side, 8 + random.nextInt(4), bases.get(ind));
                             results.add(fleet);
-                            world.setFleet(fleet, id);
+                            world.setFleet(fleet);
                         }
                     } catch (Exception e) {
                         UI.toast("er " + e.toString());

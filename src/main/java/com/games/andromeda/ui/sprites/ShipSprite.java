@@ -23,11 +23,13 @@ public class ShipSprite extends Sprite {
             WorldAccessor world = WorldAccessor.getInstance();
             Node prev = world.getNodes().get(fleet.getPrevPosition());
             Node current = world.getNodes().get(fleet.getPosition());
-            setRotation((float) Math.toDegrees(
-                Math.atan2(current.getX() - prev.getX(), prev.getY() - current.getY())));
+            rotate(prev.getX(), prev.getY(), current.getX(), current.getY());
         }
     }
 
+    public void rotate(float oldX, float oldY, float newX, float newY){
+        setRotation((float) Math.toDegrees(Math.atan2(newX - oldX, oldY - newY)));
+    }
 
 
     public void setFleet(Fleet fleet) {

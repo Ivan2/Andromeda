@@ -94,10 +94,10 @@ public class WorldAccessor {
         return null;
     }
 
-    public void setFleet(Fleet fleet, int number) {
-        this.fleets[calcFleetIndex(fleet.getSide(), number)] = fleet;
+    public void setFleet(Fleet fleet) {
+        this.fleets[calcFleetIndex(fleet.getSide(), fleet.getId())] = fleet;
         for (FleetObserver observer : fleetObservers) {
-            observer.onFleetChanged(fleet, number);
+            observer.onFleetChanged(fleet);
         }
     }
 
@@ -167,15 +167,6 @@ public class WorldAccessor {
             case FEDERATION:
                 federationPocket = pocket;
                 return;
-        }
-    }
-
-    public void moveFleet(GameObject.Side side, int number, int nodeID){
-        Fleet fleet = getFleet(side, number);
-        fleet.setPosition(nodeID); // todo makeMove
-
-        for(FleetObserver observer: fleetObservers){
-            observer.onFleetChanged(fleet, number);
         }
     }
 
