@@ -83,6 +83,11 @@ public abstract class SystemInfoLayer extends DialogLayer {
             @Override
             public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
                 setVisibility(false);
+                if (UI.getInstance().getMediaPlayer()!=null)
+                {
+                    UI.getInstance().getMediaPlayer().release();
+                    Phases.getInstance().getMediaPlayer().start();
+                }
                 onOk();
             }
         });
@@ -141,6 +146,11 @@ public abstract class SystemInfoLayer extends DialogLayer {
                     try {
                         ((MoneySpendingStrategy) Phases.getInstance().getPhase()).handlePhaseEvent(purchase);
                         setVisibility(false);
+                        if (UI.getInstance().getMediaPlayer()!=null)
+                        {
+                            UI.getInstance().getMediaPlayer().release();
+                            Phases.getInstance().getMediaPlayer().start();
+                        }
                         mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.get_money);
                         mediaPlayer.start();
                     } catch (Exception e) {
@@ -321,6 +331,11 @@ public abstract class SystemInfoLayer extends DialogLayer {
                             ((MoneySpendingStrategy) Phases.getInstance().getPhase()).
                                     handlePhaseEvent(new Purchase(Purchase.Kind.BUY_FLEET, node));
                             setVisibility(false);
+                            if (UI.getInstance().getMediaPlayer()!=null)
+                            {
+                                UI.getInstance().getMediaPlayer().release();
+                                Phases.getInstance().getMediaPlayer().start();
+                            }
                             mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.get_money);
                             mediaPlayer.start();
                         } catch (Exception e) {

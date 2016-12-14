@@ -1,11 +1,13 @@
 package com.games.andromeda.ui;
 
 import android.app.Activity;
+import android.media.MediaPlayer;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.games.andromeda.GameActivity;
 import com.games.andromeda.Phases;
+import com.games.andromeda.R;
 import com.games.andromeda.graph.BFSSolver;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.graph.PathInfo;
@@ -65,6 +67,7 @@ public class UI {
     private final ShipsLayer shipsLayer;
     private final SystemInfoLayer systemInfoLayer;
     private final MessageLayer messageLayer;
+    private MediaPlayer mediaPlayer;
 
     public Activity activity;
 
@@ -165,8 +168,13 @@ public class UI {
                         getShipsLayer().repaint();
                         panel.repaintShipInfo();
                     }
-                } else
+                } else {
+                    Phases.getInstance().getMediaPlayer().pause();
+                    mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.base);
+                    mediaPlayer.setLooping(true);
+                    mediaPlayer.start();
                     systemInfoLayer.show(node);
+                }
             }
         });
 
@@ -229,5 +237,10 @@ public class UI {
     public void finishGame()
     {
         activity.finish();
+    }
+
+    public MediaPlayer getMediaPlayer()
+    {
+        return mediaPlayer;
     }
 }

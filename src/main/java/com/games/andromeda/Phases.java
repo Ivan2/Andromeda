@@ -2,6 +2,7 @@ package com.games.andromeda;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.media.MediaPlayer;
 
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.WorldAccessor;
@@ -9,7 +10,10 @@ import com.games.andromeda.logic.phases.FleetBattleStrategy;
 import com.games.andromeda.logic.phases.GamePhases;
 import com.games.andromeda.logic.phases.HandlingStrategy;
 import com.games.andromeda.logic.phases.IncomeEarningStrategy;
+import com.games.andromeda.logic.phases.LevelPreparationStrategy;
+import com.games.andromeda.logic.phases.MoneySpendingStrategy;
 import com.games.andromeda.logic.phases.RandomEventStrategy;
+import com.games.andromeda.message.MessageFlags;
 import com.games.andromeda.threads.GameTimer;
 import com.games.andromeda.ui.UI;
 
@@ -20,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Iterator;
+import java.util.Random;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -40,6 +45,7 @@ public class Phases {
     private Activity activity;
     public GameObject.Side side;
     private final String OPTIONS_FILE_NAME = "options";
+    private MediaPlayer mediaPlayer;
 
     private Phases() {
         gamePhases = new GamePhases();
@@ -78,10 +84,39 @@ public class Phases {
 
     private void nextPhase() {
         strategy = iterator.next();
+        if (strategy instanceof LevelPreparationStrategy)
+            if (mediaPlayer == null)
+            {
+                mediaPlayer = MediaPlayer.create(activity,R.raw.start);
+                mediaPlayer.setLooping(true);
+                mediaPlayer.start();
+            }
         if (strategy.getSide() == side) {
             gameTimer.restart();
             UI.getInstance().setEnabled(true);
-
+            if (strategy instanceof MoneySpendingStrategy)
+            {
+                if (mediaPlayer!=null)
+                    mediaPlayer.release();
+                Random rand = new Random();
+                switch (rand.nextInt(4))
+                {
+                    case 0:
+                        mediaPlayer = MediaPlayer.create(activity,R.raw.music1);
+                        break;
+                    case 1:
+                        mediaPlayer = MediaPlayer.create(activity,R.raw.music2);
+                        break;
+                    case 2:
+                        mediaPlayer = MediaPlayer.create(activity,R.raw.music3);
+                        break;
+                    case 3:
+                        mediaPlayer = MediaPlayer.create(activity,R.raw.music4);
+                        break;
+                }
+                mediaPlayer.setLooping(true);
+                mediaPlayer.start();
+            }
             if (strategy instanceof RandomEventStrategy || strategy instanceof IncomeEarningStrategy ||
                     strategy instanceof FleetBattleStrategy
                 ) {
@@ -98,6 +133,29 @@ public class Phases {
             else
                 dialog.show(activity.getFragmentManager(), "");
         } else {
+            if (strategy instanceof MoneySpendingStrategy)
+            {
+                if (mediaPlayer!=null)
+                    mediaPlayer.release();
+                Random rand = new Random();
+                switch (rand.nextInt(4))
+                {
+                    case 0:
+                        mediaPlayer = MediaPlayer.create(activity,R.raw.waiting1);
+                        break;
+                    case 1:
+                        mediaPlayer = MediaPlayer.create(activity,R.raw.waiting2);
+                        break;
+                    case 2:
+                        mediaPlayer = MediaPlayer.create(activity,R.raw.waiting3);
+                        break;
+                    case 3:
+                        mediaPlayer = MediaPlayer.create(activity,R.raw.waiting4);
+                        break;
+                }
+                mediaPlayer.setLooping(true);
+                mediaPlayer.start();
+            }
             UI.getInstance().setEnabled(false);
         }
         UI.getInstance().getPanel().repaintPhaseName(strategy.getTextDescription());
@@ -130,5 +188,11 @@ public class Phases {
     {
         return activity;
     }
+
+    public MediaPlayer getMediaPlayer()
+    {
+        return mediaPlayer;
+    }
+
 
 }
