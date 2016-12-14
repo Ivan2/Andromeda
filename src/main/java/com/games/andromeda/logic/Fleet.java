@@ -213,6 +213,10 @@ public class Fleet extends GameObject {
         prevNodeId = nodes.get(nodes.size() - 2);
     }
 
+    public int getMaxWayLength(){
+        return (int) (properties.getSpeed(ships.size()) * energy);
+    }
+
     @Deprecated
     public void setPosition(int nodeID){
         this.nodeID = nodeID;

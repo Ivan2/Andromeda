@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import com.games.andromeda.GameActivity;
 import com.games.andromeda.Phases;
+import com.games.andromeda.graph.BFSSolver;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.graph.PathInfo;
 import com.games.andromeda.graph.PathManager;
@@ -29,6 +30,7 @@ import org.andengine.engine.camera.Camera;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
+import org.andengine.util.StreamUtils;
 import org.andengine.util.color.Color;
 
 public class UI {
@@ -66,9 +68,9 @@ public class UI {
 
     public Activity activity;
 
-    private UI(GameActivity activity, Scene scene, Camera camera, TextureLoader textureLoader,
-              VertexBufferObjectManager vertexBufferObjectManager,
-              ShipsLayer.IOnFleetMove onFleetMove,ShipsLayer.IOnFleetFight onFleetFight) {
+    private UI(GameActivity activity, final Scene scene, Camera camera, TextureLoader textureLoader,
+               VertexBufferObjectManager vertexBufferObjectManager,
+               ShipsLayer.IOnFleetMove onFleetMove, ShipsLayer.IOnFleetFight onFleetFight) {
         this.activity = activity;
         manager = new PathManager();
 
@@ -165,6 +167,16 @@ public class UI {
                     }
                 } else
                     systemInfoLayer.show(node);
+            }
+        });
+
+        shipsLayer.setLayerListener(new ShipsLayer.LayerListener() {
+            @Override
+            public void onClick(Fleet fleet) {
+                BFSSolver solver = new BFSSolver(fleet);
+                for (int node: solver.availableNodes()){
+                    Log.wtf("Node: ", String.valueOf(node));
+                }
             }
         });
 

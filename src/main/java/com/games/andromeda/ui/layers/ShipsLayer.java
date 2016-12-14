@@ -79,9 +79,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
     }
 
     public static abstract class LayerListener {
-        public abstract void onClick(Node node);
-        public abstract void onMove(Node node);
-        public abstract void onUp(Node node);
+        public abstract void onClick(Fleet fleet);
     }
 
 
@@ -93,51 +91,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
 
         //pathManager = manager;
 
-        // todo refacor this using magic layerListener ???
-        layer = new Rectangle(0, 0, camera.getWidth(), camera.getHeight(),
-                vertexBufferObjectManager){
-            @Override
-            public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                /*if (activeSprite != null) {
-                    //if (pSceneTouchEvent.isActionMove()) {
-                        activeSprite.setX(pSceneTouchEvent.getX() - activeSprite.getWidth() / 2);
-                        activeSprite.setY(pSceneTouchEvent.getY() - activeSprite.getHeight() / 2);
-                    } else if (pSceneTouchEvent.isActionUp()) {
-                        // todo сделать ход, если возможно
-                        try {
-                            activeSprite.getFleet().makeMove(manager.getPath());
-                            WorldAccessor world = WorldAccessor.getInstance();
-                            int fleetNum = -1;
-                            for (int i = 0; i < 6; i++) {
-                                if (world.getAllFleets()[i] == activeSprite.getFleet()) {
-                                    if (i > 2) i -=3;
-                                    fleetNum = i+1;
-                                    onFleetMove.onFleetMove(activeSprite.getFleet(), fleetNum);
-                                    break;
-                                }
-                            }
-                            for (int i = 0; i < 6; i++) {
-                                if (world.getAllFleets()[i] != null && world.getAllFleets()[i] != activeSprite.getFleet() &&
-                                        world.getAllFleets()[i].getPosition() == activeSprite.getFleet().getPosition() &&
-                                        activeSprite.getFleet().getSide() != world.getAllFleets()[i].getSide()
-                                        ) {
-                                    if (i > 2) i -=3;
-                                    onFleetFight.onFleetFight(activeSprite.getFleet(),world.getAllFleets()[i],fleetNum,i+1);
-                                    break;
-                                }
-                            }
-                        } catch (Exception e) {
-                            Log.wtf("PATH", e.toString());
-                            e.printStackTrace();
-                        }
-                        activeSprite = null;
-                        manager.reset();
-                        ShipsLayer.this.repaint();
-                    }
-                }*/
-                return super.onAreaTouched(pSceneTouchEvent, pTouchAreaLocalX, pTouchAreaLocalY);
-            }
-        };
+        layer = new Rectangle(0, 0, camera.getWidth(), camera.getHeight(), vertexBufferObjectManager);
         layer.setColor(Color.TRANSPARENT);
         scene.attachChild(layer);
         scene.registerTouchArea(layer);
@@ -163,8 +117,9 @@ public class ShipsLayer extends Layer implements FleetObserver {
                             } else {
                                 UI.toast("Вы не можете перемещать не свои флоты");
                             }
-    //                        activeSprite.getFleet().setEnergy(100500);
-                            //manager.start(this.getFleet());
+                            if (layerListener != null){
+                                layerListener.onClick(this.getFleet());
+                            }
                         }
                     return super.onAreaTouched(pSceneTouchEvent, pTouchAreaLocalX, pTouchAreaLocalY);
                 }
@@ -313,9 +268,9 @@ public class ShipsLayer extends Layer implements FleetObserver {
         }
     }
 
-//    public void setLayerListener(LayerListener layerListener) {
-//        this.layerListener = layerListener;
-//    }
+    public void setLayerListener(LayerListener layerListener) {
+        this.layerListener = layerListener;
+    }
 //
 //    public boolean isShipMoves() {
 //        return (activeSprite != null);
