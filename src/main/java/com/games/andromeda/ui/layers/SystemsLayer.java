@@ -86,11 +86,11 @@ public class SystemsLayer extends Layer implements BaseObserver{
                 sprite.setSize(size, size);
             layer.attachChild(sprite);
             scene.registerTouchArea(sprite);
-            sprites.put(sprite, node.getId());
+            sprites.put(node.getId(), sprite);
         }
     }
 
-    private Map<SystemSprite, Integer> sprites;
+    private Map<Integer, SystemSprite> sprites;
 
     @Override
     public void repaint() {
@@ -98,24 +98,35 @@ public class SystemsLayer extends Layer implements BaseObserver{
             @Override
             public void run() {
                 Map<Integer, Node> nodes = WorldAccessor.getInstance().getNodes();
-                for(Map.Entry<SystemSprite, Integer> entry: sprites.entrySet()){
-                    switch (nodes.get(entry.getValue()).getSystemType()){
+                for(Map.Entry<Integer, SystemSprite> entry: sprites.entrySet()){
+                    entry.getValue().deactivate();
+                    switch (nodes.get(entry.getKey()).getSystemType()){
                         case EMPTY:
-                            entry.getKey().setColor(new Color(0.8f, 0.8f, 0.8f));
+                            entry.getValue().setColor(new Color(0.8f, 0.8f, 0.8f));
                             break;
                         case FRIENDLY:
-                            entry.getKey().setColor(Color.GREEN);
+                            entry.getValue().setColor(Color.GREEN);
                             break;
                         case ENEMY:
-                            entry.getKey().setColor(Color.RED);
+                            entry.getValue().setColor(Color.RED);
                             break;
                         default:
-                            entry.getKey().setColor(new Color(0.8f, 0.8f, 0.8f));
+                            entry.getValue().setColor(new Color(0.8f, 0.8f, 0.8f));
                     }
                 }
             }
 
         });
+    }
+
+    public void highlightSystem(int nodeId){
+        sprites.get(nodeId).activate();
+    }
+
+    public void unhighlightAll(){
+        for (SystemSprite sprite: sprites.values()){
+            sprite.deactivate();
+        }
     }
 
     public void setLayerListener(LayerListener layerListener) {

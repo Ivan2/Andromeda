@@ -4,6 +4,9 @@ import android.view.MotionEvent;
 
 import com.games.andromeda.graph.Node;
 
+import org.andengine.entity.modifier.LoopEntityModifier;
+import org.andengine.entity.modifier.ScaleModifier;
+import org.andengine.entity.modifier.SequenceEntityModifier;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
@@ -16,17 +19,27 @@ public abstract class SystemSprite extends Sprite {
 
     private Node node;
 
+    private LoopEntityModifier modifier;
+
     public SystemSprite(Node node, float pX, float pY, ITextureRegion pTextureRegion,
                         VertexBufferObjectManager pVertexBufferObjectManager) {
         super(pX, pY, pTextureRegion, pVertexBufferObjectManager);
         this.node = node;
-        /*setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 
-                //runnable.run();
-            }
-        });*/
+        setScaleCenter(getWidth()/8, getHeight()/8);
+        modifier = new LoopEntityModifier(new SequenceEntityModifier(
+                new ScaleModifier(1, 1f, 1.2f),
+                new ScaleModifier(1, 1.2f, 1f)
+        ));
+    }
+
+    public void activate(){
+        registerEntityModifier(modifier);
+    }
+
+    public void deactivate(){
+        clearEntityModifiers();
+        setScale(1);
     }
 
     @Override

@@ -124,6 +124,7 @@ public class UI {
             @Override
             public void onUp(Node node) {
                 //TODO handlePhaseEvent
+                getSystemsLayer().unhighlightAll();
                 if (Phases.getInstance().getPhase() instanceof LevelPreparationStrategy) {
                     try {
                         boolean res = ((LevelPreparationStrategy)Phases.getInstance().
@@ -159,7 +160,6 @@ public class UI {
                             Log.wtf("moving: ", e.toString());
                         }
 
-                        //TODO show ask dialog (in beta?)
                         getShipsLayer().releaseSprite();
                         manager.reset();
                         getShipsLayer().repaint();
@@ -173,10 +173,15 @@ public class UI {
         shipsLayer.setLayerListener(new ShipsLayer.LayerListener() {
             @Override
             public void onClick(Fleet fleet) {
+                systemsLayer.unhighlightAll();
                 BFSSolver solver = new BFSSolver(fleet);
-                for (int node: solver.availableNodes()){
-                    Log.wtf("Node: ", String.valueOf(node));
+                for (int node : solver.availableNodes()) {
+                    systemsLayer.highlightSystem(node);
                 }
+            }
+            @Override
+            public void onCancel(){
+                systemsLayer.unhighlightAll();
             }
         });
 

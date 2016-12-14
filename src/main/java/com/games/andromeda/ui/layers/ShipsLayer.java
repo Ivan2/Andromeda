@@ -80,6 +80,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
 
     public static abstract class LayerListener {
         public abstract void onClick(Fleet fleet);
+        public abstract void onCancel();
     }
 
 
@@ -112,13 +113,17 @@ public class ShipsLayer extends Layer implements FleetObserver {
                                 if (activeSprite == null) {
                                     UI.toast("Выберите систему для перемещения флота");
                                     setActive(this);
-                                } else
+                                    if (layerListener != null){
+                                        layerListener.onClick(this.getFleet());
+                                    }
+                                } else {
                                     releaseSprite();
+                                    if (layerListener != null) {
+                                        layerListener.onCancel();
+                                    }
+                                }
                             } else {
                                 UI.toast("Вы не можете перемещать не свои флоты");
-                            }
-                            if (layerListener != null){
-                                layerListener.onClick(this.getFleet());
                             }
                         }
                     return super.onAreaTouched(pSceneTouchEvent, pTouchAreaLocalX, pTouchAreaLocalY);
