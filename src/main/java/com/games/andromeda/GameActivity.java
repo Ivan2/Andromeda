@@ -148,6 +148,7 @@ public class GameActivity extends SimpleBaseGameActivity{
                 Toast.makeText(GameActivity.this, Phases.getInstance().side+"", Toast.LENGTH_SHORT).show();
             }
         });
+        Phases.getInstance().setActivity(this);
         Phases.getInstance().startGame(gameTimer);
 
         return scene;

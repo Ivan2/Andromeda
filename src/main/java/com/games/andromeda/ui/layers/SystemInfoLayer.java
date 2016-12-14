@@ -1,9 +1,11 @@
 package com.games.andromeda.ui.layers;
 
 import android.content.res.Resources;
+import android.media.MediaPlayer;
 
 import com.games.andromeda.Phases;
 import com.games.andromeda.PxDpConverter;
+import com.games.andromeda.R;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
@@ -32,12 +34,14 @@ public abstract class SystemInfoLayer extends DialogLayer {
 
     protected abstract void onOk();
     protected abstract void onCancel();
+    protected MediaPlayer mediaPlayer;
 
     private Node node;
 
     public SystemInfoLayer(Resources resources, Scene scene, Camera camera, TextureLoader textureLoader,
                            VertexBufferObjectManager vertexBufferObjectManager) {
         super(resources, scene, camera, textureLoader, vertexBufferObjectManager);
+
     }
 
     public void show(Node node) {
@@ -131,11 +135,14 @@ public abstract class SystemInfoLayer extends DialogLayer {
             @Override
             public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
                 //TODO построить базу
+
                 if (Phases.getInstance().getPhase() instanceof MoneySpendingStrategy) {
                     Purchase purchase = new Purchase(Purchase.Kind.BUILD_BASE, node);
                     try {
                         ((MoneySpendingStrategy) Phases.getInstance().getPhase()).handlePhaseEvent(purchase);
                         setVisibility(false);
+                        mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.get_money);
+                        mediaPlayer.start();
                     } catch (Exception e) {
                         UI.toast(e.getMessage());
                     }
@@ -314,6 +321,8 @@ public abstract class SystemInfoLayer extends DialogLayer {
                             ((MoneySpendingStrategy) Phases.getInstance().getPhase()).
                                     handlePhaseEvent(new Purchase(Purchase.Kind.BUY_FLEET, node));
                             setVisibility(false);
+                            mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.get_money);
+                            mediaPlayer.start();
                         } catch (Exception e) {
                             UI.toast(e.getMessage());
                         }
