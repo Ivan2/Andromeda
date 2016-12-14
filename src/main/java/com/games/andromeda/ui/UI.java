@@ -157,7 +157,7 @@ public class UI {
                         }
 
                         //TODO show ask dialog (in beta?)
-                        ShipsLayer.activeSprite = null;
+                        getShipsLayer().releaseSprite();
                         manager.reset();
                         getShipsLayer().repaint();
                         panel.repaintShipInfo();

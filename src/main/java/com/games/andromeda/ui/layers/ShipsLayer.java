@@ -157,9 +157,9 @@ public class ShipsLayer extends Layer implements FleetObserver {
                             if (this.getFleet().getSide() == Phases.getInstance().side) {
                                 if (activeSprite == null) {
                                     UI.toast("Выберите систему для перемещения флота");
-                                    activeSprite = this;
+                                    setActive(this);
                                 } else
-                                    activeSprite = null;
+                                    releaseSprite();
                             } else {
                                 UI.toast("Вы не можете перемещать не свои флоты");
                             }
@@ -252,21 +252,17 @@ public class ShipsLayer extends Layer implements FleetObserver {
             sprite.clearEntityModifiers();
             sprite.registerEntityModifier(new PathModifier(0.5f * path.getNodeIds().size(),
                     convertPath(path), new PathModifier.IPathModifierListener() {
-                private int pointIdx;
-
                 @Override
                 public void onPathStarted(PathModifier pPathModifier, IEntity pEntity) {
-                    pointIdx = 0;
                 }
 
                 @Override
                 public void onPathWaypointStarted(PathModifier pPathModifier, IEntity pEntity, int pWaypointIndex) {
-                    if (pointIdx < path.getNodeIds().size() - 1) {
-                        Node old = getPathNode(pointIdx);
-                        Node current = getPathNode(pointIdx + 1);
+                    if (pWaypointIndex < path.getNodeIds().size() - 1) {
+                        Node old = getPathNode(pWaypointIndex);
+                        Node current = getPathNode(pWaypointIndex + 1);
                         sprite.rotate(old.getX(), old.getY(), current.getX(), current.getY());
                     }
-                    pointIdx++;
                 }
 
                 private Node getPathNode(int idx) {
@@ -305,22 +301,34 @@ public class ShipsLayer extends Layer implements FleetObserver {
         //TODO удалить все спрайты со слоя
     }
 
-    public void setLayerListener(LayerListener layerListener) {
-        this.layerListener = layerListener;
+    public void setActive(ShipSprite sprite){
+        activeSprite = sprite;
+        sprite.activate();
     }
 
-    public boolean isShipMoves() {
-        return (activeSprite != null);
+    public void releaseSprite(){
+        if (activeSprite != null){
+            activeSprite.deactivate();
+            activeSprite = null;
+        }
     }
 
-    public PointF getPos() {
-        return new PointF(activeSprite.getX(), activeSprite.getY());
-    }
-
-    public void move(float x, float y) {
-        activeSprite.setX(x);
-        activeSprite.setY(y);
-    }
+//    public void setLayerListener(LayerListener layerListener) {
+//        this.layerListener = layerListener;
+//    }
+//
+//    public boolean isShipMoves() {
+//        return (activeSprite != null);
+//    }
+//
+//    public PointF getPos() {
+//        return new PointF(activeSprite.getX(), activeSprite.getY());
+//    }
+//
+//    public void move(float x, float y) {
+//        activeSprite.setX(x);
+//        activeSprite.setY(y);
+//    }
 
 }
 
