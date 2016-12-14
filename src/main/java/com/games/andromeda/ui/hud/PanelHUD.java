@@ -7,6 +7,7 @@ import com.games.andromeda.Phases;
 import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.R;
 import com.games.andromeda.logic.Fleet;
+import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.ui.layers.ShipsLayer;
 import com.games.andromeda.ui.texture.TextureLoader;
@@ -38,6 +39,7 @@ public class PanelHUD {
     private Sprite[] shipEnergySprites;
     private Text[] shipCountTexts;
     private ButtonSprite endPhaseButton;
+    private Text sideText;
     private Text moneyText;
     private Text phaseText;
     private Text timerText;
@@ -69,8 +71,23 @@ public class PanelHUD {
     }
 
     private void createGUI() {
-        float top = 0;
+        float top = PxDpConverter.dpToPx(10);
         float left = PxDpConverter.dpToPx(4);
+        Font font = textureLoader.loadSubtitleDialogTexture();
+
+        Sprite moneySprite = new Sprite(left, top,
+                textureLoader.loadMoneyTexture(), vertexBufferObjectManager);
+        moneySprite.setSize(size, size);
+        rectangleVertical.attachChild(moneySprite);
+
+        moneyText = new Text(0, 0, textureLoader.loadPanelTexture(),
+                "10000", vertexBufferObjectManager);
+        moneyText.setPosition(moneySprite.getWidth(),
+                moneySprite.getHeight());
+        rectangleVertical.attachChild(moneyText);
+
+        top += moneyText.getY() + moneyText.getHeight() + top;
+
         String[] colors = ShipsLayer.SHIP_COLORS;
         shipSprites = new Rectangle[6];
         shipCountTexts = new Text[6];
@@ -86,10 +103,13 @@ public class PanelHUD {
             rectangleVertical.attachChild(shipSprites[i]);
         }
 
-        Font font = textureLoader.loadSubtitleDialogTexture();
+
+        sideText = new Text(rectangleVertical.getWidth() + PxDpConverter.dpToPx(20),
+                (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
+                font, "Федерация", vertexBufferObjectManager);
 
         endPhaseButton = new ButtonSprite(0, 0,
-                textureLoader.loadEmptyTexture(android.graphics.Color.argb(20, 255, 255, 255)),
+                textureLoader.loadEmptyTexture(android.graphics.Color.argb(15, 255, 255, 255)),
                 vertexBufferObjectManager);
         endPhaseButton.setOnClickListener(new ButtonSprite.OnClickListener() {
             @Override
@@ -100,25 +120,22 @@ public class PanelHUD {
         hud.registerTouchArea(endPhaseButton);
 
 
-        Text endPhaseText = new Text(0, 0, textureLoader.loadDialogTexture(), "End", vertexBufferObjectManager);
+        Text endPhaseText = new Text(0, 0, textureLoader.loadDialogTexture(),
+                "Завершить фазу", vertexBufferObjectManager);
         endPhaseText.setColor(1, 1, 1);
         endPhaseText.setHorizontalAlign(HorizontalAlign.CENTER);
         endPhaseButton.attachChild(endPhaseText);
-        endPhaseButton.setSize(endPhaseText.getWidth()*2, rectangleHorizontal.getHeight()-margin*2);
+        endPhaseButton.setSize(endPhaseText.getWidth()+PxDpConverter.dpToPx(20),
+                rectangleHorizontal.getHeight()-margin*2);
         endPhaseText.setPosition((endPhaseButton.getWidth() - endPhaseText.getWidth())/2,
                 (endPhaseButton.getHeight() - endPhaseText.getHeight())/2);
 
         endPhaseButton.setPosition(GameActivity.SCREEN_WIDTH-endPhaseButton.getWidth()-margin*2, margin);
 
-        moneyText = new Text(0,
-                (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
-                font, "Очки: 1000", vertexBufferObjectManager);
-        moneyText.setX(endPhaseButton.getX()-moneyText.getWidth()-margin*4);
-
         timerText = new Text(0,
                 (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
                 font, "00:45", vertexBufferObjectManager);
-        timerText.setX(moneyText.getX()-timerText.getWidth()-margin*4);
+        timerText.setX(endPhaseButton.getX()-timerText.getWidth()-margin*4);
 
         phaseText = new Text(0,
                 (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
@@ -127,14 +144,25 @@ public class PanelHUD {
         phaseText.setX(timerText.getX()-phaseText.getWidth()-margin*4);
 
 
+        rectangleHorizontal.attachChild(sideText);
         rectangleHorizontal.attachChild(endPhaseButton);
-        rectangleHorizontal.attachChild(moneyText);
         rectangleHorizontal.attachChild(timerText);
         rectangleHorizontal.attachChild(phaseText);
     }
 
+    public void repaintSide(GameObject.Side side) {
+        switch (side) {
+            case EMPIRE:
+                sideText.setText("Империя");
+                break;
+            case FEDERATION:
+                sideText.setText("Федерация");
+                break;
+        }
+    }
+
     public void repaintPhaseName(String phaseName) {
-        phaseText.setText("Фаза " + phaseName);
+        phaseText.setText(phaseName);
         phaseText.setX(timerText.getX()-phaseText.getWidth()-margin*4);
     }
 
@@ -143,7 +171,7 @@ public class PanelHUD {
     }
 
     public void repaintMoney(int money) {
-        moneyText.setText("Очки: "+money);
+        moneyText.setText(money+"");
     }
 
     public void repaintShipInfo() {

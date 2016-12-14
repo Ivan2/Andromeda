@@ -30,7 +30,6 @@ import org.andengine.engine.camera.Camera;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
-import org.andengine.util.StreamUtils;
 import org.andengine.util.color.Color;
 
 public class UI {
@@ -125,6 +124,8 @@ public class UI {
             public void onUp(Node node) {
                 //TODO handlePhaseEvent
                 getSystemsLayer().unhighlightAll();
+                if (!enabled)
+                    return;
                 if (Phases.getInstance().getPhase() instanceof LevelPreparationStrategy) {
                     try {
                         boolean res = ((LevelPreparationStrategy)Phases.getInstance().
@@ -174,6 +175,8 @@ public class UI {
             @Override
             public void onClick(Fleet fleet) {
                 systemsLayer.unhighlightAll();
+                if (!enabled)
+                    return;
                 BFSSolver solver = new BFSSolver(fleet);
                 for (int node : solver.availableNodes()) {
                     systemsLayer.highlightSystem(node);
@@ -197,12 +200,15 @@ public class UI {
         thread.start();
     }
 
+    private boolean enabled = false;
+
     public void setEnabled(boolean enabled) {
-        if (enabled) {
+        this.enabled = enabled;
+        /*if (enabled) {
             messageLayer.hide();
         } else {
             messageLayer.show("Ход противника");
-        }
+        }*/
         getPanel().setButtonEnabled(enabled);
     }
 
@@ -229,5 +235,10 @@ public class UI {
     public void finishGame()
     {
         activity.finish();
+    }
+
+    public void hideAllDialogs() {
+        if (systemInfoLayer != null)
+            systemInfoLayer.hide();
     }
 }

@@ -80,4 +80,8 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
         return gameSide == GameObject.Side.EMPIRE ? GameObject.Side.FEDERATION : GameObject.Side.EMPIRE;
     }
 
+    @Override
+    public String getTextDescription() {
+        return "Фаза боя";
+    }
 }

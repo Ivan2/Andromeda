@@ -106,6 +106,6 @@ public class LevelPreparationStrategy extends ListStrategy<Node, Boolean>{
 
     @Override
     public String getTextDescription() {
-        return "Создание баз";
+        return "Фаза создания баз";
     }
 }

@@ -17,16 +17,16 @@ public abstract class GameTimer {
     }
 
     public GameTimer(){
-        this(50, 1000);
+        this(60, 1000);
     }
 
     synchronized public void restart() {
-        time = 50;
+        time = 60;
     }
 
     synchronized public void stop() {
         time = 0;
-        onTime(0);
+        //onTime(0);
     }
 
     private void createThread() {

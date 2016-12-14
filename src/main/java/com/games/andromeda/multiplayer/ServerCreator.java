@@ -33,11 +33,9 @@ import org.andengine.util.debug.Debug;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
-import java.net.Socket;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -263,8 +261,9 @@ public class ServerCreator implements MessageFlags {
                             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(sb.toString()), 9999);
                             while ( connectedCount == 1) {
                                 try {
-                                    Thread.sleep(2000);
-                                    ds.send(packet);
+                                    Thread.sleep(1000);
+                                    for (int i=0; i<10; i++)
+                                        ds.send(packet);
                                 }
                                 catch (Exception ex)
                                 {

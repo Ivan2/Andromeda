@@ -4,6 +4,7 @@ import android.graphics.PointF;
 import android.util.Log;
 
 import com.games.andromeda.Phases;
+import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.graph.PathInfo;
 import com.games.andromeda.logic.Fleet;
@@ -36,8 +37,10 @@ public class ShipsLayer extends Layer implements FleetObserver {
     {
         void onFleetFight(Fleet attackingFleet, Fleet anotherFleet, int number, int secondNumber);
     }
+
     private static float SHIP_SCALE = 0.3f; // масштаб иконки корабля
-    private static int SHIP_MARGIN = 60;  // вынос иконки корабля относительно системы в px
+    private static float SHIP_SIZE = PxDpConverter.dpToPx(35); // размер иконки корабля
+    private static float SHIP_MARGIN = PxDpConverter.dpToPx(60);  // вынос иконки корабля относительно системы в px
     // разные флоты смещены внутри системы в разные стороны, чтобы не перекрывать друг друга
     private static double[] SHIP_ANGLES = {
         -2*Math.PI/3, Math.PI, 2*Math.PI/3, -Math.PI/3, 0, Math.PI/3
@@ -129,7 +132,8 @@ public class ShipsLayer extends Layer implements FleetObserver {
                     return super.onAreaTouched(pSceneTouchEvent, pTouchAreaLocalX, pTouchAreaLocalY);
                 }
             };
-            sprites[i].setScale(SHIP_SCALE);
+            sprites[i].setSize(SHIP_SIZE, SHIP_SIZE);
+            //sprites[i].setScale(SHIP_SCALE);
             scene.registerTouchArea(sprites[i]);
         }
     }

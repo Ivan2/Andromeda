@@ -1,7 +1,6 @@
 package com.games.andromeda;
 
 import android.util.DisplayMetrics;
-import android.widget.Toast;
 
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.multiplayer.Client;
@@ -97,57 +96,10 @@ public class GameActivity extends SimpleBaseGameActivity{
                 });
             }
         };
+        gameTimer.stop();
+        UI.getInstance().getPanel().repaintMoney(0);
+        UI.getInstance().getPanel().repaintSide(Phases.getInstance().side);
 
-        //generate bases and fleets
-        /*Pocket pocket = world.getPocket(GameObject.Side.EMPIRE);
-        pocket.increase(100500);
-
-        Iterator<Node> iter = world.getMap().getNodes().iterator();
-        iter.next();
-        iter.next();
-        iter.next();
-        Node node = iter.next();
-        try {
-            Base base = new Base(GameObject.Side.EMPIRE, node);
-            world.setBase(base);
-            world.setFleet(Fleet.buy(5, base, pocket), 1);
-        } catch (Exception e) {
-            Log.wtf("my stupid exception: ", e.toString());
-        }
-
-        iter.next();
-        iter.next();
-        node = iter.next();
-
-        Pocket pocket2 = world.getPocket(GameObject.Side.FEDERATION);
-        pocket2.increase(150000);
-        try {
-            Base base = new Base(GameObject.Side.FEDERATION, node);
-            world.setBase(base);
-            world.setFleet(Fleet.buy(8, base, pocket2), 2);
-        } catch (Exception e) {
-            Log.wtf("my stupid exception: ", e.toString());
-        }
-        ui.repaintHUD();*/
-
-
-        /*Node node = WorldAccessor.getInstance().getNodes().get(1);
-        try {
-            Base base = new Base(GameObject.Side.EMPIRE, node.getId());
-            WorldAccessor.getInstance().setBase(base);
-            WorldAccessor.getInstance().setFleet(new Fleet(Phases.getInstance().side, 5, base), 1);
-        } catch (Exception e) {
-            Log.wtf("my stupid exception: ", e.toString());
-        }*/
-
-
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(GameActivity.this, Phases.getInstance().side+"", Toast.LENGTH_SHORT).show();
-            }
-        });
         Phases.getInstance().setActivity(this);
         Phases.getInstance().startGame(gameTimer);
 

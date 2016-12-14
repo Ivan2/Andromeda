@@ -1,10 +1,8 @@
 package com.games.andromeda;
 
 import android.app.Activity;
-import android.app.FragmentManager;
 
 import com.games.andromeda.logic.GameObject;
-import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.logic.phases.FleetBattleStrategy;
 import com.games.andromeda.logic.phases.GamePhases;
 import com.games.andromeda.logic.phases.HandlingStrategy;
@@ -14,14 +12,10 @@ import com.games.andromeda.threads.GameTimer;
 import com.games.andromeda.ui.UI;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.Iterator;
-
-import static android.content.Context.MODE_PRIVATE;
 
 public class Phases {
 
@@ -40,6 +34,7 @@ public class Phases {
     private Activity activity;
     public GameObject.Side side;
     private final String OPTIONS_FILE_NAME = "options";
+    private HelpDialog dialog;
 
     private Phases() {
         gamePhases = new GamePhases();
@@ -55,12 +50,12 @@ public class Phases {
         return strategy;
     }
 
-    //вызывается сообщением с сервера об окончании времени хода
+    //вызывается таймером
     public void serverEndPhase() {
-        //if (strategy.getSide() != side)
-        //return;
-        //strategy.autoApplyChanges();
-        //endPhase();
+        if (strategy.getSide() != side)
+            return;
+        strategy.autoApplyChanges();
+        endPhase();
     }
 
     //вызывается нажатием кнопки
@@ -72,6 +67,9 @@ public class Phases {
     //вызывается сообщением с сервера об окончании фазы
     public void endPhase() {
         //UI.getInstance().setEnabled(false);
+        if (dialog != null && dialog.isVisible())
+            dialog.dismiss();
+        UI.getInstance().hideAllDialogs();
         gameTimer.stop();
         nextPhase();
     }
@@ -89,7 +87,7 @@ public class Phases {
                 nextPhase();
                 return;
             }
-            HelpDialog dialog = new HelpDialog();
+            dialog = new HelpDialog();
             String show = readFile();
             if (show!=null) {
                 if (show.equals("1"))
@@ -100,7 +98,10 @@ public class Phases {
         } else {
             UI.getInstance().setEnabled(false);
         }
-        UI.getInstance().getPanel().repaintPhaseName(strategy.getTextDescription());
+        if (strategy.getSide() == side)
+            UI.getInstance().getPanel().repaintPhaseName(strategy.getTextDescription());
+        else
+            UI.getInstance().getPanel().repaintPhaseName("Ход противника");
         UI.getInstance().getPanel().repaintShipInfo();
     }
 

@@ -107,6 +107,10 @@ public class TextureLoader {
         return loadFileTexture("patch.png", 1024, 1024);
     }
 
+    public ITextureRegion loadMoneyTexture() {
+        return loadFileTexture("coins.png", 1024, 1024);
+    }
+
     private ITextureRegion loadFileTexture(String file, int sizeX, int sizeY){
         BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(textureManager, sizeX, sizeY,
                 TextureOptions.BILINEAR_PREMULTIPLYALPHA);

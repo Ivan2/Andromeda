@@ -100,6 +100,6 @@ public class FleetPreparationStrategy extends ListStrategy<Fleet, Boolean> {
 
     @Override
     public String getTextDescription() {
-        return "Расстановка флотов";
+        return "Фаза расстановки флотов";
     }
 }

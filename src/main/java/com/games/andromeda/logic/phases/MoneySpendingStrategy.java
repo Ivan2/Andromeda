@@ -1,7 +1,5 @@
 package com.games.andromeda.logic.phases;
 
-import android.util.Log;
-
 import com.games.andromeda.Phases;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.logic.Base;
@@ -128,6 +126,6 @@ public class MoneySpendingStrategy extends ListStrategy<Purchase, Boolean> {
 
     @Override
     public String getTextDescription() {
-        return "Покупка баз и флотов";
+        return "фаза покупки баз и флотов";
     }
 }

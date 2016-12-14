@@ -27,6 +27,6 @@ public class FleetMovingStrategy extends CommonHandlingStrategy<MoveFleetMessage
 
     @Override
     public String getTextDescription() {
-        return "Передвижение флота";
+        return "Фаза передвижения флотов";
     }
 }

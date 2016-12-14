@@ -44,6 +44,10 @@ public abstract class SystemInfoLayer extends DialogLayer {
 
     }
 
+    public void hide() {
+        setVisibility(false);
+    }
+
     public void show(Node node) {
         this.node = node;
         repaint();
