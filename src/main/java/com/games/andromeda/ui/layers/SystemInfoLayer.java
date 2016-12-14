@@ -1,7 +1,12 @@
 package com.games.andromeda.ui.layers;
 
-import android.content.res.Resources;
+import android.app.Activity;
+import android.app.Dialog;
 import android.media.MediaPlayer;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.RadioButton;
 
 import com.games.andromeda.Phases;
 import com.games.andromeda.PxDpConverter;
@@ -9,6 +14,7 @@ import com.games.andromeda.R;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
+import com.games.andromeda.logic.Pocket;
 import com.games.andromeda.logic.Purchase;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.logic.phases.MoneySpendingStrategy;
@@ -36,12 +42,13 @@ public abstract class SystemInfoLayer extends DialogLayer {
     protected abstract void onCancel();
     protected MediaPlayer mediaPlayer;
 
+    private Activity activity;
     private Node node;
 
-    public SystemInfoLayer(Resources resources, Scene scene, Camera camera, TextureLoader textureLoader,
+    public SystemInfoLayer(Activity activity, Scene scene, Camera camera, TextureLoader textureLoader,
                            VertexBufferObjectManager vertexBufferObjectManager) {
-        super(resources, scene, camera, textureLoader, vertexBufferObjectManager);
-
+        super(activity.getResources(), scene, camera, textureLoader, vertexBufferObjectManager);
+        this.activity = activity;
     }
 
     public void hide() {
@@ -61,24 +68,17 @@ public abstract class SystemInfoLayer extends DialogLayer {
         float WIDTH = contentLayer.getWidth();
         float HEIGHT = contentLayer.getHeight();
 
+        String systemType = "Нейтральная";
+        if (node.getSystemType() == Node.SystemType.FRIENDLY)
+            systemType = "Дружественная";
+        if (node.getSystemType() == Node.SystemType.ENEMY)
+            systemType = "Враждебная";
+
         Text titleText = new Text(0, 0, textureLoader.loadTitleDialogTexture(),
-                "Система " + node.getSystemType(), vertexBufferObjectManager);
+                systemType + " система", vertexBufferObjectManager);
         titleText.setPosition((WIDTH-titleText.getWidth())/2, PxDpConverter.dpToPx(20));
         titleText.setColor(1, 1, 1);
         contentLayer.attachChild(titleText);
-
-        String systemType = "нейтральная";
-        if (node.getSystemType() == Node.SystemType.FRIENDLY)
-            systemType = "дружественная";
-        if (node.getSystemType() == Node.SystemType.ENEMY)
-            systemType = "враждебная";
-        Text subtitleText = new Text(0, 0, textureLoader.loadSubtitleDialogTexture(),
-                "Тип: " + systemType, vertexBufferObjectManager);
-        subtitleText.setPosition((WIDTH-subtitleText.getWidth())/2,
-                titleText.getY()+titleText.getHeight()+PxDpConverter.dpToPx(5));
-        subtitleText.setColor(1, 1, 1);
-        contentLayer.attachChild(subtitleText);
-
 
         ButtonSprite okButton = new ButtonSprite(0, 0,
                 textureLoader.loadEmptyTexture(android.graphics.Color.TRANSPARENT),
@@ -106,182 +106,61 @@ public abstract class SystemInfoLayer extends DialogLayer {
 
 
         Rectangle parent = new Rectangle(0,
-                subtitleText.getY()+subtitleText.getHeight()+PxDpConverter.dpToPx(10),
+                titleText.getY()+titleText.getHeight()+PxDpConverter.dpToPx(10),
                 WIDTH,
-                HEIGHT-(subtitleText.getY()+subtitleText.getHeight()+PxDpConverter.dpToPx(10))-
+                HEIGHT-(titleText.getY()+titleText.getHeight()+PxDpConverter.dpToPx(10))-
                 (HEIGHT-okButton.getY()),
                 vertexBufferObjectManager);
         parent.setColor(Color.TRANSPARENT);
 
-        switch (node.getSystemType()) {
-            case FRIENDLY:
-                createFriendlySystem(parent);
-                break;
-            case ENEMY:
-                createEnemySystem(parent);
-                break;
-            case EMPTY:
-            case MINI:
-            case HYPER:
-                createEmptySystem(parent);
-                break;
-        }
+        createSystem(parent, node.getSystemType());
         contentLayer.attachChild(parent);
     }
 
-    private void createEmptySystem(Rectangle parent) {
+    private void createSystem(Rectangle parent, Node.SystemType systemType) {
         float margin = PxDpConverter.dpToPx(20);
 
-        ///Создание кнопки постройки базы
-        ButtonSprite buildButton = new ButtonSprite(0, 0, textureLoader.loadBuildTexture(),
-                vertexBufferObjectManager);
-        buildButton.setOnClickListener(new ButtonSprite.OnClickListener() {
-            @Override
-            public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                //TODO построить базу
-
-                if (Phases.getInstance().getPhase() instanceof MoneySpendingStrategy) {
-                    Purchase purchase = new Purchase(Purchase.Kind.BUILD_BASE, node);
-                    try {
-                        ((MoneySpendingStrategy) Phases.getInstance().getPhase()).handlePhaseEvent(purchase);
-                        setVisibility(false);
-                        mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.get_money);
-                        mediaPlayer.start();
-                    } catch (Exception e) {
-                        UI.toast(e.getMessage());
+        float systemSpriteBottomMargin = 0;
+        if (systemType == Node.SystemType.EMPTY) {
+            ///Создание кнопки постройки базы
+            ButtonSprite buildButton = new ButtonSprite(0, 0, textureLoader.loadBuildTexture(),
+                    vertexBufferObjectManager);
+            buildButton.setOnClickListener(new ButtonSprite.OnClickListener() {
+                @Override
+                public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+                    if (Phases.getInstance().getPhase() instanceof MoneySpendingStrategy) {
+                        Purchase purchase = new Purchase(Purchase.Kind.BUILD_BASE, node);
+                        try {
+                            ((MoneySpendingStrategy) Phases.getInstance().getPhase()).handlePhaseEvent(purchase);
+                            setVisibility(false);
+                            mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.get_money);
+                            mediaPlayer.start();
+                        } catch (Exception e) {
+                            UI.toast(e.getMessage());
+                        }
                     }
                 }
-            }
-        });
-        buildButton.setSize(PxDpConverter.dpToPx(50), PxDpConverter.dpToPx(50));
-        buildButton.setPosition(margin, parent.getHeight()-buildButton.getHeight()-margin);
-        parent.attachChild(buildButton);
-        scene.registerTouchArea(buildButton);
-
-
-        ///Создание картинки с системой
-        Sprite systemSprite = new Sprite(0, 0, textureLoader.loadEmptySystemTexture(),
-                vertexBufferObjectManager);
-        float size = parent.getWidth()/2 - margin*2;
-        if (parent.getHeight() - margin - (parent.getHeight()-buildButton.getY()) < size)
-            size = parent.getHeight() - margin - (parent.getHeight()-buildButton.getY());
-        systemSprite.setSize(size, size);
-        systemSprite.setPosition((parent.getWidth()/2-size)/2,
-                (parent.getHeight()-(parent.getHeight()-buildButton.getY())-size)/2);
-
-        parent.attachChild(systemSprite);
-
-
-        float shipRowHeight = PxDpConverter.dpToPx(70);
-
-        ArrayList<Fleet> fleets = new ArrayList<>(3);
-        for (Fleet fleet : WorldAccessor.getInstance().getAllFleets())
-            if (fleet != null && fleet.getPosition() == node.getId())
-                fleets.add(fleet);
-
-        for (int i=0; i<fleets.size(); i++) {
-            Fleet fleet = fleets.get(i);
-
-            Rectangle shipRow = new Rectangle(
-                    parent.getWidth()/2+margin,
-                    margin*(i+1)+shipRowHeight*i,
-                    parent.getWidth()/2-margin*2,
-                    shipRowHeight,
-                    vertexBufferObjectManager
-            );
-            shipRow.setColor(Color.TRANSPARENT);
-            parent.attachChild(shipRow);
-
-            createShipRow(shipRow, fleet);
+            });
+            buildButton.setSize(PxDpConverter.dpToPx(50), PxDpConverter.dpToPx(50));
+            buildButton.setPosition(margin, parent.getHeight() - buildButton.getHeight() - margin);
+            parent.attachChild(buildButton);
+            scene.registerTouchArea(buildButton);
+            systemSpriteBottomMargin = parent.getHeight()-buildButton.getY();
         }
-    }
 
-    private void createShipRow(Rectangle shipRow, Fleet fleet) {
-        float shipSize = PxDpConverter.dpToPx(70);
-
-        String color = (fleet.getSide() == GameObject.Side.EMPIRE) ? "red1" : "green1";
-        Sprite shipSprite = new Sprite(0, (shipRow.getHeight()-shipSize)/2,
-                textureLoader.loadColoredShipTexture(color),
-                vertexBufferObjectManager);
-        shipSprite.setSize(shipSize, shipSize);
-        shipRow.attachChild(shipSprite);
-
-        ITextureRegion shipCountTexture = textureLoader.loadColoredShipTexture(color);
-        Sprite shipCountSprite = new Sprite(shipSize+PxDpConverter.dpToPx(20),
-                shipSprite.getY(), shipCountTexture, vertexBufferObjectManager);
-        shipCountSprite.setSize(PxDpConverter.dpToPx(30), PxDpConverter.dpToPx(30));
-
-        Font font = textureLoader.loadPanelTexture();
-        Text shipCountText = new Text(
-                shipCountSprite.getX()+shipCountSprite.getWidth()+PxDpConverter.dpToPx(10),
-                shipCountSprite.getY(),
-                font,
-                fleet.getShipCount()+"",
-                vertexBufferObjectManager
-        );
-
-        ITextureRegion energyTexture = textureLoader.loadEnergyTexture();
-        Sprite energySprite = new Sprite(shipSize+PxDpConverter.dpToPx(20),
-                shipCountSprite.getY()+shipCountSprite.getHeight()+PxDpConverter.dpToPx(10),
-                energyTexture, vertexBufferObjectManager);
-        energySprite.setSize(PxDpConverter.dpToPx(30), PxDpConverter.dpToPx(30));
-
-        Text energyText = new Text(
-                energySprite.getX()+energySprite.getWidth()+PxDpConverter.dpToPx(10),
-                energySprite.getY(),
-                font,
-                String.format(Locale.ENGLISH, "%.2f%%", fleet.getEnergy()*100),
-                vertexBufferObjectManager
-        );
-
-        shipRow.attachChild(shipCountSprite);
-        shipRow.attachChild(shipCountText);
-        shipRow.attachChild(energySprite);
-        shipRow.attachChild(energyText);
-/*
-        ///Создание кнопки патча
-        ButtonSprite patchButton = new ButtonSprite(0, 0, textureLoader.loadPatchTexture(),
-                vertexBufferObjectManager);
-        patchButton.setOnClickListener(new ButtonSprite.OnClickListener() {
-            @Override
-            public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                //TODO
-            }
-        });
-        patchButton.setSize(PxDpConverter.dpToPx(50), PxDpConverter.dpToPx(50));
-        patchButton.setPosition(shipRow1.getWidth()-patchButton.getWidth(),
-                (shipRow1.getHeight()-patchButton.getHeight())/2);
-        shipRow1.attachChild(patchButton);
-        scene.registerTouchArea(patchButton);*/
-    }
-
-    private void createFriendlySystem(Rectangle parent) {
-        float margin = PxDpConverter.dpToPx(20);
-
-        ///Создание кнопки постройки базы
-        ButtonSprite patchBaseButton = new ButtonSprite(0, 0, textureLoader.loadPatchTexture(),
-                vertexBufferObjectManager);
-        patchBaseButton.setOnClickListener(new ButtonSprite.OnClickListener() {
-            @Override
-            public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                //TODO построить базу
-            }
-        });
-        patchBaseButton.setSize(PxDpConverter.dpToPx(50), PxDpConverter.dpToPx(50));
-        patchBaseButton.setPosition(margin, parent.getHeight()-patchBaseButton.getHeight()-margin);
-        parent.attachChild(patchBaseButton);
-        scene.registerTouchArea(patchBaseButton);
-
-
+        ITextureRegion textureRegion = textureLoader.loadEmptySystemTexture();
+        if (systemType == Node.SystemType.FRIENDLY)
+            textureRegion = textureLoader.loadFriendlySystemTexture();
+        if (systemType == Node.SystemType.ENEMY)
+            textureRegion = textureLoader.loadEnemySystemTexture();
         ///Создание картинки с системой
-        Sprite systemSprite = new Sprite(0, 0, textureLoader.loadFriendlySystemTexture(),
-                vertexBufferObjectManager);
+        Sprite systemSprite = new Sprite(0, 0, textureRegion, vertexBufferObjectManager);
         float size = parent.getWidth()/2 - margin*2;
-        if (parent.getHeight() - margin - (parent.getHeight()-patchBaseButton.getY()) < size)
-            size = parent.getHeight() - margin - (parent.getHeight()-patchBaseButton.getY());
+        if (parent.getHeight() - margin - systemSpriteBottomMargin < size)
+            size = parent.getHeight() - margin - systemSpriteBottomMargin;
         systemSprite.setSize(size, size);
         systemSprite.setPosition((parent.getWidth()/2-size)/2,
-                (parent.getHeight()-(parent.getHeight()-patchBaseButton.getY())-size)/2);
+                (parent.getHeight()-systemSpriteBottomMargin-size)/2);
 
         parent.attachChild(systemSprite);
 
@@ -309,7 +188,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
             createShipRow(shipRow, fleet);
         }
 
-        if (fleets.size() < 3) {
+        if (fleets.size() < 3 && systemType == Node.SystemType.FRIENDLY) {
             ButtonSprite addShipRow = new ButtonSprite(
                     parent.getWidth()/2+margin,
                     margin*(fleets.size()+1)+shipRowHeight*fleets.size(),
@@ -343,18 +222,117 @@ public abstract class SystemInfoLayer extends DialogLayer {
         }
     }
 
-    private void createEnemySystem(Rectangle parent) {
-        float margin = PxDpConverter.dpToPx(20);
+    private void createShipRow(Rectangle shipRow, final Fleet fleet) {
+        float shipSize = PxDpConverter.dpToPx(70);
 
-        ///Создание картинки с системой
-        Sprite systemSprite = new Sprite(0, 0, textureLoader.loadEnemySystemTexture(),
+        String color = (fleet.getSide() == GameObject.Side.EMPIRE) ? "red1" : "green1";
+        Sprite shipSprite = new Sprite(0, (shipRow.getHeight()-shipSize)/2,
+                textureLoader.loadColoredShipTexture(color),
                 vertexBufferObjectManager);
-        float size = parent.getHeight() - margin*2;
-        systemSprite.setSize(size, size);
-        systemSprite.setPosition((parent.getWidth()-size)/2,
-                (parent.getHeight()-size)/2);
+        shipSprite.setSize(shipSize, shipSize);
+        shipRow.attachChild(shipSprite);
 
-        parent.attachChild(systemSprite);
+        ITextureRegion shipCountTexture = textureLoader.loadColoredShipTexture(color);
+        Sprite shipCountSprite = new Sprite(shipSize+PxDpConverter.dpToPx(20),
+                shipSprite.getY(), shipCountTexture, vertexBufferObjectManager);
+        shipCountSprite.setSize(PxDpConverter.dpToPx(30), PxDpConverter.dpToPx(30));
+
+        Font font = textureLoader.loadPanelTexture();
+        final Text shipCountText = new Text(
+                shipCountSprite.getX()+shipCountSprite.getWidth()+PxDpConverter.dpToPx(10),
+                shipCountSprite.getY(),
+                font,
+                fleet.getShipCount()+"",
+                vertexBufferObjectManager
+        );
+
+        ITextureRegion energyTexture = textureLoader.loadEnergyTexture();
+        Sprite energySprite = new Sprite(shipSize+PxDpConverter.dpToPx(20),
+                shipCountSprite.getY()+shipCountSprite.getHeight()+PxDpConverter.dpToPx(10),
+                energyTexture, vertexBufferObjectManager);
+        energySprite.setSize(PxDpConverter.dpToPx(30), PxDpConverter.dpToPx(30));
+
+        Text energyText = new Text(
+                energySprite.getX()+energySprite.getWidth()+PxDpConverter.dpToPx(10),
+                energySprite.getY(),
+                font,
+                String.format(Locale.ENGLISH, "%.2f%%", fleet.getEnergy()*100),
+                vertexBufferObjectManager
+        );
+
+        shipRow.attachChild(shipCountSprite);
+        shipRow.attachChild(shipCountText);
+        shipRow.attachChild(energySprite);
+        shipRow.attachChild(energyText);
+
+
+        if (fleet.getSide() == Phases.getInstance().side) {
+            ///Создание кнопки патча
+            ButtonSprite patchButton = new ButtonSprite(0, 0, textureLoader.loadPatchTexture(),
+                    vertexBufferObjectManager);
+            patchButton.setOnClickListener(new ButtonSprite.OnClickListener() {
+                @Override
+                public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
+                    //TODO
+                    if (fleet.getSide() != Phases.getInstance().side)
+                        return;
+
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            final Dialog dialog = new Dialog(activity);
+                            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                            dialog.setContentView(R.layout.buy_dialog);
+
+                            final RadioButton radioButton1 = (RadioButton) dialog.findViewById(R.id.count1_radio_button);
+                            radioButton1.setText("1 корабль (" + fleet.getOneShipCost()+")");
+                            final RadioButton radioButton2 = (RadioButton) dialog.findViewById(R.id.count2_radio_button);
+                            radioButton2.setText("3 корабля (" + fleet.getOneShipCost()*3 + ")");
+                            final RadioButton radioButton3 = (RadioButton) dialog.findViewById(R.id.count3_radio_button);
+                            radioButton3.setText("5 кораблей (" + fleet.getOneShipCost()*5 + ")");
+                            Button okButton = (Button)dialog.findViewById(R.id.ok_button);
+                            Button cancelButton = (Button)dialog.findViewById(R.id.cancel_button);
+
+                            okButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    try {
+                                        Pocket pocket = WorldAccessor.getInstance().getPocket(fleet.getSide());
+                                        if (radioButton1.isChecked())
+                                            fleet.buyShips(1, pocket);
+                                        if (radioButton2.isChecked())
+                                            fleet.buyShips(3, pocket);
+                                        if (radioButton3.isChecked())
+                                            fleet.buyShips(5, pocket);
+                                        shipCountText.setText(fleet.getShipCount()+"");
+                                        UI.getInstance().getPanel().repaintShipInfo();
+                                    } catch (Exception e) {
+                                        UI.toast(e.getMessage());
+                                    }
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            cancelButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            dialog.show();
+                        }
+                    });
+
+                }
+            });
+            patchButton.setSize(PxDpConverter.dpToPx(50), PxDpConverter.dpToPx(50));
+            patchButton.setPosition(shipRow.getWidth() - patchButton.getWidth(),
+                    (shipRow.getHeight() - patchButton.getHeight()) / 2);
+            shipRow.attachChild(patchButton);
+            scene.registerTouchArea(patchButton);
+        }
     }
 
 }

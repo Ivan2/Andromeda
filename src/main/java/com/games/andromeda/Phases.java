@@ -71,6 +71,7 @@ public class Phases {
             dialog.dismiss();
         UI.getInstance().hideAllDialogs();
         gameTimer.stop();
+        UI.getInstance().getPanel().repaintTime(0);
         nextPhase();
     }
 

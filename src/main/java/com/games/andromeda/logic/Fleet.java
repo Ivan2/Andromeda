@@ -14,7 +14,12 @@ public class Fleet extends GameObject {
     public class InvalidPositionException extends Exception{}
     public class InvalidPathException extends Exception{}
     public class NotEnoughEnergyException extends Exception {}
-    public class TooMuchShipsException extends Exception {}
+    public class TooMuchShipsException extends Exception {
+        @Override
+        public String getMessage() {
+            return "Превышено максимально допустимое количество кораблей";
+        }
+    }
 
     private FleetProperties properties;
     private List<SpaceShip> ships;
@@ -178,6 +183,10 @@ public class Fleet extends GameObject {
 
     public int getCost(){
         return properties.getEmptyFleetCost() + properties.getShipCost()*ships.size();
+    }
+
+    public int getOneShipCost(){
+        return properties.getShipCost();
     }
 
     public int getPosition(){

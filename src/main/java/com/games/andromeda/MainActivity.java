@@ -2,9 +2,9 @@ package com.games.andromeda;
 
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -14,10 +14,8 @@ import com.games.andromeda.message.ConnectionCloseServerMessage;
 import com.games.andromeda.multiplayer.GameClient;
 import com.games.andromeda.multiplayer.ServerCreator;
 
-import org.andengine.extension.multiplayer.protocol.adt.message.IMessage;
 import org.andengine.extension.multiplayer.protocol.server.SocketServer;
 import org.andengine.extension.multiplayer.protocol.server.connector.SocketConnectionClientConnector;
-import org.andengine.extension.multiplayer.protocol.util.MessagePool;
 import org.andengine.util.debug.Debug;
 
 import java.io.IOException;
@@ -38,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private SocketServer<SocketConnectionClientConnector> mSocketServer;
     private GameClient client;
 
+    private AlertDialog waitDialog;
+
     private void initServer() {
 
             start.setEnabled(false);
@@ -52,6 +52,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void initClient() {
         if (mSocketServer == null) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = getLayoutInflater();
+            builder.setView(inflater.inflate(R.layout.wait_dialog, null));
+            builder.setCancelable(false);
+            waitDialog = builder.create();
+            waitDialog.show();
+
             Thread th = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -60,6 +68,13 @@ public class MainActivity extends AppCompatActivity {
                         byte[] buffer = new byte[1024];
                         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                         ds.receive(packet);
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (waitDialog != null)
+                                    waitDialog.dismiss();
+                            }
+                        });
                         client = GameClient.createInstance(MainActivity.this, packet.getAddress().getHostAddress(), SERVER_PORT);
                         Thread thread = new Thread(client);
                         thread.setDaemon(true);
@@ -71,8 +86,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
+            th.setDaemon(true);
             th.start();
-
         }
         else
         {

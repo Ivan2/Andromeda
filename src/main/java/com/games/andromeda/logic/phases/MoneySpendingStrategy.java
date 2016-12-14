@@ -42,7 +42,7 @@ public class MoneySpendingStrategy extends ListStrategy<Purchase, Boolean> {
                     results.add(input);
                     UI.getInstance().getSystemsLayer().repaint();
                 } catch (Exception e) {
-                    UI.toast(e.getMessage());
+                    throw e;
                 }
                 break;
             case BUY_FLEET:
@@ -63,7 +63,7 @@ public class MoneySpendingStrategy extends ListStrategy<Purchase, Boolean> {
                     UI.getInstance().getShipsLayer().repaint();
                     UI.getInstance().getPanel().repaintShipInfo();
                 } catch (Exception e) {
-                    UI.toast(e.getMessage());
+                    throw e;
                 }
                 break;
         }
