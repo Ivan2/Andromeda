@@ -24,6 +24,7 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.color.Color;
+import org.andengine.util.modifier.ease.EaseCircularInOut;
 
 
 public class ShipsLayer extends Layer implements FleetObserver {
@@ -281,7 +282,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
                 public void onPathFinished(PathModifier pPathModifier, IEntity pEntity) {
 
                 }
-            }));
+            }, EaseCircularInOut.getInstance()));
         }
     }
 

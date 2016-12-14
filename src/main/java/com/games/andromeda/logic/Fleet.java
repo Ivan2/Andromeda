@@ -147,7 +147,7 @@ public class Fleet extends GameObject {
             if (size == 0) return true;
             hitShip(ships.get(random.nextInt(size)));
         }
-        return false;
+        return (getShipCount() == 0);
     }
 
     /**
