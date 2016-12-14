@@ -5,6 +5,8 @@ import android.graphics.PointF;
 import com.games.andromeda.GameActivity;
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;
+import com.games.andromeda.logic.Base;
+import com.games.andromeda.logic.BaseObserver;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.ui.sprites.SystemSprite;
 import com.games.andromeda.ui.texture.TextureLoader;
@@ -20,7 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SystemsLayer extends Layer {
+public class SystemsLayer extends Layer implements BaseObserver{
 
     public static abstract class LayerListener {
         public abstract void onMove(Node node);
@@ -118,6 +120,16 @@ public class SystemsLayer extends Layer {
 
     public void setLayerListener(LayerListener layerListener) {
         this.layerListener = layerListener;
+    }
+
+    @Override
+    public void onBaseChanged(Base base) {
+        repaint();
+    }
+
+    @Override
+    public void onBaseDestroyed(int nodeID) {
+        repaint();
     }
 
 }

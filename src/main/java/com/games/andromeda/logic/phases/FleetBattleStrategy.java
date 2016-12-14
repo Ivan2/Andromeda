@@ -21,6 +21,7 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
         while (conflict != null){
             if (singleFight(conflict.getKey(), conflict.getValue())){
                 WorldAccessor.getInstance().removeFleet(conflict.getValue());
+                WorldAccessor.getInstance().destroyBase(conflict.getKey().getPosition());
             } else {
                 WorldAccessor.getInstance().removeFleet(conflict.getKey());
             }

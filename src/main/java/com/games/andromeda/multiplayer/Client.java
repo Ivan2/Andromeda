@@ -25,6 +25,7 @@ import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMe
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 
 public class Client implements MessageFlags {
@@ -133,6 +134,14 @@ public class Client implements MessageFlags {
                             fleet.setEnergy(fight.energy);
                             fleet.setShips(fight.ships);
                             if (fleet.getShipCount() == 0) {
+                                Map<Integer, Base> bases = WorldAccessor.getInstance().getBases();
+                                int nodeId = fleet.getPosition();
+                                if (bases.containsKey(nodeId)){
+                                    Base base = bases.get(nodeId);
+                                    if (fleet.getSide() == base.getSide()){
+                                        WorldAccessor.getInstance().destroyBase(nodeId);
+                                    }
+                                }
                                 WorldAccessor.getInstance().removeFleet(fleet);
                             }
                         }

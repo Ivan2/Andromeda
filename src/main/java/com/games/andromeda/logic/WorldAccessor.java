@@ -143,10 +143,13 @@ public class WorldAccessor {
     }
 
     public void destroyBase(int nodeID){
-        bases.remove(nodeID);
-        for(BaseObserver observer: baseObservers){
-            observer.onBaseDestroyed(nodeID);
+        if (bases.containsKey(nodeID)) {
+            bases.remove(nodeID);
+            for (BaseObserver observer : baseObservers) {
+                observer.onBaseDestroyed(nodeID);
+            }
         }
+        nodes.get(nodeID).setSystemType(Node.SystemType.EMPTY);
     }
 
     public void destroyBase(Base base){

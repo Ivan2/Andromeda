@@ -84,6 +84,7 @@ public class UI {
         //слой с системами
         systemsLayer = new SystemsLayer(activity, scene, camera, textureLoader,
                 vertexBufferObjectManager, WorldAccessor.getInstance().getMap());
+        WorldAccessor.getInstance().addBaseObserver(systemsLayer);
         systemsLayer.repaint();
 
         //слой с кораблями
