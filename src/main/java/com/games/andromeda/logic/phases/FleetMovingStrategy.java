@@ -15,7 +15,7 @@ public class FleetMovingStrategy extends CommonHandlingStrategy<MoveFleetMessage
     @Override
     public boolean applyChanges() {
         // todo refactor message name
-        Client.getInstance().sendEndFightMessage();
+        Client.getInstance().sendEndFightMessage(false);
         //sendMoveFleetMessage(results);
         return true;
     }
