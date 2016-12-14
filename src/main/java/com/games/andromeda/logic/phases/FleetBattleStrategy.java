@@ -48,7 +48,11 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
         for(Fleet friendlyFleet: world.getFleetsBySide(getSide())){
             for(Fleet enemyFleet: world.getFleetsBySide(enemy)){
                 if (friendlyFleet.getPosition() == enemyFleet.getPosition()){
-                    return new Pair<>(friendlyFleet, enemyFleet);
+                    switch (world.getNodes().get(friendlyFleet.getPosition()).getSystemType()){
+                        case EMPTY:
+                        case ENEMY:
+                            return new Pair<>(friendlyFleet, enemyFleet);
+                    }
                 }
             }
         }
