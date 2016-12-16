@@ -57,4 +57,8 @@ public class ShipSprite extends Sprite {
     public void setFleet(Fleet fleet) {
         this.fleet = fleet;
     }
+
+    public void resize(float size){
+        setScale(size/getWidth());
+    }
 }
