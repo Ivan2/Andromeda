@@ -15,4 +15,9 @@ public abstract class CommonHandlingStrategy<TParam, TOut>
     public GameObject.Side getSide() {
         return side;
     }
+
+    @Override
+    public String getTextDescription() {
+        return this.getClass().getSimpleName();
+    }
 }

@@ -1,22 +1,32 @@
 package com.games.andromeda.logic.phases;
 
-import com.games.andromeda.graph.Node;
+import com.games.andromeda.message.MoveFleetMessage;
+import com.games.andromeda.multiplayer.Client;
 
-public class FleetMovingStrategy extends ListStrategy<Node, Void> {
+//пока только конечная точка
+public class FleetMovingStrategy extends CommonHandlingStrategy<MoveFleetMessage.Move, Void> {
+
     @Override
-    public Void handlePhaseEvent(Node input){
-        results.add(input);
+    public Void handlePhaseEvent(MoveFleetMessage.Move input) {
+        Client.getInstance().sendMoveFleetMessage(input);
         return null;
     }
 
     @Override
     public boolean applyChanges() {
-        // todo send path to server (and fleet???)
+        // todo refactor message name
+        Client.getInstance().sendEndFightMessage();
+        //sendMoveFleetMessage(results);
         return true;
     }
 
     @Override
     public void autoApplyChanges() {
+       applyChanges();
+    }
 
+    @Override
+    public String getTextDescription() {
+        return "Фаза передвижения флотов";
     }
 }

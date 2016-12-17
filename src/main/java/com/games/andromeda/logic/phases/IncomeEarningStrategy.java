@@ -1,5 +1,11 @@
 package com.games.andromeda.logic.phases;
 
+import com.games.andromeda.logic.Base;
+import com.games.andromeda.logic.Fleet;
+import com.games.andromeda.logic.Pocket;
+import com.games.andromeda.logic.WorldAccessor;
+import com.games.andromeda.multiplayer.Client;
+import com.games.andromeda.ui.UI;
 
 public class IncomeEarningStrategy extends CommonHandlingStrategy<Void, Void>{
     @Override
@@ -9,7 +15,22 @@ public class IncomeEarningStrategy extends CommonHandlingStrategy<Void, Void>{
 
     @Override
     public boolean applyChanges() {
-        // todo get money from bases and increase player's pocket
+        // доходы от баз
+        Pocket pocket = WorldAccessor.getInstance().getPocket(getSide());
+        int start = pocket.getTotal();
+        for(Base base: WorldAccessor.getInstance().getBases().values()){
+            if (base.getSide() == getSide()){
+                pocket.increase(base.getProfit());
+            }
+        }
+        // восстановление энергии и щитов
+        for(Fleet fleet: WorldAccessor.getInstance().getFleetsBySide(getSide())){
+            fleet.restoreShields();
+            fleet.restoreEnergy();
+        }
+
+        UI.toast("Получен доход от баз: " + (pocket.getTotal() - start));
+        Client.getInstance().sendPocketChangesMessage(pocket.getTotal());
         return true;
     }
 

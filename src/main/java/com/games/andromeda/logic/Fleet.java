@@ -3,7 +3,7 @@ package com.games.andromeda.logic;
 import android.util.Log;
 
 import com.games.andromeda.draw.Drawer;
-import com.games.andromeda.graph.Node;
+import com.games.andromeda.graph.PathInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,17 +14,28 @@ public class Fleet extends GameObject {
     public class InvalidPositionException extends Exception{}
     public class InvalidPathException extends Exception{}
     public class NotEnoughEnergyException extends Exception {}
-    public class TooMuchShipsException extends Exception {}
+    public class TooMuchShipsException extends Exception {
+        @Override
+        public String getMessage() {
+            return "Превышено максимально допустимое количество кораблей";
+        }
+    }
 
     private FleetProperties properties;
     private List<SpaceShip> ships;
     private static Random random = new Random();
+    private int id;
     private float energy;  // 0..1
-    private Node position;
+    private int nodeID;
+    private Integer prevNodeId;
     private static float CURRENCY = 0.0000001f;
 
     public void setEnergy(float energy) {
         this.energy = energy;
+    }
+
+    public float getEnergy() {
+        return energy;
     }
 
     /**
@@ -35,7 +46,7 @@ public class Fleet extends GameObject {
      * @param base
      */
     @Deprecated
-    public Fleet(Side side, int shipCount, Base base) throws InvalidPositionException,
+    public Fleet(int id, Side side, int shipCount, Base base) throws InvalidPositionException,
             TooMuchShipsException{
         super(side);
         switch (side){
@@ -54,21 +65,26 @@ public class Fleet extends GameObject {
 //        ships = Stream.generate(SpaceShip::new)
 //                .limit(shipCount).collect(Collectors.toList());
         ships = new ArrayList<>();
-        for (int i=0; i<shipCount; ++i){
+        for (int i = 0; i < shipCount; ++i){
             ships.add(new SpaceShip());
         }
         if (base.getSide() != side){
             throw new InvalidPositionException();
         }
-        this.position = base.getNode();
+        this.id = id;
+        this.nodeID = base.getNodeID();
     }
 
-    public static Fleet buy(int shipCount, Base base, Pocket pocket)
+    public static Fleet buy(int id, int shipCount, Base base, Pocket pocket)
             throws Pocket.NotEnoughMoneyException, InvalidPositionException, TooMuchShipsException{
         // todo проверять количество флотов игрока. возможно, не здесь
-        Fleet result = new Fleet(pocket.getSide(), shipCount, base);
+        Fleet result = new Fleet(id, pocket.getSide(), shipCount, base);
         pocket.decrease(result.getCost());
         return result;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public void buyShips(int shipCount, Pocket pocket) throws TooMuchShipsException,
@@ -85,7 +101,7 @@ public class Fleet extends GameObject {
     /**
      * Восстановление щитов после боя
      */
-    private void restoreShields(){
+    public void restoreShields(){
         for(SpaceShip x: ships){
             x.restoreShield();
         }
@@ -107,6 +123,14 @@ public class Fleet extends GameObject {
         return ships.size();
     }
 
+    public List<SpaceShip> getShips() {
+        return ships;
+    }
+
+    public void setShips(List<SpaceShip> ships) {
+        this.ships = ships;
+    }
+
     /**
      * Нанесение урона кораблю
      * @param ship корабль
@@ -123,12 +147,12 @@ public class Fleet extends GameObject {
      * @return true, если флот уничтожен
      */
     private boolean splitDamage(int damage){
-        for(int i=0; i<damage; ++i){
+        for(int i = 0; i < damage; ++i){
             int size = getShipCount();
             if (size == 0) return true;
             hitShip(ships.get(random.nextInt(size)));
         }
-        return false;
+        return (getShipCount() == 0);
     }
 
     /**
@@ -142,8 +166,11 @@ public class Fleet extends GameObject {
         while (result == null){
             if (another.splitDamage(this.properties.getAttack(this.getShipCount()))) {
                 result = true;
-                if (this.splitDamage(another.properties.getAttack(another.getShipCount()))){
+//                WorldAccessor.getInstance().removeFleet(another);
+            } else {
+                if (this.splitDamage(another.properties.getAttack(another.getShipCount()))) {
                     result = false;
+//                    WorldAccessor.getInstance().removeFleet(this);
                 }
             }
             drawer.drawFleets(this, another);
@@ -154,42 +181,64 @@ public class Fleet extends GameObject {
         return result;
     }
 
-
     public int getCost(){
         return properties.getEmptyFleetCost() + properties.getShipCost()*ships.size();
     }
 
-    public Node getPosition(){
-        return position;
+    public int getOneShipCost(){
+        return properties.getShipCost();
+    }
+
+    public int getPosition(){
+        return nodeID;
+    }
+
+    public Integer getPrevPosition(){
+        return prevNodeId;
     }
 
     /**
      * Выполняется перемещение флота, если оно возможно
      * @param path результат пользовательского ввода
      */
-    public void makeMove(List<Node> path) throws InvalidPathException, InvalidPositionException,
-            NotEnoughEnergyException {
-        if (false) {
-            // todo проверка валидности последовательности вершин. лучше в пакете graph ?
-            throw new InvalidPathException();
-        }
-
-        if (!path.get(0).equals(position)){
-            throw new InvalidPositionException();
-        }
-        if (path.size() == 0){
+    public void makeMove(PathInfo path) throws InvalidPathException,
+            InvalidPositionException, NotEnoughEnergyException {
+        List<Integer> nodes = path.getNodeIds();
+        if (nodes.size() < 2){
             return;
         }
-        float requiredEnergy =(float) (path.size()-1)/properties.getSpeed(ships.size()) - CURRENCY;
+        if (!nodes.get(0).equals(nodeID)){
+            throw new InvalidPositionException();
+        }
+        float requiredEnergy =(float) (path.getLength())/properties.getSpeed(ships.size()) - CURRENCY;
         if (requiredEnergy > energy){
             throw new NotEnoughEnergyException();
         }
-        Log.wtf("path_len", String.valueOf(path.size()));
+        Log.wtf("path", path.toString());
         Log.wtf("required_energy", String.valueOf(requiredEnergy));
         Log.wtf("energy", String.valueOf(energy));
         energy -= requiredEnergy;
-        position = path.get(path.size()-1);
+        nodeID = nodes.get(nodes.size() - 1);
+        prevNodeId = nodes.get(nodes.size() - 2);
     }
 
+    public int getMaxWayLength(){
+        return (int) (properties.getSpeed(ships.size()) * energy);
+    }
 
+    @Deprecated
+    public void setPosition(int nodeID){
+        this.nodeID = nodeID;
+    }
+
+    public void destroyShips(int amount)
+    {
+        for (int i = 0; i < amount; i++)
+            ships.remove(ships.size() - 1);
+    }
+
+    public float restoreEnergy(){
+        energy = (float) Math.min(properties.getEnergyRestore() + energy, 1.0);
+        return energy;
+    }
 }

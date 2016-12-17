@@ -3,11 +3,21 @@ package com.games.andromeda.logic;
 import java.util.Random;
 
 public class SpaceShip {
+
     private boolean shield;
     private static Random random = new Random();
 
     public SpaceShip(){
         this.shield = true;
+    }
+
+    @Deprecated
+    public SpaceShip(boolean shield){
+        this.shield = shield;
+    }
+
+    public boolean getShield() {
+        return shield;
     }
 
     /**
