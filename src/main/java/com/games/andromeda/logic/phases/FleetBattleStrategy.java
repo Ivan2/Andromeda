@@ -1,5 +1,9 @@
 package com.games.andromeda.logic.phases;
 
+import android.media.MediaPlayer;
+
+import com.games.andromeda.Phases;
+import com.games.andromeda.R;
 import com.games.andromeda.draw.Drawer;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
@@ -18,19 +22,23 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
     @Override
     public boolean applyChanges() {
         Pair<Fleet, Fleet> conflict = detectConflict();
+        boolean someDestroyed = false;
         while (conflict != null){
             if (singleFight(conflict.getKey(), conflict.getValue())){
                 WorldAccessor.getInstance().removeFleet(conflict.getValue());
                 WorldAccessor.getInstance().destroyBase(conflict.getKey().getPosition());
+                someDestroyed = true;
             } else {
                 WorldAccessor.getInstance().removeFleet(conflict.getKey());
+                someDestroyed = true;
             }
             conflict = detectConflict();
         }
-
+        if (someDestroyed)
+            MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.explosion).start();
         UI.getInstance().getShipsLayer().repaint();
         UI.getInstance().getPanel().repaintShipInfo();
-        Client.getInstance().sendEndFightMessage();
+        Client.getInstance().sendEndFightMessage(someDestroyed);
         return true;
     }
 

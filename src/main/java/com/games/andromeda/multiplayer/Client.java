@@ -1,8 +1,10 @@
 package com.games.andromeda.multiplayer;
 
+import android.media.MediaPlayer;
 import android.util.Log;
 
 import com.games.andromeda.Phases;
+import com.games.andromeda.R;
 import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
@@ -150,8 +152,9 @@ public class Client implements MessageFlags {
                         break;
 
                     case END_FIGHT_MESSAGE:
-                        //EndFightMessage endFightMessage = (EndFightMessage) message;
-                        //TODO read message
+                        EndFightMessage endFightMessage = (EndFightMessage) message;
+                        if (endFightMessage.getDestroyed())
+                            MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.explosion).start();
                         UI.getInstance().getShipsLayer().repaint();
                         UI.getInstance().getPanel().repaintShipInfo();
                         Phases.getInstance().endPhase();
@@ -234,10 +237,10 @@ public class Client implements MessageFlags {
         }
     }
 
-    public void sendEndFightMessage() {
+    public void sendEndFightMessage(boolean destroyed) {
         try {
             GameClient.getInstance().sendMessage(new EndFightMessage
-                    (Phases.getInstance().side));
+                    (Phases.getInstance().side,destroyed));
         } catch (IOException e) {
             Log.wtf("sendEndFightMessage error", e.toString());
         }

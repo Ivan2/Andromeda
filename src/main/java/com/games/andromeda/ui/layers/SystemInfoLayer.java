@@ -2,6 +2,7 @@ package com.games.andromeda.ui.layers;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.view.View;
 import android.view.Window;
@@ -45,9 +46,9 @@ public abstract class SystemInfoLayer extends DialogLayer {
     private Activity activity;
     private Node node;
 
-    public SystemInfoLayer(Activity activity, Scene scene, Camera camera, TextureLoader textureLoader,
+    public SystemInfoLayer(Resources resources, Scene scene, Camera camera, TextureLoader textureLoader,
                            VertexBufferObjectManager vertexBufferObjectManager) {
-        super(activity.getResources(), scene, camera, textureLoader, vertexBufferObjectManager);
+        super(resources, scene, camera, textureLoader, vertexBufferObjectManager);
         this.activity = activity;
     }
 
@@ -87,6 +88,11 @@ public abstract class SystemInfoLayer extends DialogLayer {
             @Override
             public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
                 setVisibility(false);
+                if (UI.getInstance().getMediaPlayer()!=null)
+                {
+                    UI.getInstance().getMediaPlayer().release();
+                    Phases.getInstance().getMediaPlayer().start();
+                }
                 onOk();
             }
         });

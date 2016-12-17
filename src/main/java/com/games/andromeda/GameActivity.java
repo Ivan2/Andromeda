@@ -106,4 +106,15 @@ public class GameActivity extends SimpleBaseGameActivity{
         return scene;
     }
 
+    @Override
+    public void onDestroy(){
+        if (Phases.getInstance().getMediaPlayer()!=null) {
+            Phases.getInstance().getMediaPlayer().release();
+        }
+        if (UI.getInstance().getMediaPlayer()!=null) {
+            UI.getInstance().getMediaPlayer().release();
+        }
+        super.onDestroy();
+    }
+
 }

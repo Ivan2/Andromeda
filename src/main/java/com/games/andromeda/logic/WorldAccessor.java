@@ -1,5 +1,7 @@
 package com.games.andromeda.logic;
 
+import android.util.Log;
+
 import com.games.andromeda.Phases;
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.graph.Node;

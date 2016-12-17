@@ -39,6 +39,10 @@ public class GamePhases implements Iterable<HandlingStrategy>{
         strategyMap.put(PhaseType.FLEET_BATTLE, new FleetBattleStrategy());
     }
 
+    public PhaseType getPhaseType(){
+        return PhaseType.values()[iterator.getIterator().idx];
+    }
+
     
     abstract class PhaseIterator implements Iterator<HandlingStrategy>{
         protected int idx;
