@@ -10,6 +10,7 @@ import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.BasesCreationMessage;
+import com.games.andromeda.message.BaseDestructionMessage;
 import com.games.andromeda.message.EndFightMessage;
 import com.games.andromeda.message.FightMessage;
 import com.games.andromeda.message.FleetsCreationMessage;
@@ -27,7 +28,6 @@ import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMe
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
 
 
 public class Client implements MessageFlags {
@@ -44,6 +44,8 @@ public class Client implements MessageFlags {
         GameClient.getInstance().setMessageReceiver(new GameClient.MessageReceiver() {
             @Override
             public void onMessageReceive(short flag, IServerMessage message) {
+
+                WorldAccessor world = WorldAccessor.getInstance();
                 switch (flag) {
                     /*case FLAG_MESSAGE_SERVER_SHOW:
                         MoveShipServerMessage moveShipServerMessage = (MoveShipServerMessage) message;
@@ -130,20 +132,11 @@ public class Client implements MessageFlags {
                         FightMessage fightMessage = (FightMessage) message;
                         FightMessage.Fight fight = fightMessage.getFight();
 
-                        Fleet fleet = WorldAccessor.getInstance().getFleet(fight.side,
-                                fight.fleetID);
+                        Fleet fleet = WorldAccessor.getInstance().getFleet(fight.side, fight.fleetID);
                         if (fleet != null) {
                             fleet.setEnergy(fight.energy);
                             fleet.setShips(fight.ships);
                             if (fleet.getShipCount() == 0) {
-                                Map<Integer, Base> bases = WorldAccessor.getInstance().getBases();
-                                int nodeId = fleet.getPosition();
-                                if (bases.containsKey(nodeId)){
-                                    Base base = bases.get(nodeId);
-                                    if (fleet.getSide() == base.getSide()){
-                                        WorldAccessor.getInstance().destroyBase(nodeId);
-                                    }
-                                }
                                 WorldAccessor.getInstance().removeFleet(fleet);
                             }
                         }
@@ -163,6 +156,9 @@ public class Client implements MessageFlags {
                         UI.toast("Вы проиграли(");
                         UI.getInstance().finishGame();
                         break;
+                    case BASE_DESTRUCTION_MESSAGE:
+                        BaseDestructionMessage destructionMessage = (BaseDestructionMessage) message;
+                        world.destroyBase(destructionMessage.getNodeId());
                 }
             }
         });
@@ -253,6 +249,15 @@ public class Client implements MessageFlags {
                     (Phases.getInstance().side));
         }catch (IOException e) {
             Log.wtf("sendWinMessage error", e.toString());
+        }
+    }
+
+    public void sendBaseDestructionMessage(int nodeId) {
+        try {
+            GameClient.getInstance().sendMessage(new BaseDestructionMessage(
+                    Phases.getInstance().side, nodeId));
+        } catch (IOException e) {
+            Log.wtf("sendBaseDestructionMessage error", e.toString());
         }
     }
     /*public void sendMoveShipMessage(Fleet fleet, int num) {

@@ -5,12 +5,20 @@ import android.media.MediaPlayer;
 import com.games.andromeda.Phases;
 import com.games.andromeda.R;
 import com.games.andromeda.draw.Drawer;
+import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.Pair;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.multiplayer.Client;
 import com.games.andromeda.ui.UI;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
 
@@ -24,18 +32,17 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
         Pair<Fleet, Fleet> conflict = detectConflict();
         boolean someDestroyed = false;
         while (conflict != null){
+            someDestroyed = true;
             if (singleFight(conflict.getKey(), conflict.getValue())){
                 WorldAccessor.getInstance().removeFleet(conflict.getValue());
-                WorldAccessor.getInstance().destroyBase(conflict.getKey().getPosition());
-                someDestroyed = true;
             } else {
                 WorldAccessor.getInstance().removeFleet(conflict.getKey());
-                someDestroyed = true;
             }
             conflict = detectConflict();
         }
         if (someDestroyed)
             MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.explosion).start();
+        checkBases();
         UI.getInstance().getShipsLayer().repaint();
         UI.getInstance().getPanel().repaintShipInfo();
         Client.getInstance().sendEndFightMessage(someDestroyed);
@@ -91,5 +98,22 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
     @Override
     public String getTextDescription() {
         return "Фаза боя";
+    }
+
+    private void checkBases(){
+        WorldAccessor world = WorldAccessor.getInstance();
+        Map<Integer, Base> bases = world.getBases();
+
+        for (Fleet fleet: world.getAllFleets()){
+            if (fleet != null){
+                if (bases.containsKey(fleet.getPosition())){
+                    Base base = bases.get(fleet.getPosition());
+                    if (base.getSide() != fleet.getSide()){
+                        Client.getInstance().sendBaseDestructionMessage(fleet.getPosition());
+                        world.destroyBase(base);
+                    }
+                }
+            }
+        }
     }
 }

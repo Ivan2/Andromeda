@@ -8,6 +8,7 @@ import com.games.andromeda.GameActivity;
 import com.games.andromeda.MainActivity;
 import com.games.andromeda.level.LevelLoader;
 import com.games.andromeda.logic.WorldAccessor;
+import com.games.andromeda.message.BaseDestructionMessage;
 import com.games.andromeda.message.BasesCreationMessage;
 import com.games.andromeda.message.ConnectionCloseServerMessage;
 import com.games.andromeda.message.EndFightMessage;
@@ -174,6 +175,13 @@ public class GameClient implements Runnable,MessageFlags {
                 public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
                     if (messageReceiver != null)
                         messageReceiver.onMessageReceive(WIN_MESSAGE, iServerMessage);
+                }
+            });
+            connector.registerServerMessage(BASE_DESTRUCTION_MESSAGE, BaseDestructionMessage.class, new IServerMessageHandler<SocketConnection>() {
+                @Override
+                public void onHandleMessage(ServerConnector<SocketConnection> serverConnector, IServerMessage iServerMessage) throws IOException {
+                    if (messageReceiver != null)
+                        messageReceiver.onMessageReceive(BASE_DESTRUCTION_MESSAGE, iServerMessage);
                 }
             });
             connector.registerServerMessage(TIME_OVER_MESSAGE, TimeOverMessage.class, new IServerMessageHandler<SocketConnection>() {

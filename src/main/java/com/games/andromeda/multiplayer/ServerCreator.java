@@ -6,6 +6,7 @@ import com.games.andromeda.MainActivity;
 import com.games.andromeda.graph.MyGraph;
 import com.games.andromeda.level.LevelLoader;
 import com.games.andromeda.logic.GameObject;
+import com.games.andromeda.message.BaseDestructionMessage;
 import com.games.andromeda.message.BasesCreationMessage;
 import com.games.andromeda.message.EndFightMessage;
 import com.games.andromeda.message.FightMessage;
@@ -168,6 +169,13 @@ public class ServerCreator implements MessageFlags {
                     @Override
                     public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
                         sendMessageToEnemy(iClientMessage);
+                    }
+                });
+
+                connector.registerClientMessage(BASE_DESTRUCTION_MESSAGE, BaseDestructionMessage.class, new IClientMessageHandler<SocketConnection>() {
+                    @Override
+                    public void onHandleMessage(ClientConnector<SocketConnection> pClientConnector, IClientMessage pClientMessage) throws IOException {
+                        sendMessageToEnemy(pClientMessage);
                     }
                 });
                 return connector;
