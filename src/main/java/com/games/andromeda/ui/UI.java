@@ -249,6 +249,9 @@ public class UI {
     public void hideAllDialogs() {
         if (systemInfoLayer != null)
             systemInfoLayer.hide();
+
+        systemsLayer.unhighlightAll();
+        shipsLayer.releaseSprite();
     }
 
     public MediaPlayer getMediaPlayer()

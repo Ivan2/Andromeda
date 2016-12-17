@@ -40,7 +40,7 @@ public class GamePhases implements Iterable<HandlingStrategy>{
     }
 
     public PhaseType getPhaseType(){
-        return PhaseType.values()[iterator.getIterator().idx];
+        return iterator.getIterator().getType();
     }
 
     
@@ -55,6 +55,8 @@ public class GamePhases implements Iterable<HandlingStrategy>{
         public GameObject.Side getSide(){
             return firstPlayer ? GameObject.Side.FEDERATION: GameObject.Side.EMPIRE;
         }
+
+        abstract protected PhaseType getType();
     }
     
     class UnifiedPhaseIterator implements Iterator<HandlingStrategy>{
@@ -100,10 +102,14 @@ public class GamePhases implements Iterable<HandlingStrategy>{
         public HandlingStrategy next() {
             firstPlayer = !firstPlayer;
             idx++;
-            HandlingStrategy phase = strategyMap.get(
-                    idx<=2 ? PhaseType.LEVEL_PREPARATION_BASES: PhaseType.LEVEL_PREPARATION_FLEETS);
+            HandlingStrategy phase = strategyMap.get(getType());
             phase.startPhase(getSide());
             return phase;
+        }
+
+        @Override
+        protected PhaseType getType(){
+            return idx<=2 ? PhaseType.LEVEL_PREPARATION_BASES: PhaseType.LEVEL_PREPARATION_FLEETS;
         }
     }
 
@@ -121,6 +127,11 @@ public class GamePhases implements Iterable<HandlingStrategy>{
         }
 
         @Override
+        protected PhaseType getType() {
+            return order[idx];
+        }
+
+        @Override
         public boolean hasNext() {
             return true;
         }
@@ -133,7 +144,7 @@ public class GamePhases implements Iterable<HandlingStrategy>{
                 idx = start_idx;
                 firstPlayer = !firstPlayer;
             }
-            HandlingStrategy result = strategyMap.get(order[idx]);
+            HandlingStrategy result = strategyMap.get(getType());
             result.startPhase(getSide());
             return result;
         }
