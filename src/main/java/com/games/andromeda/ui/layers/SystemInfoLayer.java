@@ -305,12 +305,16 @@ public abstract class SystemInfoLayer extends DialogLayer {
                                 public void onClick(View view) {
                                     try {
                                         Pocket pocket = WorldAccessor.getInstance().getPocket(fleet.getSide());
+                                        int shipCount = 0;
                                         if (radioButton1.isChecked())
-                                            fleet.buyShips(1, pocket);
+                                            shipCount = 1;
                                         if (radioButton2.isChecked())
-                                            fleet.buyShips(3, pocket);
+                                            shipCount = 3;
                                         if (radioButton3.isChecked())
-                                            fleet.buyShips(5, pocket);
+                                            shipCount = 5;
+                                        fleet.buyShips(shipCount, pocket);
+                                        ((MoneySpendingStrategy) Phases.getInstance().getPhase())
+                                                .handlePhaseEvent(new Purchase(fleet, node));
                                         shipCountText.setText(fleet.getShipCount()+"");
                                         UI.getInstance().getPanel().repaintShipInfo();
                                     } catch (Exception e) {

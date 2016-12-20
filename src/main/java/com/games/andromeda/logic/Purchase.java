@@ -24,6 +24,12 @@ public class Purchase {
         this.node = node;
     }
 
+    public Purchase(Fleet fleet, Node node){
+        this.fleet = fleet;
+        this.node = node;
+        this.kind = Kind.UPGRADE_FLEET;
+    }
+
     public Kind getKind() {
         return kind;
     }

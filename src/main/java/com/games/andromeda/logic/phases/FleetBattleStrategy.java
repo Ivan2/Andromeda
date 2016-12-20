@@ -80,8 +80,8 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
             @Override
             public void showFleetChanges(Fleet one, Fleet two) {
                 // todo dialog
-                Client.getInstance().sendFightMessage(one);
-                Client.getInstance().sendFightMessage(two);
+                Client.getInstance().sendChangeFleetMessage(one);
+                Client.getInstance().sendChangeFleetMessage(two);
             }
         });
     }

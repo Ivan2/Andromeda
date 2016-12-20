@@ -222,7 +222,7 @@ public class Client implements MessageFlags {
         }
     }
 
-    public void sendFightMessage(Fleet fleet) {
+    public void sendChangeFleetMessage(Fleet fleet) {
         try {
             FleetStateMessage.FleetState fleetState = new FleetStateMessage.FleetState(fleet.getId(),
                     fleet.getEnergy(), fleet.getSide(), fleet.getShips());
@@ -271,7 +271,7 @@ public class Client implements MessageFlags {
         }
     }
 
-    public void sendFightMessage(GameObject.Side side, Fleet attackingFleet, Fleet anotherFleet, int number, int secondNum)
+    public void sendChangeFleetMessage(GameObject.Side side, Fleet attackingFleet, Fleet anotherFleet, int number, int secondNum)
     {
         try {
             attackingFleet.attack(anotherFleet);

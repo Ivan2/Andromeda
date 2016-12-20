@@ -66,6 +66,8 @@ public class MoneySpendingStrategy extends ListStrategy<Purchase, Boolean> {
                     throw e;
                 }
                 break;
+            case UPGRADE_FLEET:
+                results.add(input);
         }
         return null;
     }
@@ -73,19 +75,21 @@ public class MoneySpendingStrategy extends ListStrategy<Purchase, Boolean> {
     @Override
     public boolean applyChanges() {
         List<Base> bases = new LinkedList<>();
-        List<Fleet> fleets = new LinkedList<>();
+        List<Fleet> newFleets = new LinkedList<>();
         for (Purchase purchase : results) {
             switch (purchase.getKind()) {
                 case BUILD_BASE:
                     bases.add(purchase.base);
                     break;
                 case BUY_FLEET:
-                    fleets.add(purchase.fleet);
+                    newFleets.add(purchase.fleet);
                     break;
+                case UPGRADE_FLEET:
+                    Client.getInstance().sendChangeFleetMessage(purchase.fleet);
             }
         }
         checkWinCondition();
-        Client.getInstance().sendMoneySpendingMessage(bases, fleets,
+        Client.getInstance().sendMoneySpendingMessage(bases, newFleets,
                 WorldAccessor.getInstance().getPocket(Phases.getInstance().side).getTotal());
         return false;
     }

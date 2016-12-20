@@ -73,7 +73,7 @@ public class GameActivity extends SimpleBaseGameActivity{
         ShipsLayer.IOnFleetFight onFleetFight = new ShipsLayer.IOnFleetFight() {
             @Override
             public void onFleetFight(Fleet attackingFleet,  Fleet anotherFleet, int number, int secondNumber) {
-                //client.sendFightMessage(attackingFleet.getSide(),attackingFleet,anotherFleet,number,secondNumber);
+                //client.sendChangeFleetMessage(attackingFleet.getSide(),attackingFleet,anotherFleet,number,secondNumber);
 
             }
         };

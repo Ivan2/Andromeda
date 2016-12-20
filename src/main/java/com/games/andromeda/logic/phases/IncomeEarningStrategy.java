@@ -27,6 +27,7 @@ public class IncomeEarningStrategy extends CommonHandlingStrategy<Void, Void>{
         for(Fleet fleet: WorldAccessor.getInstance().getFleetsBySide(getSide())){
             fleet.restoreShields();
             fleet.restoreEnergy();
+            Client.getInstance().sendChangeFleetMessage(fleet);
         }
 
         UI.toast("Получен доход от баз: " + (pocket.getTotal() - start));
