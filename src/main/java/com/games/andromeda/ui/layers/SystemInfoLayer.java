@@ -46,9 +46,9 @@ public abstract class SystemInfoLayer extends DialogLayer {
     private Activity activity;
     private Node node;
 
-    public SystemInfoLayer(Resources resources, Scene scene, Camera camera, TextureLoader textureLoader,
+    public SystemInfoLayer(Activity activity, Scene scene, Camera camera, TextureLoader textureLoader,
                            VertexBufferObjectManager vertexBufferObjectManager) {
-        super(resources, scene, camera, textureLoader, vertexBufferObjectManager);
+        super(activity.getResources(), scene, camera, textureLoader, vertexBufferObjectManager);
         this.activity = activity;
     }
 

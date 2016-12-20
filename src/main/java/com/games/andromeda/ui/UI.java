@@ -104,7 +104,7 @@ public class UI {
 
         //слой с вопросом
         systemInfoLayer =
-                new SystemInfoLayer(activity.getResources(), scene,
+                new SystemInfoLayer(activity, scene,
                 camera, textureLoader, vertexBufferObjectManager) {
             @Override
             protected void onOk() {
