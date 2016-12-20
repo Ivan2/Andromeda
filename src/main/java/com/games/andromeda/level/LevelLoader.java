@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.SparseArray;
 
 import com.games.andromeda.graph.Edge;
-import com.games.andromeda.graph.MyGraph;
+import com.games.andromeda.graph.LevelGraph;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.message.StartGameMessage;
 
@@ -16,12 +16,12 @@ import java.util.Random;
 public class LevelLoader {
     public class MapFormatException extends Exception {}
     private SparseArray<Node> map;
-    private MyGraph result;
+    private LevelGraph result;
     private int miniSystemID = -1;
 
     private LevelLoader(){
         map = new SparseArray<>();
-        result = new MyGraph();
+        result = new LevelGraph();
     }
 
     private void addVertex(Integer id, Float x, Float y, Node.SystemType type){
@@ -99,7 +99,7 @@ public class LevelLoader {
      * @throws IOException
      * @throws MapFormatException
      */
-    public static MyGraph loadMap(Context context, String file) throws IOException,
+    public static LevelGraph loadMap(Context context, String file) throws IOException,
             MapFormatException {
         LevelLoader loader = new LevelLoader();
         ResourceReader csvReader = new ResourceReader(context, file);
@@ -115,7 +115,7 @@ public class LevelLoader {
      * @param message
      * @return
      */
-    public static MyGraph loadMap(StartGameMessage message) {
+    public static LevelGraph loadMap(StartGameMessage message) {
         LevelLoader loader = new LevelLoader();
         for (Node node : message.getNodeList())
             loader.addVertex(node.getId(), node.getX(), node.getY(), node.getSystemType());

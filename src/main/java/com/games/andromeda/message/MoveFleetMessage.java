@@ -7,7 +7,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class MoveFleetMessage extends SideMessage implements MessageFlags {
@@ -52,7 +51,7 @@ public class MoveFleetMessage extends SideMessage implements MessageFlags {
         super.onWriteTransmissionData(pDataOutputStream);
         pDataOutputStream.writeInt(move.fleetID);
         pDataOutputStream.writeFloat(move.energy);
-        pDataOutputStream.writeInt(move.pathInfo.getLength());
+        pDataOutputStream.writeInt(move.pathInfo.getPathWeight());
         pDataOutputStream.writeInt(move.pathInfo.getNodeIds().size());
         for (int node : move.pathInfo.getNodeIds()) {
             pDataOutputStream.writeInt(node);

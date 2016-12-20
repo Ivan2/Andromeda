@@ -3,13 +3,14 @@ package com.games.andromeda.logic;
 import com.games.andromeda.graph.Node;
 
 /**
- * TODO класс-обёртка для покупки
+ * класс-обёртка для покупки
  */
 public class Purchase {
 
     public enum Kind {
         BUILD_BASE,
-        BUY_FLEET
+        BUY_FLEET,
+        UPGRADE_FLEET
     }
 
     private Kind kind;

@@ -12,6 +12,9 @@ import java.util.Set;
 
 import edu.uci.ics.jung.graph.SparseGraph;
 
+/**
+ * Поиск доступных для перемещения систем
+ */
 public class BFSSolver {
     private SparseGraph<Node, Edge> graph;
     private int waypoints;
@@ -19,7 +22,7 @@ public class BFSSolver {
     private Node fleetPosition;
 
     public BFSSolver(Fleet fleet){
-        graph = WorldAccessor.getInstance().getMap().getRepresentation();
+        graph = WorldAccessor.getInstance().getLevel().getRepresentation();
         waypoints = fleet.getMaxWayLength();
         result = new HashSet<>();
         int start = fleet.getPosition();
@@ -36,6 +39,11 @@ public class BFSSolver {
         return WorldAccessor.getInstance().getNodes().get(idx);
     }
 
+    /**
+     * Перемещения, которые флот обязан совершить согласно правилам
+     * @param fleet флот
+     * @return true, если у флота осталась энергия на свободное перемещение
+     */
     private boolean preDefinedMoves(Fleet fleet){
         Node current = fleetPosition;
         if (fleet.getPrevPosition() != null) {
@@ -80,6 +88,10 @@ public class BFSSolver {
         }
     }
 
+    /**
+     * Единственный способ получить вычесленный результат
+     * @return последовательность из Node Id
+     */
     public Iterable<Integer> availableNodes(){
         return result;
     }

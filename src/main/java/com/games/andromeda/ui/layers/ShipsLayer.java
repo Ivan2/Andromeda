@@ -59,7 +59,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
 
     public static ShipSprite activeSprite;
 
-    //private PathManager pathManager;
+    //private PathBuilder pathManager;
 
     private Rectangle layer;
 
@@ -88,7 +88,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
 
 
     public ShipsLayer(Scene scene, Camera camera, TextureLoader textureLoader,
-                      VertexBufferObjectManager vertexBufferObjectManager,// final PathManager manager,
+                      VertexBufferObjectManager vertexBufferObjectManager,// final PathBuilder manager,
                       final IOnFleetMove onFleetMove, final IOnFleetFight onFleetFight) {
         super(scene, camera, textureLoader, vertexBufferObjectManager);
 

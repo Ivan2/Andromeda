@@ -3,7 +3,7 @@ package com.games.andromeda.ui.layers;
 import android.graphics.PointF;
 
 import com.games.andromeda.graph.Edge;
-import com.games.andromeda.graph.MyGraph;
+import com.games.andromeda.graph.LevelGraph;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.ui.texture.TextureLoader;
 
@@ -15,11 +15,11 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 public class BackgroundLayer extends Layer {
 
-    private MyGraph graph;
+    private LevelGraph graph;
     private Sprite layer;
 
     public BackgroundLayer(Scene scene, Camera camera, TextureLoader textureLoader,
-                           VertexBufferObjectManager vertexBufferObjectManager, MyGraph graph) {
+                           VertexBufferObjectManager vertexBufferObjectManager, LevelGraph graph) {
         super(scene, camera, textureLoader, vertexBufferObjectManager);
         this.graph = graph;
 

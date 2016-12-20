@@ -84,33 +84,7 @@ public class MoneySpendingStrategy extends ListStrategy<Purchase, Boolean> {
                     break;
             }
         }
-        Map<Integer,Base> allBases = WorldAccessor.getInstance().getBases();
-        int basesCount = 0;
-        Iterator<Map.Entry<Integer, Base>> it = allBases.entrySet().iterator();
-        while (it.hasNext())
-        {
-            Map.Entry<Integer, Base> pair = it.next();
-            if (pair.getValue().getSide() == Phases.getInstance().side)
-            {
-                basesCount++;
-            }
-        }
-        if (Phases.getInstance().side == GameObject.Side.EMPIRE)
-        {
-            if (basesCount >= 18)
-            {
-                UI.toast("Вы победили!");
-                Client.getInstance().sendWinMessage();
-                UI.getInstance().finishGame();
-            }
-        }
-        else
-            if (basesCount >= 16)
-            {
-                UI.toast("Вы победили!");
-                Client.getInstance().sendWinMessage();
-                UI.getInstance().finishGame();
-            }
+        checkWinCondition();
         Client.getInstance().sendMoneySpendingMessage(bases, fleets,
                 WorldAccessor.getInstance().getPocket(Phases.getInstance().side).getTotal());
         return false;
@@ -127,5 +101,27 @@ public class MoneySpendingStrategy extends ListStrategy<Purchase, Boolean> {
     @Override
     public String getTextDescription() {
         return "фаза покупки баз и флотов";
+    }
+
+    private void checkWinCondition(){
+        int basesCount = 0;
+        for (Base base: WorldAccessor.getInstance().getBases().values()){
+            basesCount += (base.getSide() == getSide()) ? 1 : 0;
+        }
+        if (enoughBases(basesCount)){
+            UI.toast("Вы победили!");
+            Client.getInstance().sendWinMessage();
+            UI.getInstance().finishGame();
+        }
+    }
+
+    private boolean enoughBases(int count){
+        switch (getSide()){
+            case EMPIRE:
+                return count >= 18;
+            case FEDERATION:
+                return count >= 16;
+        }
+        return false;
     }
 }

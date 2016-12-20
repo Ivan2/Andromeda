@@ -11,8 +11,8 @@ import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.BasesCreationMessage;
 import com.games.andromeda.message.BaseDestructionMessage;
-import com.games.andromeda.message.EndFightMessage;
-import com.games.andromeda.message.FightMessage;
+import com.games.andromeda.message.EndPhaseMessage;
+import com.games.andromeda.message.FleetStateMessage;
 import com.games.andromeda.message.FleetsCreationMessage;
 import com.games.andromeda.message.MessageFlags;
 import com.games.andromeda.message.MoveFleetMessage;
@@ -21,7 +21,7 @@ import com.games.andromeda.message.RandomEventMessage;
 import com.games.andromeda.message.SetupBasesMessage;
 import com.games.andromeda.message.SetupFleetsMessage;
 import com.games.andromeda.message.StartGameMessage;
-import com.games.andromeda.message.WinMessage;
+import com.games.andromeda.message.EndGameMessage;
 import com.games.andromeda.ui.UI;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
@@ -54,9 +54,9 @@ public class Client implements MessageFlags {
                         //Log.wtf("nfgnfn","gfn");
 
                         break;
-                    case FIGHT_MESSAGE:
-                        FightMessage fightMessage = (FightMessage) message;
-                        onFightMessage(fightMessage.getFleet1(),fightMessage.getFleet2(),fightMessage.getNumber1(),fightMessage.getNumber2());
+                    case FLEET_STATE_MESSAGE:
+                        FleetStateMessage fleetStateMessage = (FleetStateMessage) message;
+                        onFightMessage(fleetStateMessage.getFleet1(),fleetStateMessage.getFleet2(),fleetStateMessage.getNumber1(),fleetStateMessage.getNumber2());
 
                         break;*/
                     case START_GAME_MESSAGE:
@@ -128,14 +128,14 @@ public class Client implements MessageFlags {
                         UI.getInstance().getPanel().repaintShipInfo();
                         break;
 
-                    case FIGHT_MESSAGE:
-                        FightMessage fightMessage = (FightMessage) message;
-                        FightMessage.Fight fight = fightMessage.getFight();
+                    case FLEET_STATE_MESSAGE:
+                        FleetStateMessage fleetStateMessage = (FleetStateMessage) message;
+                        FleetStateMessage.FleetState fleetState = fleetStateMessage.getFleetState();
 
-                        Fleet fleet = WorldAccessor.getInstance().getFleet(fight.side, fight.fleetID);
+                        Fleet fleet = WorldAccessor.getInstance().getFleet(fleetState.side, fleetState.fleetID);
                         if (fleet != null) {
-                            fleet.setEnergy(fight.energy);
-                            fleet.setShips(fight.ships);
+                            fleet.setEnergy(fleetState.energy);
+                            fleet.setShips(fleetState.ships);
                             if (fleet.getShipCount() == 0) {
                                 WorldAccessor.getInstance().removeFleet(fleet);
                             }
@@ -144,15 +144,15 @@ public class Client implements MessageFlags {
                         UI.getInstance().getPanel().repaintShipInfo();
                         break;
 
-                    case END_FIGHT_MESSAGE:
-                        EndFightMessage endFightMessage = (EndFightMessage) message;
-                        if (endFightMessage.getDestroyed())
+                    case END_PHASE_MESSAGE:
+                        EndPhaseMessage endPhaseMessage = (EndPhaseMessage) message;
+                        if (endPhaseMessage.getDestroyed())
                             MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.explosion).start();
                         UI.getInstance().getShipsLayer().repaint();
                         UI.getInstance().getPanel().repaintShipInfo();
                         Phases.getInstance().endPhase();
                         break;
-                    case WIN_MESSAGE:
+                    case END_GAME_MESSAGE:
                         UI.toast("Вы проиграли(");
                         UI.getInstance().finishGame();
                         break;
@@ -224,10 +224,10 @@ public class Client implements MessageFlags {
 
     public void sendFightMessage(Fleet fleet) {
         try {
-            FightMessage.Fight fight = new FightMessage.Fight(fleet.getId(),
+            FleetStateMessage.FleetState fleetState = new FleetStateMessage.FleetState(fleet.getId(),
                     fleet.getEnergy(), fleet.getSide(), fleet.getShips());
-            GameClient.getInstance().sendMessage(new FightMessage
-                    (Phases.getInstance().side, fight));
+            GameClient.getInstance().sendMessage(new FleetStateMessage
+                    (Phases.getInstance().side, fleetState));
         } catch (IOException e) {
             Log.wtf("sendEndFightMessage error", e.toString());
         }
@@ -235,7 +235,7 @@ public class Client implements MessageFlags {
 
     public void sendEndFightMessage(boolean destroyed) {
         try {
-            GameClient.getInstance().sendMessage(new EndFightMessage
+            GameClient.getInstance().sendMessage(new EndPhaseMessage
                     (Phases.getInstance().side,destroyed));
         } catch (IOException e) {
             Log.wtf("sendEndFightMessage error", e.toString());
@@ -245,7 +245,7 @@ public class Client implements MessageFlags {
     public void sendWinMessage()
     {
         try{
-            GameClient.getInstance().sendMessage(new WinMessage
+            GameClient.getInstance().sendMessage(new EndGameMessage
                     (Phases.getInstance().side));
         }catch (IOException e) {
             Log.wtf("sendWinMessage error", e.toString());
@@ -276,7 +276,7 @@ public class Client implements MessageFlags {
         try {
             attackingFleet.attack(anotherFleet);
             Log.wtf("" + attackingFleet.getShipCount(),"" + anotherFleet.getShipCount());
-            GameClient.getInstance().sendMessage(new FightMessage(side,attackingFleet,anotherFleet,number,secondNum));
+            GameClient.getInstance().sendMessage(new FleetStateMessage(side,attackingFleet,anotherFleet,number,secondNum));
         } catch (IOException e) {
             Log.wtf("PATH", e.toString());
         }

@@ -10,8 +10,8 @@ import com.games.andromeda.Phases;
 import com.games.andromeda.R;
 import com.games.andromeda.graph.BFSSolver;
 import com.games.andromeda.graph.Node;
+import com.games.andromeda.graph.PathBuilder;
 import com.games.andromeda.graph.PathInfo;
-import com.games.andromeda.graph.PathManager;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.logic.phases.FleetMovingStrategy;
@@ -32,7 +32,6 @@ import org.andengine.engine.camera.Camera;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
-import org.andengine.util.StreamUtils;
 import org.andengine.util.color.Color;
 
 public class UI {
@@ -60,7 +59,7 @@ public class UI {
         return instance;
     }
 
-    private PathManager manager;
+    private PathBuilder pathBuilder;
     private PanelHUD panel;
     private final BackgroundLayer backgroundLayer;
     private final SystemsLayer systemsLayer;
@@ -75,7 +74,7 @@ public class UI {
                VertexBufferObjectManager vertexBufferObjectManager,
                ShipsLayer.IOnFleetMove onFleetMove, ShipsLayer.IOnFleetFight onFleetFight) {
         this.activity = activity;
-        manager = new PathManager();
+        pathBuilder = new PathBuilder();
 
         scene.setBackground(new Background(Color.BLACK));
         //scene.setTouchAreaBindingOnActionDownEnabled(true);//Без этого не будет работать нормально перетаскивание спрайтов
@@ -83,12 +82,12 @@ public class UI {
 
         //Слой с фоном и линиями
         backgroundLayer = new BackgroundLayer(scene, camera, textureLoader,
-                vertexBufferObjectManager, WorldAccessor.getInstance().getMap());
+                vertexBufferObjectManager, WorldAccessor.getInstance().getLevel());
         backgroundLayer.repaint();
 
         //слой с системами
         systemsLayer = new SystemsLayer(activity, scene, camera, textureLoader,
-                vertexBufferObjectManager, WorldAccessor.getInstance().getMap());
+                vertexBufferObjectManager, WorldAccessor.getInstance().getLevel());
         WorldAccessor.getInstance().addBaseObserver(systemsLayer);
         systemsLayer.repaint();
 
@@ -121,7 +120,7 @@ public class UI {
 
             @Override
             public void onMove(Node node) {
-                //manager.addNode(node.getId());
+                //pathBuilder.setTarget(node.getId());
             }
 
             @Override
@@ -150,11 +149,11 @@ public class UI {
                     if (activeSprite != null && activeSprite.getFleet().getId() != node.getId()) {
                         Fleet fleet = activeSprite.getFleet();
 
-                        manager.start(fleet);
-                        manager.addNode(node.getId());
+                        pathBuilder.start(fleet);
+                        pathBuilder.setTarget(node.getId());
                         try {
                             float energy = fleet.getEnergy();
-                            PathInfo path = manager.getPath();
+                            PathInfo path = pathBuilder.getPath();
                             getShipsLayer().moveFleet(path);
                             ((FleetMovingStrategy)Phases.getInstance().getPhase()).handlePhaseEvent(
                                     new MoveFleetMessage.Move(fleet.getId(), energy, path));
@@ -166,7 +165,7 @@ public class UI {
                         }
 
                         getShipsLayer().releaseSprite();
-                        manager.reset();
+                        pathBuilder.reset();
                         getShipsLayer().repaint();
                         panel.repaintShipInfo();
                     }

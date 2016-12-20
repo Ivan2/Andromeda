@@ -1,7 +1,5 @@
 package com.games.andromeda.logic;
 
-import com.games.andromeda.graph.Node;
-
 public class Base extends GameObject {
     public class IncorrectNodeException extends Exception {}
     public static class NoFriendlyFleetException extends Exception {}
@@ -11,8 +9,6 @@ public class Base extends GameObject {
     /**
      * Базы сами по себе не появляются, поэтому конструктор deprecated.
      * Для создания базы следует использовать buy
-     * @param side
-     * @param nodeID
      */
     @Deprecated
     public Base(Side side, int nodeID) throws IncorrectNodeException{

@@ -2,7 +2,6 @@ package com.games.andromeda.logic;
 
 import android.util.Log;
 
-import com.games.andromeda.draw.Drawer;
 import com.games.andromeda.graph.PathInfo;
 
 import java.util.ArrayList;
@@ -161,7 +160,7 @@ public class Fleet extends GameObject {
      * @param drawer интерфейс, который отрисует бой
      * @return true, если атака успешна
      */
-    public boolean attack(Fleet another, Drawer drawer){
+    public boolean attack(Fleet another, BattleReporter drawer){
         Boolean result = null;
         while (result == null){
             if (another.splitDamage(this.properties.getAttack(this.getShipCount()))) {
@@ -173,10 +172,10 @@ public class Fleet extends GameObject {
 //                    WorldAccessor.getInstance().removeFleet(this);
                 }
             }
-            drawer.drawFleets(this, another);
+            drawer.showFleets(this, another);
             this.tryToRestoreShields();
             another.tryToRestoreShields();
-            drawer.reDrawFleets(this, another);
+            drawer.showFleetChanges(this, another);
         }
         return result;
     }
@@ -210,7 +209,7 @@ public class Fleet extends GameObject {
         if (!nodes.get(0).equals(nodeID)){
             throw new InvalidPositionException();
         }
-        float requiredEnergy =(float) (path.getLength())/properties.getSpeed(ships.size()) - CURRENCY;
+        float requiredEnergy =(float) (path.getPathWeight())/properties.getSpeed(ships.size()) - CURRENCY;
         if (requiredEnergy > energy){
             throw new NotEnoughEnergyException();
         }

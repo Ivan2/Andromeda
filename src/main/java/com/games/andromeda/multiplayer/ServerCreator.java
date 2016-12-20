@@ -3,13 +3,13 @@ package com.games.andromeda.multiplayer;
 import android.util.Log;
 
 import com.games.andromeda.MainActivity;
-import com.games.andromeda.graph.MyGraph;
+import com.games.andromeda.graph.LevelGraph;
 import com.games.andromeda.level.LevelLoader;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.message.BaseDestructionMessage;
 import com.games.andromeda.message.BasesCreationMessage;
-import com.games.andromeda.message.EndFightMessage;
-import com.games.andromeda.message.FightMessage;
+import com.games.andromeda.message.EndPhaseMessage;
+import com.games.andromeda.message.FleetStateMessage;
 import com.games.andromeda.message.FleetsCreationMessage;
 import com.games.andromeda.message.MessageFlags;
 import com.games.andromeda.message.MoveFleetMessage;
@@ -21,7 +21,7 @@ import com.games.andromeda.message.SideMessage;
 import com.games.andromeda.message.StartGameMessage;
 import com.games.andromeda.message.TimeAlmostOverMessage;
 import com.games.andromeda.message.TimeOverMessage;
-import com.games.andromeda.message.WinMessage;
+import com.games.andromeda.message.EndGameMessage;
 import com.games.andromeda.threads.ServerTimeThread;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
@@ -38,8 +38,10 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
@@ -78,111 +80,53 @@ public class ServerCreator implements MessageFlags {
             protected SocketConnectionClientConnector newClientConnector(final SocketConnection pSocketConnection) throws IOException {
                 SocketConnectionClientConnector connector = new SocketConnectionClientConnector(pSocketConnection);
 
-                /*
-                connector.registerClientMessage(FIGHT_MESSAGE, FightMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        try {
-                            FightMessage fightMessage = (FightMessage) iClientMessage;
-                            //Fleet   first = fightMessage.getFleet1(),
-                            //        second = fightMessage.getFleet2();
-                            //first.attack(second);
-                           // FightMessage serverFightMessage = new FightMessage(fightMessage.getSide(),
-                           //         first,second,fightMessage.getNumber1(),fightMessage.getNumber2());
-                            if (fightMessage.getSide() == GameObject.Side.EMPIRE) {
-                                federation.sendServerMessage(fightMessage);
-                            }
-                            else {
-                                empire.sendServerMessage(fightMessage);
-                            }
-                        } catch (IOException e) {
-                            Debug.e(e);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });*/
-                connector.registerClientMessage(SETUP_BASE_MESSAGE, SetupBasesMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        timeThread.restart(40,
-                                GameObject.getOtherSide(((SideMessage)iClientMessage).getSide()));
-                        sendMessageToEnemy(iClientMessage);
-                    }
-                });
-                connector.registerClientMessage(SETUP_FLEET_MESSAGE, SetupFleetsMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        timeThread.restart(40,
-                                GameObject.getOtherSide(((SideMessage)iClientMessage).getSide()));
-                        sendMessageToEnemy(iClientMessage);
-                    }
-                });
-                connector.registerClientMessage(RANDOM_EVENT_MESSAGE, RandomEventMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        sendMessageToEnemy(iClientMessage);
-                    }
-                });
-                connector.registerClientMessage(POCKET_CHANGE_MESSAGE, PocketChangesMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        //TODO POCKET_CHANGE_MESSAGE отправляется в двух фазах (для одной из них timeout не нужен). Разбить сообщение на два
-                        timeThread.restart(40,
-                                ((SideMessage)iClientMessage).getSide());
-                        sendMessageToEnemy(iClientMessage);
-                    }
-                });
-                connector.registerClientMessage(BASES_CREATION_MESSAGE, BasesCreationMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        sendMessageToEnemy(iClientMessage);
-                    }
-                });
-                connector.registerClientMessage(FLEETS_CREATION_MESSAGE, FleetsCreationMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        sendMessageToEnemy(iClientMessage);
-                    }
-                });
-                connector.registerClientMessage(MOVE_FLEET_MESSAGE, MoveFleetMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        timeThread.restart(40,
-                                ((SideMessage)iClientMessage).getSide());
-                        sendMessageToEnemy(iClientMessage);
-                    }
-                });
-                connector.registerClientMessage(FIGHT_MESSAGE, FightMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        sendMessageToEnemy(iClientMessage);
-                    }
-                });
-                connector.registerClientMessage(END_FIGHT_MESSAGE, EndFightMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        sendMessageToEnemy(iClientMessage);
-                    }
-                });
-                connector.registerClientMessage(WIN_MESSAGE, WinMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
-                        sendMessageToEnemy(iClientMessage);
-                    }
-                });
+                registerMessages(connector,
+                        // к сожалению, getFlag не является статическим методом
+                        new HashMap<Short, Class<? extends IClientMessage>>(){{
+                            put(SETUP_BASE_MESSAGE,         SetupBasesMessage.class);
+                            put(SETUP_FLEET_MESSAGE,        SetupFleetsMessage.class);
+                            put(RANDOM_EVENT_MESSAGE,       RandomEventMessage.class);
+                            put(POCKET_CHANGE_MESSAGE,      PocketChangesMessage.class);
+                            put(BASES_CREATION_MESSAGE,     BasesCreationMessage.class);
+                            put(FLEETS_CREATION_MESSAGE,    FleetsCreationMessage.class);
+                            put(FLEETS_CREATION_MESSAGE,    FleetsCreationMessage.class);
+                            put(MOVE_FLEET_MESSAGE,         MoveFleetMessage.class);
+                            put(FLEET_STATE_MESSAGE,        FleetStateMessage.class);
+                            put(END_PHASE_MESSAGE,          EndPhaseMessage.class);
+                            put(END_GAME_MESSAGE,           EndGameMessage.class);
+                            put(BASE_DESTRUCTION_MESSAGE,   BaseDestructionMessage.class);
 
-                connector.registerClientMessage(BASE_DESTRUCTION_MESSAGE, BaseDestructionMessage.class, new IClientMessageHandler<SocketConnection>() {
-                    @Override
-                    public void onHandleMessage(ClientConnector<SocketConnection> pClientConnector, IClientMessage pClientMessage) throws IOException {
-                        sendMessageToEnemy(pClientMessage);
-                    }
-                });
+                        }},
+                        new HashMap<Short, Integer>(){{
+                            put(SETUP_BASE_MESSAGE, 40);
+                            put(SETUP_FLEET_MESSAGE, 40);
+                            put(POCKET_CHANGE_MESSAGE, 40); //TODO POCKET_CHANGE_MESSAGE отправляется в двух фазах (для одной из них timeout не нужен). Разбить сообщение на два
+                            put(MOVE_FLEET_MESSAGE, 40);
+                        }}
+                );
+
                 return connector;
             }
         };
 
         return server;
+    }
+
+    private void registerMessages(SocketConnectionClientConnector connector,
+                                  Map<Short, Class<? extends IClientMessage>> classes,
+                                  final Map<Short, Integer> timeouts){
+        for(final Map.Entry<Short, Class<? extends IClientMessage>> entry: classes.entrySet()){
+            connector.registerClientMessage(entry.getKey(), entry.getValue(), new IClientMessageHandler<SocketConnection>() {
+                @Override
+                public void onHandleMessage(ClientConnector<SocketConnection> clientConnector, IClientMessage iClientMessage) throws IOException {
+                    if (timeouts.containsKey(entry.getKey())){
+                        timeThread.restart(timeouts.get(entry.getKey()),
+                                ((SideMessage)iClientMessage).getSide());
+                    }
+                    sendMessageToEnemy(iClientMessage);
+                }
+            });
+        }
     }
 
     private void sendMessage(IClientMessage message) {
@@ -290,7 +234,7 @@ public class ServerCreator implements MessageFlags {
 
             if (connectedCount == 2) //Поменять на 2 для двух устройств
                 try {
-                    MyGraph graph = null;
+                    LevelGraph graph = null;
                     try {
                         graph = LevelLoader.loadMap(activity, "map");
                     } catch (IOException e) {

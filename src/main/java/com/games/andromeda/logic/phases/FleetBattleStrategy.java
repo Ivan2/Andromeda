@@ -4,7 +4,7 @@ import android.media.MediaPlayer;
 
 import com.games.andromeda.Phases;
 import com.games.andromeda.R;
-import com.games.andromeda.draw.Drawer;
+import com.games.andromeda.logic.BattleReporter;
 import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
@@ -13,12 +13,7 @@ import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.multiplayer.Client;
 import com.games.andromeda.ui.UI;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
 
@@ -76,14 +71,14 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
 
     private boolean singleFight(Fleet atacker, Fleet defender)
     {
-        return atacker.attack(defender, new Drawer() {
+        return atacker.attack(defender, new BattleReporter() {
             @Override
-            public void drawFleets(Fleet one, Fleet two) {
+            public void showFleets(Fleet one, Fleet two) {
                 // todo dialog
             }
 
             @Override
-            public void reDrawFleets(Fleet one, Fleet two) {
+            public void showFleetChanges(Fleet one, Fleet two) {
                 // todo dialog
                 Client.getInstance().sendFightMessage(one);
                 Client.getInstance().sendFightMessage(two);

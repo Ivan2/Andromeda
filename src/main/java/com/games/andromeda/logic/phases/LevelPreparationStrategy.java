@@ -81,7 +81,7 @@ public class LevelPreparationStrategy extends ListStrategy<Node, Boolean>{
             }
         }
 
-        ArrayList<Node> nodes = new ArrayList<>(world.getMap().getNodes());
+        ArrayList<Node> nodes = new ArrayList<>(world.getLevel().getNodes());
         int baseCount = maxSize - bases.size();
 
         for (int i=0; i<baseCount; i++) {

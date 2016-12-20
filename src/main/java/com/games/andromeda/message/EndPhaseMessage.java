@@ -6,12 +6,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class EndFightMessage extends SideMessage implements MessageFlags {
+public class EndPhaseMessage extends SideMessage implements MessageFlags {
 
     private boolean destroyed;
-    public EndFightMessage() {}
+    public EndPhaseMessage() {}
 
-    public EndFightMessage(GameObject.Side side, boolean destroyed) {
+    public EndPhaseMessage(GameObject.Side side, boolean destroyed) {
 
         super(side);
         this.destroyed = destroyed;
@@ -31,7 +31,7 @@ public class EndFightMessage extends SideMessage implements MessageFlags {
 
     @Override
     public short getFlag() {
-        return END_FIGHT_MESSAGE;
+        return END_PHASE_MESSAGE;
     }
 
     public boolean getDestroyed()

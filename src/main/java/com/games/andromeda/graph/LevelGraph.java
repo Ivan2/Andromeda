@@ -6,12 +6,12 @@ import java.util.Collection;
 
 import edu.uci.ics.jung.graph.SparseGraph;
 
-public class MyGraph {
+public class LevelGraph {
 
     private SparseGraph<Node, Edge> graph;
     private Node hyper;
 
-    public MyGraph() {
+    public LevelGraph() {
         graph = new SparseGraph<>();
     }
 

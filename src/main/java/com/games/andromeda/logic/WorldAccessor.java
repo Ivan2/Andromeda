@@ -1,17 +1,13 @@
 package com.games.andromeda.logic;
 
-import android.util.Log;
-
 import com.games.andromeda.Phases;
-import com.games.andromeda.graph.MyGraph;
+import com.games.andromeda.graph.LevelGraph;
 import com.games.andromeda.graph.Node;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +31,7 @@ public class WorldAccessor {
 
     // storage part
     private Fleet[] fleets;
-    private MyGraph map;
+    private LevelGraph level;
     private Map<Integer, Base> bases;
     private Map<Integer, Node> nodes;
     private Pocket empirePocket;
@@ -51,8 +47,8 @@ public class WorldAccessor {
         fleetObservers = new HashSet<>();
     }
 
-    public void setMap(MyGraph graph){
-        map = graph;
+    public void setLevel(LevelGraph graph){
+        level = graph;
         nodes.clear();
         for (Node node : graph.getNodes())
             nodes.put(node.getId(), node);
@@ -124,8 +120,8 @@ public class WorldAccessor {
         }
     }
 
-    public MyGraph getMap() {
-        return map;
+    public LevelGraph getLevel() {
+        return level;
     }
 
     public void setBase(Base base) {
@@ -187,10 +183,10 @@ public class WorldAccessor {
         baseObservers.add(observer);
     }
 
-    public static void init(MyGraph graph){
+    public static void init(LevelGraph graph){
         getInstance().setPocket(new Pocket(GameObject.Side.FEDERATION));
         getInstance().setPocket(new Pocket(GameObject.Side.EMPIRE));
-        getInstance().setMap(graph);
+        getInstance().setLevel(graph);
     }
 
     public static void initBases(Collection<Base> bases){

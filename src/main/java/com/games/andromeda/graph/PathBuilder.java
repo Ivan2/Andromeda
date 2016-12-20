@@ -10,14 +10,14 @@ import java.util.List;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.SparseGraph;
 
-public class PathManager {
+public class PathBuilder {
 
     private Node start, end, previous;
     private DijkstraShortestPath<Node, Edge> solver;
 
-    public PathManager(){
+    public PathBuilder(){
         solver = new DijkstraShortestPath<>(
-                WorldAccessor.getInstance().getMap().getRepresentation(),
+                WorldAccessor.getInstance().getLevel().getRepresentation(),
                 new Function<Edge, Number>() {
                     @Override
                     public Number apply(Edge edge) {
@@ -27,12 +27,12 @@ public class PathManager {
                 true);
     }
 
-    public void addNode(int nodeID){
+    public void setTarget(int nodeID){
         end = getNode(nodeID);
     }
 
     /**
-     * Построение кратчайшего пути по результатам, накопленным при перетаскивании
+     * Построение кратчайшего пути по результатам, полученным от UI
      * @return список вершин и вес пути
      */
     public PathInfo getPath(){
@@ -62,7 +62,7 @@ public class PathManager {
     private List<Integer> goToNearestSystem(){
         List<Integer> path = new ArrayList<>();
         Node current = start;
-        SparseGraph<Node, Edge> graph = WorldAccessor.getInstance().getMap().getRepresentation();
+        SparseGraph<Node, Edge> graph = WorldAccessor.getInstance().getLevel().getRepresentation();
         while ((current.getSystemType() == Node.SystemType.MINI) && !current.equals(end)){
             for (Node neighbour: graph.getNeighbors(current)){
                 if (!neighbour.equals(previous)){

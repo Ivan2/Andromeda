@@ -5,7 +5,7 @@ import android.graphics.PointF;
 import com.games.andromeda.GameActivity;
 import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.R;
-import com.games.andromeda.graph.MyGraph;
+import com.games.andromeda.graph.LevelGraph;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.BaseObserver;
@@ -31,7 +31,7 @@ public class SystemsLayer extends Layer implements BaseObserver{
         public abstract void onUp(Node node);
     }
 
-    private MyGraph graph;
+    private LevelGraph graph;
     private Rectangle layer;
     private HashMap<Node.SystemType, ITextureRegion> systemTextures;
     private GameActivity activity;
@@ -39,7 +39,7 @@ public class SystemsLayer extends Layer implements BaseObserver{
     private LayerListener layerListener;
 
     public SystemsLayer(GameActivity activity, Scene scene, Camera camera, TextureLoader textureLoader,
-                        VertexBufferObjectManager vertexBufferObjectManager, MyGraph graph) {
+                        VertexBufferObjectManager vertexBufferObjectManager, LevelGraph graph) {
         super(scene, camera, textureLoader, vertexBufferObjectManager);
         this.graph = graph;
         this.activity = activity;

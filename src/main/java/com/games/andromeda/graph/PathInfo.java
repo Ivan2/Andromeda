@@ -4,23 +4,23 @@ import java.util.List;
 
 public class PathInfo {
     private List<Integer> nodeIds;
-    private Integer length;
+    private Integer pathWeight;
 
-    public PathInfo(List<Integer> nodes, Integer length) {
+    public PathInfo(List<Integer> nodes, Integer pathWeight) {
         this.nodeIds = nodes;
-        this.length = length;
+        this.pathWeight = pathWeight;
     }
 
     public List<Integer> getNodeIds() {
         return nodeIds;
     }
 
-    public Integer getLength() {
-        return length;
+    public Integer getPathWeight() {
+        return pathWeight;
     }
 
     @Override
     public String toString() {
-        return nodeIds + ": " + length;
+        return nodeIds + ": " + pathWeight;
     }
 }
