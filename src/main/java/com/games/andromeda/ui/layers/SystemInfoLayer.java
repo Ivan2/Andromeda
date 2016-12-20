@@ -88,11 +88,6 @@ public abstract class SystemInfoLayer extends DialogLayer {
             @Override
             public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
                 setVisibility(false);
-                if (UI.getInstance().getMediaPlayer()!=null)
-                {
-                    UI.getInstance().getMediaPlayer().release();
-                    Phases.getInstance().getMediaPlayer().start();
-                }
                 onOk();
             }
         });

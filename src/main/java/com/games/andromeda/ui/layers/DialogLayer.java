@@ -2,10 +2,13 @@ package com.games.andromeda.ui.layers;
 
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.util.Log;
 
 import com.games.andromeda.GameActivity;
+import com.games.andromeda.Phases;
 import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.R;
+import com.games.andromeda.ui.UI;
 import com.games.andromeda.ui.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
@@ -52,8 +55,22 @@ public abstract class DialogLayer extends Layer {
         if (visibility) {
             background.setVisible(true);
             moveToCenter();
-        } else
+        } else {
             background.setVisible(false);
+            disableDialogMusic();
+        }
+    }
+
+    private void disableDialogMusic(){
+        try {
+            if (UI.getInstance().getMediaPlayer() != null){
+                UI.getInstance().getMediaPlayer().release();
+                Phases.getInstance().getMediaPlayer().start();
+            }
+        } catch (IllegalStateException e) {
+            Log.wtf("disable_music", "wasn't enabled");
+        }
+
     }
 
 }
