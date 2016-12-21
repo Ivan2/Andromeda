@@ -1,33 +1,22 @@
 package com.games.andromeda;
 
 import android.app.Activity;
-import android.app.FragmentManager;
 import android.media.MediaPlayer;
 
+import com.games.andromeda.dialogs.HelpDialog;
 import com.games.andromeda.logic.GameObject;
-import com.games.andromeda.logic.WorldAccessor;
-import com.games.andromeda.logic.phases.FleetBattleStrategy;
 import com.games.andromeda.logic.phases.GamePhases;
 import com.games.andromeda.logic.phases.HandlingStrategy;
-import com.games.andromeda.logic.phases.IncomeEarningStrategy;
-import com.games.andromeda.logic.phases.LevelPreparationStrategy;
-import com.games.andromeda.logic.phases.MoneySpendingStrategy;
 import com.games.andromeda.logic.phases.RandomEventStrategy;
-import com.games.andromeda.message.MessageFlags;
 import com.games.andromeda.threads.GameTimer;
 import com.games.andromeda.ui.UI;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
-
-import static android.content.Context.MODE_PRIVATE;
 
 public class Phases {
 

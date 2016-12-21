@@ -11,6 +11,7 @@ import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.BasesCreationMessage;
 import com.games.andromeda.message.BaseDestructionMessage;
+import com.games.andromeda.message.EndGameLooseMessage;
 import com.games.andromeda.message.EndPhaseMessage;
 import com.games.andromeda.message.FleetStateMessage;
 import com.games.andromeda.message.FleetsCreationMessage;
@@ -159,6 +160,11 @@ public class Client implements MessageFlags {
                     case BASE_DESTRUCTION_MESSAGE:
                         BaseDestructionMessage destructionMessage = (BaseDestructionMessage) message;
                         world.destroyBase(destructionMessage.getNodeId());
+                        break;
+                    case END_GAME_LOOSE_MESSAGE:
+                        UI.toast("Ваш оппонент сдался. Вы выиграли!!!");
+                        UI.getInstance().finishGame();
+                        break;
                 }
             }
         });
@@ -258,6 +264,16 @@ public class Client implements MessageFlags {
                     Phases.getInstance().side, nodeId));
         } catch (IOException e) {
             Log.wtf("sendBaseDestructionMessage error", e.toString());
+        }
+    }
+
+    public void sendLooseGameMessage()
+    {
+        try {
+            GameClient.getInstance().sendMessage(new EndGameLooseMessage(
+                    Phases.getInstance().side));
+        } catch (IOException e) {
+            Log.wtf("sendEndGameLooseMessage error", e.toString());
         }
     }
     /*public void sendMoveShipMessage(Fleet fleet, int num) {

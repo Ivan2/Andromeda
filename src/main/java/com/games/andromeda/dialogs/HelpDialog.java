@@ -1,4 +1,4 @@
-package com.games.andromeda;
+package com.games.andromeda.dialogs;
 
 import android.app.DialogFragment;
 import android.content.Context;
@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.games.andromeda.Phases;
+import com.games.andromeda.R;
 import com.games.andromeda.logic.phases.CommonHandlingStrategy;
 import com.games.andromeda.logic.phases.FleetMovingStrategy;
 import com.games.andromeda.logic.phases.FleetPreparationStrategy;

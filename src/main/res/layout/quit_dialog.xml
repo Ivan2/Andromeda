@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="500dp"
+        android:layout_weight="1"
+        />
+    <Button
+        android:id="@+id/buttonContinue"
+        android:layout_height="wrap_content"
+        android:layout_width="500dp"
+        android:layout_gravity="center"
+        android:text="@string/continue_string"
+        android:textSize="50sp"
+        android:layout_weight="1"/>
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="500dp"
+        android:layout_weight="1"
+        />
+    <Button
+        android:id="@+id/buttonSurrender"
+        android:layout_height="wrap_content"
+        android:layout_width="500dp"
+        android:layout_gravity="center"
+        android:text="@string/quit_string"
+        android:textSize="50sp"
+        android:layout_weight="1"/>
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="500dp"
+        android:layout_weight="1"
+        />
+</LinearLayout>

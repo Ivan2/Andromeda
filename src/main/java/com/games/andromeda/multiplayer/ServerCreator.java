@@ -8,6 +8,7 @@ import com.games.andromeda.level.LevelLoader;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.message.BaseDestructionMessage;
 import com.games.andromeda.message.BasesCreationMessage;
+import com.games.andromeda.message.EndGameLooseMessage;
 import com.games.andromeda.message.EndPhaseMessage;
 import com.games.andromeda.message.FleetStateMessage;
 import com.games.andromeda.message.FleetsCreationMessage;
@@ -95,7 +96,7 @@ public class ServerCreator implements MessageFlags {
                             put(END_PHASE_MESSAGE,          EndPhaseMessage.class);
                             put(END_GAME_MESSAGE,           EndGameMessage.class);
                             put(BASE_DESTRUCTION_MESSAGE,   BaseDestructionMessage.class);
-
+                            put(END_GAME_LOOSE_MESSAGE,     EndGameLooseMessage.class);
                         }},
                         new HashMap<Short, Integer>(){{
                             put(SETUP_BASE_MESSAGE, 40);

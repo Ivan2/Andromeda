@@ -10,6 +10,7 @@ import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.BaseDestructionMessage;
 import com.games.andromeda.message.BasesCreationMessage;
 import com.games.andromeda.message.ConnectionCloseServerMessage;
+import com.games.andromeda.message.EndGameLooseMessage;
 import com.games.andromeda.message.EndPhaseMessage;
 import com.games.andromeda.message.FleetStateMessage;
 import com.games.andromeda.message.FleetsCreationMessage;
@@ -113,6 +114,7 @@ public class GameClient implements Runnable,MessageFlags {
                 put(END_PHASE_MESSAGE, EndPhaseMessage.class);
                 put(END_GAME_MESSAGE, EndGameMessage.class);
                 put(BASE_DESTRUCTION_MESSAGE, BaseDestructionMessage.class);
+                put(END_GAME_LOOSE_MESSAGE,EndGameLooseMessage.class);
             }}.entrySet()){
                 registerEchoMessage(entry.getKey(), entry.getValue());
             }
@@ -131,7 +133,6 @@ public class GameClient implements Runnable,MessageFlags {
                     //UI.toast("У вас осталось 10 секунд");
                 }
             });
-
             connector.getConnection().start();
         } catch (Throwable t) {
             Debug.e(t);
