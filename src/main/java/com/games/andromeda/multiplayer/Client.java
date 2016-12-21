@@ -160,6 +160,7 @@ public class Client implements MessageFlags {
                     case BASE_DESTRUCTION_MESSAGE:
                         BaseDestructionMessage destructionMessage = (BaseDestructionMessage) message;
                         world.destroyBase(destructionMessage.getNodeId());
+                        UI.getInstance().getPanel().repaintBaseInfo();
                         break;
                     case END_GAME_LOOSE_MESSAGE:
                         UI.toast("Ваш оппонент сдался. Вы выиграли!!!");

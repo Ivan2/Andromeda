@@ -41,6 +41,7 @@ public class MoneySpendingStrategy extends ListStrategy<Purchase, Boolean> {
                     input.base = base;
                     results.add(input);
                     UI.getInstance().getSystemsLayer().repaint();
+                    UI.getInstance().getPanel().repaintBaseInfo();
                 } catch (Exception e) {
                     throw e;
                 }
