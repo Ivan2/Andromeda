@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.media.MediaPlayer;
 import android.util.Log;
 
-import com.games.andromeda.dialogs.HelpDialog;
+import com.games.andromeda.ui.dialogs.HelpDialog;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.phases.GamePhases;
 import com.games.andromeda.logic.phases.HandlingStrategy;

@@ -1,4 +1,4 @@
-package com.games.andromeda.dialogs;
+package com.games.andromeda.ui.dialogs;
 
 import android.app.DialogFragment;
 import android.content.Context;

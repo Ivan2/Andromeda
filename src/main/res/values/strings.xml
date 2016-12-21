@@ -10,7 +10,7 @@
     <string name="level_preparation_strategy">Во время данной фазы вам нужно выбрать стартовые базы (Империя - до 10 баз, Федерация - до 6). Для выбора кликните по звездной системе и она окрасится в зеленый цвет. Для победы Империя должна захватить 18 баз, Федерация - 16.</string>
     <string name="money_spending_strategy">Во время данной фазы можно покупать новые базы (базу можно купить только если там находится хотя бы один ваш флот), а также флоты.</string>
     <string name="ok_string">Ok</string>
-    <string name="continue_string">Продолжить</string>
+    <string name="continue_string">Продолжить игру</string>
     <string name="quit_string">Сдаться и выйти</string>
     <string name="sound_off">Звук</string>
     <string name="hints">Подсказки</string>

@@ -2,37 +2,44 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#bb000000">
+
     <TextView
+        android:text="Вы уверены, что хотите выйти из игры?"
         android:layout_height="wrap_content"
-        android:layout_width="500dp"
-        android:layout_weight="1"
-        />
-    <Button
-        android:id="@+id/buttonContinue"
+        android:layout_width="match_parent"
+        android:padding="20dp"
+        android:textSize="20sp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_width="500dp"
-        android:layout_gravity="center"
-        android:text="@string/continue_string"
-        android:textSize="50sp"
-        android:layout_weight="1"/>
-    <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="500dp"
-        android:layout_weight="1"
-        />
-    <Button
-        android:id="@+id/buttonSurrender"
-        android:layout_height="wrap_content"
-        android:layout_width="500dp"
-        android:layout_gravity="center"
-        android:text="@string/quit_string"
-        android:textSize="50sp"
-        android:layout_weight="1"/>
-    <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="500dp"
-        android:layout_weight="1"
-        />
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
+
+        <Button
+            android:id="@+id/buttonContinue"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/continue_string"
+            android:textSize="18sp"
+            android:textAllCaps="false"/>
+
+        <Button
+            android:id="@+id/buttonSurrender"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/quit_string"
+            android:textSize="18sp"
+            android:textAllCaps="false"/>
+
+    </LinearLayout>
+
 </LinearLayout>

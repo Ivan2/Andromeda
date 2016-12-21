@@ -2,7 +2,7 @@ package com.games.andromeda;
 
 import android.util.DisplayMetrics;
 
-import com.games.andromeda.dialogs.QuitDialog;
+import com.games.andromeda.ui.dialogs.QuitDialog;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.multiplayer.Client;
 import com.games.andromeda.threads.GameTimer;
