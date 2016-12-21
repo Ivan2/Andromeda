@@ -11,11 +11,13 @@ import com.games.andromeda.graph.Node;
 import org.andengine.engine.Engine;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.font.FontFactory;
+import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.TextureManager;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.texture.region.TextureRegionFactory;
 import org.andengine.ui.activity.BaseGameActivity;
 
@@ -158,4 +160,7 @@ public class TextureLoader {
         return loadTextTexture(activity.getResources().getDimension(R.dimen.panel_text_size));
     }
 
+    public ITextureRegion loadLogoTexture(String side){
+        return loadFileTexture("logo/" + side + ".png", 128, 128);
+    }
 }

@@ -18,6 +18,10 @@ public class LevelLoader {
     private SparseArray<Node> map;
     private LevelGraph result;
     private int miniSystemID = -1;
+    private static final Color[] colors = {
+            new Color(0.82f, 0.22f, 0.92f),
+            new Color(0.28f, 0.66f, 0.78f),
+    };
 
     private LevelLoader(){
         map = new SparseArray<>();
@@ -76,7 +80,7 @@ public class LevelLoader {
                 addEdge(Integer.parseInt(line[1]),
                         Integer.parseInt(line[2]),
                         Integer.parseInt(line[3]),
-                        new Color(random.nextFloat(), random.nextFloat(), random.nextFloat()));
+                        colors[Integer.parseInt(line[4])]);
                 break;
             case "H":
                 addVertex(
