@@ -317,4 +317,8 @@ public class Client implements MessageFlags {
         ui.getShipsLayer().repaint();
     }
 */
+    public void toNull(){
+        instance = null;
+    }
+
 }

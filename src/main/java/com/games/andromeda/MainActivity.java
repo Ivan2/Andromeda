@@ -1,16 +1,21 @@
 package com.games.andromeda;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.games.andromeda.dialogs.WaitDialog;
 import com.games.andromeda.message.ConnectionCloseServerMessage;
+import com.games.andromeda.multiplayer.Client;
 import com.games.andromeda.multiplayer.GameClient;
 import com.games.andromeda.multiplayer.ServerCreator;
 
@@ -32,33 +37,26 @@ public class MainActivity extends AppCompatActivity {
     private Button options;
     private Button exit;
     private static String serverIp = LOCALHOST_IP;
-
+    public static String type = "";
     private SocketServer<SocketConnectionClientConnector> mSocketServer;
     private GameClient client;
 
-    private AlertDialog waitDialog;
+    private WaitDialog waitDialog;
 
     private void initServer() {
-
-            start.setEnabled(false);
-
-            join.setEnabled(false);
-
-            ServerCreator creator = new ServerCreator(this);
-            mSocketServer = creator.getServer(SERVER_PORT);
-            mSocketServer.start();
-
+        type = "Ожидание клиента...";
+        ServerCreator creator = new ServerCreator(this);
+        mSocketServer = creator.getServer(SERVER_PORT);
+        mSocketServer.start();
+        waitDialog = new WaitDialog();
+        waitDialog.show(getFragmentManager(),"");
     }
 
     private void initClient() {
         if (mSocketServer == null) {
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            LayoutInflater inflater = getLayoutInflater();
-            builder.setView(inflater.inflate(R.layout.wait_dialog, null));
-            builder.setCancelable(false);
-            waitDialog = builder.create();
-            waitDialog.show();
+            type = "Поиск сервера...";
+            waitDialog = new WaitDialog();
+            waitDialog.show(getFragmentManager(),"");
 
             Thread th = new Thread(new Runnable() {
                 @Override
@@ -171,6 +169,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (waitDialog!=null)
+            waitDialog.dismiss();
+    }
 
 
 }

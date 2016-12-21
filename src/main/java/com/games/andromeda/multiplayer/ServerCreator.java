@@ -105,7 +105,6 @@ public class ServerCreator implements MessageFlags {
                             put(MOVE_FLEET_MESSAGE, 40);
                         }}
                 );
-
                 return connector;
             }
         };
@@ -167,7 +166,6 @@ public class ServerCreator implements MessageFlags {
 
         @Override
         public void onException(final SocketServer<SocketConnectionClientConnector> pSocketServer, final Throwable pThrowable) {
-            Debug.e(pThrowable);
         }
     }
 
@@ -269,7 +267,6 @@ public class ServerCreator implements MessageFlags {
 
         @Override
         public void onTerminated(final ClientConnector<SocketConnection> pConnector) {
-
         }
 
     }

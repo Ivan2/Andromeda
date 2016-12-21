@@ -115,6 +115,7 @@ public class GameActivity extends SimpleBaseGameActivity{
         if (UI.getInstance().getMediaPlayer()!=null) {
             UI.getInstance().getMediaPlayer().release();
         }
+        setResult(1);
         super.onDestroy();
     }
 

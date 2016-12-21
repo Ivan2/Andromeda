@@ -97,7 +97,8 @@ public class GameClient implements Runnable,MessageFlags {
                     WorldAccessor.init(LevelLoader.loadMap((StartGameMessage)iServerMessage));
 
                     Intent start = new Intent(activity, GameActivity.class);
-                    activity.startActivity(start);
+                    //activity.startActivity(start);
+                    activity.startActivityForResult(start,1);
                 }
             });
 
@@ -174,6 +175,12 @@ public class GameClient implements Runnable,MessageFlags {
             activity.finish();
         }
 
+
+
+    }
+    public void toNull()
+    {
+        instance = null;
     }
 
 }
