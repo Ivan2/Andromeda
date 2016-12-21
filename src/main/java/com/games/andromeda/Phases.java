@@ -118,6 +118,7 @@ public class Phases {
         else
             UI.getInstance().getPanel().repaintPhaseName("Ход противника");
         UI.getInstance().getPanel().repaintShipInfo();
+        UI.getInstance().getPanel().repaintBaseInfo();
     }
 
     public void setActivity(Activity activity)

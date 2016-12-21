@@ -6,6 +6,7 @@ import com.games.andromeda.GameActivity;
 import com.games.andromeda.Phases;
 import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.R;
+import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.logic.WorldAccessor;
@@ -23,6 +24,8 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.HorizontalAlign;
 import org.andengine.util.color.Color;
 
+import java.util.Locale;
+
 public class PanelHUD {
 
     private HUD hud;
@@ -39,11 +42,12 @@ public class PanelHUD {
     private Sprite[] shipEnergySprites;
     private Text[] shipCountTexts;
     private ButtonSprite endPhaseButton;
-//    private Text sideText;
+    private Text baseInfo;
     private Text moneyText;
     private Text phaseText;
     private Text timerText;
     private Sprite[] sideLogo;
+    private GameObject.Side side;
 
     public PanelHUD(Camera camera, TextureLoader textureLoader,
                     VertexBufferObjectManager vertexBufferObjectManager, Resources resources) {
@@ -108,9 +112,9 @@ public class PanelHUD {
         sideLogo[0] = createLogoSprite("empire", left);
         sideLogo[1] = createLogoSprite("federation", left);
 
-//        sideText = new Text(rectangleVertical.getWidth() + PxDpConverter.dpToPx(20),
-//                (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
-//                font, "Федерация", vertexBufferObjectManager);
+        baseInfo = new Text(rectangleVertical.getWidth() + PxDpConverter.dpToPx(20),
+                (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
+                font, "--/--", vertexBufferObjectManager);
 
         endPhaseButton = new ButtonSprite(0, 0,
                 textureLoader.loadEmptyTexture(android.graphics.Color.argb(15, 255, 255, 255)),
@@ -148,28 +152,33 @@ public class PanelHUD {
         phaseText.setX(timerText.getX()-phaseText.getWidth()-margin*4);
 
 
-//        rectangleHorizontal.attachChild(sideText);
+        rectangleHorizontal.attachChild(baseInfo);
         rectangleHorizontal.attachChild(endPhaseButton);
         rectangleHorizontal.attachChild(timerText);
         rectangleHorizontal.attachChild(phaseText);
     }
 
     public void repaintSide(GameObject.Side side) {
+        this.side = side;
         rectangleVertical.attachChild(sideLogo[(side == GameObject.Side.EMPIRE) ? 0 : 1]);
-//
-//        switch (side) {
-//            case EMPIRE:
-//                sideText.setText("Империя");
-//                break;
-//            case FEDERATION:
-//                sideText.setText("Федерация");
-//                break;
-//        }
     }
 
     public void repaintPhaseName(String phaseName) {
         phaseText.setText(phaseName);
         phaseText.setX(timerText.getX()-phaseText.getWidth()-margin*4);
+    }
+
+    public void repaintBaseInfo(){
+        WorldAccessor world = WorldAccessor.getInstance();
+        int friendly = 0, enemy = 0;
+        for (Base base: world.getBases().values()){
+            if (base.getSide() == side){
+                friendly++;
+            } else {
+                enemy++;
+            }
+        }
+        baseInfo.setText(String.format(Locale.getDefault(), "%02d/%02d", friendly, enemy));
     }
 
     public void repaintTime(int time) {
