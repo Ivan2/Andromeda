@@ -177,7 +177,12 @@ public class Phases {
 
     public void dispose()
     {
-        mediaPlayer.release();
+        try {
+            mediaPlayer.release();
+        } catch (Exception e)
+        {
+            Log.wtf("Error", e.getMessage());
+        }
         gameTimer.stop();
         instance = null;
     }
