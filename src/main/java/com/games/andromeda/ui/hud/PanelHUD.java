@@ -6,6 +6,7 @@ import com.games.andromeda.GameActivity;
 import com.games.andromeda.Phases;
 import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.R;
+import com.games.andromeda.graph.Node;
 import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
@@ -42,7 +43,8 @@ public class PanelHUD {
     private Sprite[] shipEnergySprites;
     private Text[] shipCountTexts;
     private ButtonSprite endPhaseButton;
-    private Text baseInfo;
+    private Text friendlyBaseInfo;
+    private Text enemyBaseInfo;
     private Text moneyText;
     private Text phaseText;
     private Text timerText;
@@ -112,9 +114,15 @@ public class PanelHUD {
         sideLogo[0] = createLogoSprite("empire", left);
         sideLogo[1] = createLogoSprite("federation", left);
 
-        baseInfo = new Text(rectangleVertical.getWidth() + PxDpConverter.dpToPx(20),
+        Sprite friendlyBase = createBaseSprite(Node.SystemType.FRIENDLY, 0);
+        friendlyBaseInfo = new Text(friendlyBase.getX() + friendlyBase.getWidth()*1.2f,
                 (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
-                font, "--/--", vertexBufferObjectManager);
+                font, "--", vertexBufferObjectManager);
+        Sprite enemyBase = createBaseSprite(Node.SystemType.ENEMY, friendlyBaseInfo.getX()
+                + friendlyBaseInfo.getAutoWrapWidth());
+        enemyBaseInfo = new Text(enemyBase.getX() + enemyBase.getWidth()*1.2f,
+                (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
+                font, "--", vertexBufferObjectManager);
 
         endPhaseButton = new ButtonSprite(0, 0,
                 textureLoader.loadEmptyTexture(android.graphics.Color.argb(15, 255, 255, 255)),
@@ -152,7 +160,10 @@ public class PanelHUD {
         phaseText.setX(timerText.getX()-phaseText.getWidth()-margin*4);
 
 
-        rectangleHorizontal.attachChild(baseInfo);
+        rectangleHorizontal.attachChild(friendlyBase);
+        rectangleHorizontal.attachChild(friendlyBaseInfo);
+        rectangleHorizontal.attachChild(enemyBaseInfo);
+        rectangleHorizontal.attachChild(enemyBase);
         rectangleHorizontal.attachChild(endPhaseButton);
         rectangleHorizontal.attachChild(timerText);
         rectangleHorizontal.attachChild(phaseText);
@@ -178,7 +189,8 @@ public class PanelHUD {
                 enemy++;
             }
         }
-        baseInfo.setText(String.format(Locale.getDefault(), "%02d/%02d", friendly, enemy));
+        enemyBaseInfo.setText(String.format(Locale.getDefault(), "%02d", enemy));
+        friendlyBaseInfo.setText(String.format(Locale.getDefault(), "%02d", friendly));
     }
 
     public void repaintTime(int time) {
@@ -245,6 +257,15 @@ public class PanelHUD {
         Sprite result = new Sprite(0, 0, textureLoader.loadLogoTexture(logo), vertexBufferObjectManager);
         result.setSize(size*2, size*2);
         result.setPosition(margin, rectangleVertical.getHeight() - result.getHeight() - margin);
+        return result;
+    }
+
+    private Sprite createBaseSprite(Node.SystemType color, float margin){
+        Sprite result = new Sprite(0, 0, textureLoader.loadSystemTexture(color), vertexBufferObjectManager);
+        result.setSize(size, size);
+        result.setPosition(rectangleVertical.getWidth() + PxDpConverter.dpToPx(20) + margin,
+                (rectangleHorizontal.getHeight()-size)/2);
+        result.setColor((color == Node.SystemType.FRIENDLY) ? Color.GREEN: Color.RED);
         return result;
     }
 }

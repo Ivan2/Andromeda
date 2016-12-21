@@ -25,6 +25,7 @@ import com.games.andromeda.ui.texture.TextureLoader;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.primitive.Rectangle;
+import org.andengine.entity.scene.ITouchArea;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.ButtonSprite;
 import org.andengine.entity.sprite.Sprite;
@@ -40,6 +41,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Locale;
 
 public abstract class SystemInfoLayer extends DialogLayer {
@@ -51,14 +53,22 @@ public abstract class SystemInfoLayer extends DialogLayer {
     private Activity activity;
     private Node node;
 
+    private LinkedList<ITouchArea> touchAreas;
+
     public SystemInfoLayer(Activity activity, Scene scene, Camera camera, TextureLoader textureLoader,
                            VertexBufferObjectManager vertexBufferObjectManager) {
         super(activity.getResources(), scene, camera, textureLoader, vertexBufferObjectManager);
         this.activity = activity;
+        touchAreas = new LinkedList<>();
     }
 
     public void hide() {
         setVisibility(false);
+        if (!touchAreas.isEmpty()) {
+            for (ITouchArea touchArea : touchAreas)
+                scene.unregisterTouchArea(touchArea);
+        }
+        touchAreas.clear();
     }
 
     public void show(Node node) {
@@ -69,6 +79,11 @@ public abstract class SystemInfoLayer extends DialogLayer {
 
     @Override
     public void repaint() {
+        if (!touchAreas.isEmpty()) {
+            for (ITouchArea touchArea : touchAreas)
+                scene.unregisterTouchArea(touchArea);
+        }
+        touchAreas.clear();
         contentLayer.detachChildren();
 
         float WIDTH = contentLayer.getWidth();
@@ -92,12 +107,13 @@ public abstract class SystemInfoLayer extends DialogLayer {
         okButton.setOnClickListener(new ButtonSprite.OnClickListener() {
             @Override
             public void onClick(ButtonSprite pButtonSprite, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-                setVisibility(false);
+                hide();
                 onOk();
             }
         });
         contentLayer.attachChild(okButton);
         scene.registerTouchArea(okButton);
+        touchAreas.add(okButton);
 
         Text okText = new Text(0, 0, textureLoader.loadDialogTexture(), "OK", vertexBufferObjectManager);
         okText.setColor(1, 1, 1);
@@ -138,7 +154,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
                         Purchase purchase = new Purchase(Purchase.Kind.BUILD_BASE, node);
                         try {
                             ((MoneySpendingStrategy) Phases.getInstance().getPhase()).handlePhaseEvent(purchase);
-                            setVisibility(false);
+                            hide();
                             String options = readFile();
                             if (options == null) {
                                 mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.get_money);
@@ -160,6 +176,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
             buildButton.setPosition(margin, parent.getHeight() - buildButton.getHeight() - margin);
             parent.attachChild(buildButton);
             scene.registerTouchArea(buildButton);
+            touchAreas.add(buildButton);
             systemSpriteBottomMargin = parent.getHeight()-buildButton.getY();
         }
 
@@ -218,7 +235,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
                         try {
                             ((MoneySpendingStrategy) Phases.getInstance().getPhase()).
                                     handlePhaseEvent(new Purchase(Purchase.Kind.BUY_FLEET, node));
-                            setVisibility(false);
+                            hide();
                             String options = readFile();
                             if (options == null) {
                                 mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.get_money);
@@ -238,6 +255,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
             });
             parent.attachChild(addShipRow);
             scene.registerTouchArea(addShipRow);
+            touchAreas.add(addShipRow);
 
             Font font = textureLoader.loadDialogTexture();
             Text text = new Text(margin, (addShipRow.getHeight()-font.getLineHeight())/2,
@@ -364,6 +382,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
                     (shipRow.getHeight() - patchButton.getHeight()) / 2);
             shipRow.attachChild(patchButton);
             scene.registerTouchArea(patchButton);
+            touchAreas.add(patchButton);
         }
     }
 
