@@ -13,6 +13,10 @@ import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.multiplayer.Client;
 import com.games.andromeda.ui.UI;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Map;
 
 public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
@@ -35,8 +39,12 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
             }
             conflict = detectConflict();
         }
-        if (someDestroyed)
-            MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.explosion).start();
+        if (someDestroyed) {
+            String str = readFile();
+            if (str.equals("01")||str.equals("11"))
+                MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.explosion).start();
+        }
+
         checkBases();
         UI.getInstance().getShipsLayer().repaint();
         UI.getInstance().getPanel().repaintShipInfo();
@@ -110,5 +118,20 @@ public class FleetBattleStrategy extends CommonHandlingStrategy<Void, Void> {
                 }
             }
         }
+    }
+
+    private String readFile() {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    UI.getInstance().activity.openFileInput("options")));
+            String str = "";
+            str = br.readLine();
+            return str;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "11";
     }
 }
