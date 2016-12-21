@@ -265,9 +265,10 @@ public abstract class SystemInfoLayer extends DialogLayer {
                 shipCountSprite.getX()+shipCountSprite.getWidth()+PxDpConverter.dpToPx(10),
                 shipCountSprite.getY(),
                 font,
-                fleet.getShipCount()+"",
+                "000",
                 vertexBufferObjectManager
         );
+        shipCountText.setText(fleet.getShipCount()+"");
 
         ITextureRegion energyTexture = textureLoader.loadEnergyTexture();
         Sprite energySprite = new Sprite(shipSize+PxDpConverter.dpToPx(20),
