@@ -16,6 +16,11 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.ButtonSprite;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public abstract class DialogLayer extends Layer {
 
     private ButtonSprite background;
@@ -70,6 +75,21 @@ public abstract class DialogLayer extends Layer {
             Log.wtf("disable_music", "wasn't enabled");
         }
 
+    }
+
+    private String readFile() {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    Phases.getInstance().getActivity().openFileInput("options")));
+            String str = "";
+            str = br.readLine();
+            return str;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

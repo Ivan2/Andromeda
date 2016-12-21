@@ -11,7 +11,7 @@ public class PxDpConverter {
     }
 
     public static float dpToPx(float dp) {
-        return dp * context.getResources().getDisplayMetrics().density;
+        return dp * context.getResources().getDisplayMetrics().xdpi/160.0f;
     }
 
 }

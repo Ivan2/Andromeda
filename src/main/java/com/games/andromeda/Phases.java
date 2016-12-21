@@ -101,7 +101,7 @@ public class Phases {
             dialog = new HelpDialog();
             String show = readFile();
             if (show != null) {
-                if (show.equals("1"))
+                if (show.equals("11") || show.equals("10") )
                     dialog.show(activity.getFragmentManager(), "");
             }
             else
@@ -123,14 +123,15 @@ public class Phases {
     public void setActivity(Activity activity)
     {
         this.activity = activity;
-        if (mediaPlayer == null) {
-            mediaPlayer = MediaPlayer.create(activity, R.raw.start);
-            mediaPlayer.setLooping(true);
-            mediaPlayer.start();
+        String sound = readFile();
+        if (sound.equals("01")||sound.equals("11")) {
+            if (mediaPlayer == null) {
+                mediaPlayer = MediaPlayer.create(activity, R.raw.start);
+                mediaPlayer.setLooping(true);
+                mediaPlayer.start();
+            }
         }
     }
-
-
 
     private String readFile() {
         try {
@@ -158,17 +159,19 @@ public class Phases {
     }
 
     private void playRandomMusic(int[] resources){
-        Random rand = new Random();
-        if (mediaPlayer!=null) {
-            mediaPlayer.release();
-        }
-        try {
-            mediaPlayer = MediaPlayer.create(activity, resources[rand.nextInt(resources.length)]);
-            mediaPlayer.setLooping(true);
-            mediaPlayer.start();
-        } catch (Exception e)
-        {
-            Log.d("Error",e.toString());
+        String sound = readFile();
+        if (sound.equals("01")||sound.equals("11")) {
+            Random rand = new Random();
+            if (mediaPlayer != null) {
+                mediaPlayer.release();
+            }
+            try {
+                mediaPlayer = MediaPlayer.create(activity, resources[rand.nextInt(resources.length)]);
+                mediaPlayer.setLooping(true);
+                mediaPlayer.start();
+            } catch (Exception e) {
+                Log.d("Error", e.toString());
+            }
         }
     }
 
