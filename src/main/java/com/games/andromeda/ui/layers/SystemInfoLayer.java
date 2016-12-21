@@ -249,7 +249,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
     private void createShipRow(Rectangle shipRow, final Fleet fleet) {
         float shipSize = PxDpConverter.dpToPx(70);
 
-        String color = (fleet.getSide() == GameObject.Side.EMPIRE) ? "red1" : "green1";
+        String color = (fleet.getSide() == GameObject.Side.EMPIRE) ? "yellow1" : "blue1";
         Sprite shipSprite = new Sprite(0, (shipRow.getHeight()-shipSize)/2,
                 textureLoader.loadColoredShipTexture(color),
                 vertexBufferObjectManager);

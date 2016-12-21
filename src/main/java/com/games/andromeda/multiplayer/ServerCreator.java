@@ -9,6 +9,7 @@ import com.games.andromeda.logic.GameObject;
 import com.games.andromeda.message.BaseDestructionMessage;
 import com.games.andromeda.message.BasesCreationMessage;
 import com.games.andromeda.message.EndGameLooseMessage;
+import com.games.andromeda.message.EndGameMessage;
 import com.games.andromeda.message.EndPhaseMessage;
 import com.games.andromeda.message.FleetStateMessage;
 import com.games.andromeda.message.FleetsCreationMessage;
@@ -22,7 +23,6 @@ import com.games.andromeda.message.SideMessage;
 import com.games.andromeda.message.StartGameMessage;
 import com.games.andromeda.message.TimeAlmostOverMessage;
 import com.games.andromeda.message.TimeOverMessage;
-import com.games.andromeda.message.EndGameMessage;
 import com.games.andromeda.threads.ServerTimeThread;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
@@ -31,7 +31,6 @@ import org.andengine.extension.multiplayer.protocol.server.SocketServer;
 import org.andengine.extension.multiplayer.protocol.server.connector.ClientConnector;
 import org.andengine.extension.multiplayer.protocol.server.connector.SocketConnectionClientConnector;
 import org.andengine.extension.multiplayer.protocol.shared.SocketConnection;
-import org.andengine.util.debug.Debug;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -156,7 +155,7 @@ public class ServerCreator implements MessageFlags {
     private class ServerStateListener implements SocketServer.ISocketServerListener<SocketConnectionClientConnector> {
         @Override
         public void onStarted(final SocketServer<SocketConnectionClientConnector> pSocketServer) {
-            activity.toast("SERVER: Started.");
+            Log.wtf("toast", "SERVER: Started.");
         }
 
         @Override
@@ -172,7 +171,7 @@ public class ServerCreator implements MessageFlags {
     private class ClientConnectorListener implements SocketConnectionClientConnector.ISocketConnectionClientConnectorListener {
         @Override
         public void onStarted(ClientConnector<SocketConnection> pConnector) {
-            activity.toast("SERVER: Client connected: " + pConnector.getConnection().getSocket().getInetAddress().getHostAddress());
+            Log.wtf("toast", "SERVER: Client connected: " + pConnector.getConnection().getSocket().getInetAddress().getHostAddress());
             clients.add(pConnector);
             connectedCount++;
             if (connectedCount == 1)

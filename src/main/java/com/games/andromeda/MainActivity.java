@@ -8,14 +8,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import com.games.andromeda.ui.dialogs.WaitDialog;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.ConnectionCloseServerMessage;
 import com.games.andromeda.multiplayer.Client;
 import com.games.andromeda.multiplayer.GameClient;
 import com.games.andromeda.multiplayer.ServerCreator;
+import com.games.andromeda.ui.dialogs.WaitDialog;
 
 import org.andengine.extension.multiplayer.protocol.server.SocketServer;
 import org.andengine.extension.multiplayer.protocol.server.connector.SocketConnectionClientConnector;
@@ -90,15 +89,6 @@ public class MainActivity extends AppCompatActivity {
             thread.start();
         }
 
-    }
-
-    public void toast(final String pMessage) {
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(MainActivity.this, pMessage, Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     @Override

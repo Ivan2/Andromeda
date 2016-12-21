@@ -85,7 +85,6 @@ public class FleetPreparationStrategy extends ListStrategy<Fleet, Boolean> {
                             world.setFleet(fleet);
                         }
                     } catch (Exception e) {
-                        UI.toast("er " + e.toString());
                         Log.wtf("error", e.toString());
                     }
                     break;

@@ -142,7 +142,7 @@ public class PanelHUD {
 
         timerText = new Text(0,
                 (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
-                font, "00:45", vertexBufferObjectManager);
+                font, "00:00", vertexBufferObjectManager);
         timerText.setX(endPhaseButton.getX()-timerText.getWidth()-margin*4);
 
         phaseText = new Text(0,
@@ -219,7 +219,7 @@ public class PanelHUD {
         rectangle.attachChild(shipSprite);
 
         Sprite shipMaxEnergySprite = new Sprite(0, 0,
-                textureLoader.loadEmptyTexture(android.graphics.Color.BLACK),
+                textureLoader.loadEmptyTexture(new Color(0.2f, 0.2f, 0.2f).getARGBPackedInt()),
                 vertexBufferObjectManager);
         shipMaxEnergySprite.setSize(size, progressHeight);
         rectangle.attachChild(shipMaxEnergySprite);
