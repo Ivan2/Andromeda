@@ -180,7 +180,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
         parent.attachChild(systemSprite);
 
 
-        float shipRowHeight = PxDpConverter.dpToPx(70);
+        float shipRowHeight = PxDpConverter.dpToPx(50);
 
         ArrayList<Fleet> fleets = new ArrayList<>(3);
         for (Fleet fleet : WorldAccessor.getInstance().getAllFleets())
@@ -247,7 +247,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
     }
 
     private void createShipRow(Rectangle shipRow, final Fleet fleet) {
-        float shipSize = PxDpConverter.dpToPx(70);
+        float shipSize = PxDpConverter.dpToPx(50);
 
         String color = (fleet.getSide() == GameObject.Side.EMPIRE) ? "yellow1" : "blue1";
         Sprite shipSprite = new Sprite(0, (shipRow.getHeight()-shipSize)/2,
@@ -259,7 +259,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
         ITextureRegion shipCountTexture = textureLoader.loadColoredShipTexture(color);
         Sprite shipCountSprite = new Sprite(shipSize+PxDpConverter.dpToPx(20),
                 shipSprite.getY(), shipCountTexture, vertexBufferObjectManager);
-        shipCountSprite.setSize(PxDpConverter.dpToPx(30), PxDpConverter.dpToPx(30));
+        shipCountSprite.setSize(PxDpConverter.dpToPx(20), PxDpConverter.dpToPx(20));
 
         Font font = textureLoader.loadPanelTexture();
         final Text shipCountText = new Text(
@@ -275,7 +275,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
         Sprite energySprite = new Sprite(shipSize+PxDpConverter.dpToPx(20),
                 shipCountSprite.getY()+shipCountSprite.getHeight()+PxDpConverter.dpToPx(10),
                 energyTexture, vertexBufferObjectManager);
-        energySprite.setSize(PxDpConverter.dpToPx(30), PxDpConverter.dpToPx(30));
+        energySprite.setSize(PxDpConverter.dpToPx(20), PxDpConverter.dpToPx(20));
 
         Text energyText = new Text(
                 energySprite.getX()+energySprite.getWidth()+PxDpConverter.dpToPx(10),
@@ -359,7 +359,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
 
                 }
             });
-            patchButton.setSize(PxDpConverter.dpToPx(50), PxDpConverter.dpToPx(50));
+            patchButton.setSize(PxDpConverter.dpToPx(40), PxDpConverter.dpToPx(40));
             patchButton.setPosition(shipRow.getWidth() - patchButton.getWidth(),
                     (shipRow.getHeight() - patchButton.getHeight()) / 2);
             shipRow.attachChild(patchButton);
@@ -379,7 +379,7 @@ public abstract class SystemInfoLayer extends DialogLayer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return "11";
     }
 
 }

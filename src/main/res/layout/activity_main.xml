@@ -3,95 +3,104 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    android:background="@drawable/main_background">
 
-    <LinearLayout
-        android:id="@+id/main_menu"
+    <TextView
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Andromeda Rebellion"
+        android:textStyle="italic"
+        android:textSize="50sp"
+        android:textColor="@color/textCoor"
+        android:shadowColor="@color/textCoor"
+        android:shadowDx="12"
+        android:shadowDy="12"
+        android:shadowRadius="20" />
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:layout_height="match_parent">
 
-        >
-        <TextView
-            android:layout_width="300dp"
-            android:layout_height="20dp"
-            android:layout_weight="3"
-            />
-        <TextView
-            android:layout_gravity="center"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:text="Andromeda Rebellion"
-            android:textStyle="italic"
-            android:textSize="60sp"
-            android:textColor="@color/textCoor"
-            android:shadowColor="#CCA918"
-            android:shadowDx="12"
-            android:shadowDy="12"
-            android:shadowRadius="20"
-            />
-        <TextView
-            android:layout_width="300dp"
-            android:layout_height="20dp"
-            android:layout_weight="3"
-            />
-        <Button
-            android:id="@+id/button_start"
-            android:layout_height="50dp"
-            android:layout_width="500dp"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:text="@string/start"
-            android:background="@drawable/oval"
-            >
-        </Button>
-        <TextView
-            android:layout_width="300dp"
-            android:layout_height="20dp"
-            android:layout_weight="2"
-            />
-        <Button
-            android:id="@+id/button_join"
-            android:layout_height="50dp"
-            android:layout_width="500dp"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:text="@string/join"
-            android:background="@drawable/oval"
-            >
-        </Button>
-        <TextView
-            android:layout_width="300dp"
-            android:layout_height="20dp"
-            android:layout_weight="2"/>
-        <Button
-            android:id="@+id/button_options"
-            android:layout_height="50dp"
-            android:layout_width="500dp"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:text="@string/options"
-            android:background="@drawable/oval"
-            >
-        </Button>
-        <TextView
-            android:layout_width="300dp"
-            android:layout_height="20dp"
-            android:layout_weight="2"/>
-        <Button
-            android:id="@+id/button_exit"
-            android:layout_height="50dp"
-            android:layout_width="500dp"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:text="@string/exit"
-            android:background="@drawable/oval"
-            >
-        </Button>
-        <TextView
-            android:layout_width="300dp"
-            android:layout_height="20dp"
-            android:layout_weight="3"/>
-    </LinearLayout>
+            android:orientation="vertical"
+            android:layout_centerInParent="true">
+
+            <Button
+                style="?android:attr/borderlessButtonStyle"
+                android:id="@+id/button_start"
+                android:layout_height="50dp"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="@string/start"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:background="@android:color/transparent" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#aaaaaa"/>
+
+            <Button
+                style="?android:attr/borderlessButtonStyle"
+                android:id="@+id/button_join"
+                android:layout_height="50dp"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="@string/join"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:background="@android:color/transparent" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#aaaaaa"/>
+
+            <Button
+                style="?android:attr/borderlessButtonStyle"
+                android:id="@+id/button_options"
+                android:layout_height="50dp"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="@string/options"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:background="@android:color/transparent" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#aaaaaa"/>
+
+            <Button
+                style="?android:attr/borderlessButtonStyle"
+                android:id="@+id/button_exit"
+                android:layout_height="50dp"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="@string/exit"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:background="@android:color/transparent" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
 </LinearLayout>

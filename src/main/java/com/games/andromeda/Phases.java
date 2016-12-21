@@ -146,7 +146,7 @@ public class Phases {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return "11";
     }
 
     public Activity getActivity()

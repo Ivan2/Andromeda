@@ -89,7 +89,7 @@ public abstract class DialogLayer extends Layer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return "11";
     }
 
 }

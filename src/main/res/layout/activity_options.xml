@@ -6,7 +6,6 @@
     tools:context=".MainActivity"
     android:orientation="vertical"
     android:background="@drawable/options_background"
-    android:id="@+id/options_menu"
     android:padding="20dp">
 
     <TableLayout

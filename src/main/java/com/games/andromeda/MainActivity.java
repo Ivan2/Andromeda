@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.ConnectionCloseServerMessage;
@@ -116,8 +115,6 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         setContentView(R.layout.activity_main);
-        LinearLayout main = (LinearLayout) findViewById(R.id.main_menu);
-        main.setBackground(getResources().getDrawable(R.drawable.background));
         start = (Button)findViewById(R.id.button_start);
         join = (Button)findViewById(R.id.button_join);
         options = (Button)findViewById(R.id.button_options);

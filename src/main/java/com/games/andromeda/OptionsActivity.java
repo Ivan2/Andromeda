@@ -91,7 +91,7 @@ public class OptionsActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return "11";
     }
 
     private void writeFile(String content) {
