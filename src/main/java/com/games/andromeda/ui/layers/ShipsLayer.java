@@ -48,7 +48,7 @@ public class ShipsLayer extends Layer implements FleetObserver {
     // первые 3 - цвета империи, последние 3 - федерации
     public static String[] SHIP_COLORS = {
         //"red", "green", "blue", "gray", "pink", "brown"
-        "red1", "red2", "red3", "green1", "green2", "green3"
+        "yellow1", "yellow2", "yellow3", "blue1", "blue2", "blue3"
     };
 
     private PointF[] deltas;  // запоминаем смещения
