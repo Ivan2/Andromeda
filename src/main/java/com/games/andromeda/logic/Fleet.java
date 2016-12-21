@@ -240,4 +240,9 @@ public class Fleet extends GameObject {
         energy = (float) Math.min(properties.getEnergyRestore() + energy, 1.0);
         return energy;
     }
+
+    public FleetProperties getProperties()
+    {
+        return properties;
+    }
 }
