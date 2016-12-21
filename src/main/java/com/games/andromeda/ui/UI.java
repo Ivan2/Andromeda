@@ -146,7 +146,7 @@ public class UI {
                     }
                 } else if (Phases.getInstance().getPhase() instanceof FleetMovingStrategy) {
                     ShipSprite activeSprite = ShipsLayer.activeSprite;
-                    if (activeSprite != null && activeSprite.getFleet().getId() != node.getId()) {
+                    if (activeSprite != null && activeSprite.getFleet().getPosition() != node.getId()) {
                         Fleet fleet = activeSprite.getFleet();
 
                         pathBuilder.start(fleet);
