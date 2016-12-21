@@ -29,6 +29,8 @@ public class WaitDialog extends DialogFragment {
         view = inflater.inflate(R.layout.wait_dialog, null);
         context = inflater.getContext();
         ((TextView)view.findViewById(R.id.waitText)).setText(MainActivity.type);
+        getDialog().setCancelable(false);
+        getDialog().setCanceledOnTouchOutside(false);
         return view;
     }
 

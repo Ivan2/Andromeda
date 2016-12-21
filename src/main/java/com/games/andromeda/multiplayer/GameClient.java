@@ -24,6 +24,7 @@ import com.games.andromeda.message.StartGameMessage;
 import com.games.andromeda.message.TimeAlmostOverMessage;
 import com.games.andromeda.message.TimeOverMessage;
 import com.games.andromeda.message.EndGameMessage;
+import com.games.andromeda.ui.UI;
 
 import org.andengine.extension.multiplayer.protocol.adt.message.client.IClientMessage;
 import org.andengine.extension.multiplayer.protocol.adt.message.server.IServerMessage;
@@ -84,7 +85,7 @@ public class GameClient implements Runnable,MessageFlags {
                 @Override
                 public void onHandleMessage(ServerConnector<SocketConnection> pServerConnector,
                                             IServerMessage pServerMessage) throws IOException {
-                    activity.finish();
+                    //activity.finish();
                 }
             });
 
@@ -161,25 +162,21 @@ public class GameClient implements Runnable,MessageFlags {
     private class ServerConnectorListener implements SocketConnectionServerConnector.ISocketConnectionServerConnectorListener {
         @Override
         public void onStarted(final ServerConnector<SocketConnection> pConnector) {
-//            activity.runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Toast.makeText(activity, "CLIENT: Connected to server.", Toast.LENGTH_SHORT).show();
-//                }
-//            });
+//
         }
 
         @Override
         public void onTerminated(final ServerConnector<SocketConnection> pConnector) {
-            // MainActivity.this.toast("CLIENT: Disconnected from Server...");
-            activity.finish();
+            if (UI.getInstance().activity!=null)
+                UI.getInstance().finishGame();
         }
 
 
 
     }
-    public void toNull()
+    public void dispose()
     {
+        connector.terminate();
         instance = null;
     }
 

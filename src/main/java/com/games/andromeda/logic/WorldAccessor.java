@@ -195,6 +195,20 @@ public class WorldAccessor {
         }
     }
 
+    public void createWorld()
+    {
+        bases.clear();
+        nodes.clear();
+        baseObservers.clear();
+        fleetObservers.clear();
+        fleets = new Fleet[6];
+        /*bases = new HashMap<>();
+        nodes = new HashMap<>();
+
+        baseObservers = new HashSet<>();
+        fleetObservers = new HashSet<>();*/
+    }
+
 
 
 }

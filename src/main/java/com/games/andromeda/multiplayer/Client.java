@@ -164,6 +164,7 @@ public class Client implements MessageFlags {
                     case END_GAME_LOOSE_MESSAGE:
                         UI.toast("Ваш оппонент сдался. Вы выиграли!!!");
                         UI.getInstance().finishGame();
+
                         break;
                 }
             }
@@ -317,7 +318,7 @@ public class Client implements MessageFlags {
         ui.getShipsLayer().repaint();
     }
 */
-    public void toNull(){
+    public void dispose(){
         instance = null;
     }
 

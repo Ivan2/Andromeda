@@ -242,6 +242,7 @@ public class UI {
 
     public void finishGame()
     {
+
         activity.finish();
     }
 
@@ -256,5 +257,10 @@ public class UI {
     public MediaPlayer getMediaPlayer()
     {
         return mediaPlayer;
+    }
+
+    public void dispose()
+    {
+        instance = null;
     }
 }

@@ -2,6 +2,7 @@ package com.games.andromeda;
 
 import android.app.Activity;
 import android.media.MediaPlayer;
+import android.util.Log;
 
 import com.games.andromeda.dialogs.HelpDialog;
 import com.games.andromeda.logic.GameObject;
@@ -161,9 +162,21 @@ public class Phases {
         if (mediaPlayer!=null) {
             mediaPlayer.release();
         }
-        mediaPlayer = MediaPlayer.create(activity, resources[rand.nextInt(resources.length)]);
-        mediaPlayer.setLooping(true);
-        mediaPlayer.start();
+        try {
+            mediaPlayer = MediaPlayer.create(activity, resources[rand.nextInt(resources.length)]);
+            mediaPlayer.setLooping(true);
+            mediaPlayer.start();
+        } catch (Exception e)
+        {
+            Log.d("Error",e.toString());
+        }
+    }
+
+    public void dispose()
+    {
+        mediaPlayer.release();
+        gameTimer.stop();
+        instance = null;
     }
 
 }

@@ -79,7 +79,6 @@ public class GameActivity extends SimpleBaseGameActivity{
             }
         };
 
-
         UI.createInstance(this, scene, camera, textureLoader, mEngine.getVertexBufferObjectManager(),
                 onFleetMove,onFleetFight);
 

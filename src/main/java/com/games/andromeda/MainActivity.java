@@ -14,6 +14,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.games.andromeda.dialogs.WaitDialog;
+import com.games.andromeda.logic.Base;
+import com.games.andromeda.logic.Fleet;
+import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.ConnectionCloseServerMessage;
 import com.games.andromeda.multiplayer.Client;
 import com.games.andromeda.multiplayer.GameClient;
@@ -26,6 +29,8 @@ import org.andengine.util.debug.Debug;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.Iterator;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -174,6 +179,18 @@ public class MainActivity extends AppCompatActivity {
     {
         if (waitDialog!=null)
             waitDialog.dismiss();
+        Client.getInstance().dispose();
+        GameClient.getInstance().dispose();
+        Phases.getInstance().dispose();
+        WorldAccessor.getInstance().createWorld();
+        try {
+            mSocketServer.interrupt();
+            mSocketServer.terminate();
+            mSocketServer = null;
+        } catch(Exception e)
+        {
+            Log.wtf("Error ",e.getMessage());
+        }
     }
 
 
