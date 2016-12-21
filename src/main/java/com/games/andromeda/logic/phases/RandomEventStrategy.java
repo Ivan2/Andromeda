@@ -1,8 +1,7 @@
 package com.games.andromeda.logic.phases;
 
-import android.util.Log;
-
 import com.games.andromeda.Phases;
+import com.games.andromeda.TallerDeclension;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.multiplayer.Client;
 import com.games.andromeda.ui.UI;
@@ -35,17 +34,21 @@ public class RandomEventStrategy extends CommonHandlingStrategy<Void, Void> {
                     world.getPocket(Phases.getInstance().side).increase(money);
                     Client.getInstance().sendRandomEventMessage(money,-1,-1);
                     if (money > 0)
-                        UI.toast("Обнаружен золотой рудник в одной из систем. Вы получаете: " + money);
+                        UI.toast("Обнаружен золотой рудник в одной из систем. Вы получаете: " +
+                                TallerDeclension.getTallerStr(money));
                     else
                         if (money < 0)
-                            UI.toast("На восстановление урона после катаклизма вы тратите " + -1*money);
+                            UI.toast("На восстановление урона после катаклизма вы тратите " +
+                                    TallerDeclension.getTallerStr(-money));
                     return true;
                 }
                 if (money > 0)
-                    UI.toast("Обнаружен золотой рудник в одной из систем. Вы получаете: " + money);
+                    UI.toast("Обнаружен золотой рудник в одной из систем. Вы получаете: " +
+                            TallerDeclension.getTallerStr(money));
                 else
                     if (money < 0)
-                        UI.toast("На восстановление урона после катаклизма вы тратите " + -1*money);
+                        UI.toast("На восстановление урона после катаклизма вы тратите " +
+                                TallerDeclension.getTallerStr(-money));
                 world.getPocket(Phases.getInstance().side).increase(money);
                 Client.getInstance().sendRandomEventMessage(money,-1,-1);
                 return true;

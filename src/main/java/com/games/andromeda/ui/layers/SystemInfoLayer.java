@@ -12,6 +12,7 @@ import android.widget.RadioButton;
 import com.games.andromeda.Phases;
 import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.R;
+import com.games.andromeda.TallerDeclension;
 import com.games.andromeda.graph.Node;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.GameObject;
@@ -310,11 +311,14 @@ public abstract class SystemInfoLayer extends DialogLayer {
                             dialog.setContentView(R.layout.buy_dialog);
 
                             final RadioButton radioButton1 = (RadioButton) dialog.findViewById(R.id.count1_radio_button);
-                            radioButton1.setText("1 корабль (" + fleet.getOneShipCost()+")");
+                            radioButton1.setText("1 корабль (" +
+                                    TallerDeclension.getTallerStr(fleet.getOneShipCost()) + ")");
                             final RadioButton radioButton2 = (RadioButton) dialog.findViewById(R.id.count2_radio_button);
-                            radioButton2.setText("3 корабля (" + fleet.getOneShipCost()*3 + ")");
+                            radioButton2.setText("3 корабля (" +
+                                    TallerDeclension.getTallerStr(fleet.getOneShipCost()*3) + ")");
                             final RadioButton radioButton3 = (RadioButton) dialog.findViewById(R.id.count3_radio_button);
-                            radioButton3.setText("5 кораблей (" + fleet.getOneShipCost()*5 + ")");
+                            radioButton3.setText("5 кораблей (" +
+                                    TallerDeclension.getTallerStr(fleet.getOneShipCost()*5) + ")");
                             Button okButton = (Button)dialog.findViewById(R.id.ok_button);
                             Button cancelButton = (Button)dialog.findViewById(R.id.cancel_button);
 

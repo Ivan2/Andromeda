@@ -1,5 +1,6 @@
 package com.games.andromeda.logic.phases;
 
+import com.games.andromeda.TallerDeclension;
 import com.games.andromeda.logic.Base;
 import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.Pocket;
@@ -30,7 +31,7 @@ public class IncomeEarningStrategy extends CommonHandlingStrategy<Void, Void>{
             Client.getInstance().sendChangeFleetMessage(fleet);
         }
 
-        UI.toast("Получен доход от баз: " + (pocket.getTotal() - start));
+        UI.toast("Получен доход от баз: " + TallerDeclension.getTallerStr(pocket.getTotal() - start));
         Client.getInstance().sendPocketChangesMessage(pocket.getTotal());
         return true;
     }
