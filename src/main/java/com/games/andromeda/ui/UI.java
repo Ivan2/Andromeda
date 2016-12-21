@@ -34,6 +34,11 @@ import org.andengine.entity.scene.background.Background;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.color.Color;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class UI {
 
     public static void toast(final String msg) {
@@ -170,10 +175,13 @@ public class UI {
                         panel.repaintShipInfo();
                     }
                 } else {
-                    Phases.getInstance().getMediaPlayer().pause();
-                    mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.base);
-                    mediaPlayer.setLooping(true);
-                    mediaPlayer.start();
+                    String options = readFile();
+                    if (options!=null && (options.equals("11")||options.equals("01"))) {
+                        Phases.getInstance().getMediaPlayer().pause();
+                        mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.base);
+                        mediaPlayer.setLooping(true);
+                        mediaPlayer.start();
+                    }
                     systemInfoLayer.show(node);
                 }
             }
@@ -262,5 +270,20 @@ public class UI {
     public void dispose()
     {
         instance = null;
+    }
+
+    private String readFile() {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    activity.openFileInput("options")));
+            String str = "";
+            str = br.readLine();
+            return str;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

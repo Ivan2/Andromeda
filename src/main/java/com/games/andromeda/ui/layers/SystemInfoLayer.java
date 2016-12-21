@@ -34,6 +34,10 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.HorizontalAlign;
 import org.andengine.util.color.Color;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -134,8 +138,17 @@ public abstract class SystemInfoLayer extends DialogLayer {
                         try {
                             ((MoneySpendingStrategy) Phases.getInstance().getPhase()).handlePhaseEvent(purchase);
                             setVisibility(false);
-                            mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.get_money);
-                            mediaPlayer.start();
+                            String options = readFile();
+                            if (options == null) {
+                                mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.get_money);
+                                mediaPlayer.start();
+                            }
+                            else
+                                if (options.equals("11")||(options.equals("01")))
+                                {
+                                    mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.get_money);
+                                    mediaPlayer.start();
+                                }
                         } catch (Exception e) {
                             UI.toast(e.getMessage());
                         }
@@ -205,8 +218,17 @@ public abstract class SystemInfoLayer extends DialogLayer {
                             ((MoneySpendingStrategy) Phases.getInstance().getPhase()).
                                     handlePhaseEvent(new Purchase(Purchase.Kind.BUY_FLEET, node));
                             setVisibility(false);
-                            mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.get_money);
-                            mediaPlayer.start();
+                            String options = readFile();
+                            if (options == null) {
+                                mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.get_money);
+                                mediaPlayer.start();
+                            }
+                            else
+                            if (options.equals("11")||(options.equals("01")))
+                            {
+                                mediaPlayer = MediaPlayer.create(Phases.getInstance().getActivity(), R.raw.get_money);
+                                mediaPlayer.start();
+                            }
                         } catch (Exception e) {
                             UI.toast(e.getMessage());
                         }
@@ -338,6 +360,21 @@ public abstract class SystemInfoLayer extends DialogLayer {
             shipRow.attachChild(patchButton);
             scene.registerTouchArea(patchButton);
         }
+    }
+
+    private String readFile() {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    activity.openFileInput("options")));
+            String str = "";
+            str = br.readLine();
+            return str;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

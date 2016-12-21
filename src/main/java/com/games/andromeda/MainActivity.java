@@ -163,7 +163,8 @@ public class MainActivity extends AppCompatActivity {
         options.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent optionsIntent = new Intent(MainActivity.this,OptionsActivity.class);
+                MainActivity.this.startActivity(optionsIntent);
             }
         });
         exit.setOnClickListener(new View.OnClickListener() {

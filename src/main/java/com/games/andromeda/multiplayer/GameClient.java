@@ -85,7 +85,8 @@ public class GameClient implements Runnable,MessageFlags {
                 @Override
                 public void onHandleMessage(ServerConnector<SocketConnection> pServerConnector,
                                             IServerMessage pServerMessage) throws IOException {
-                    //activity.finish();
+                    if (UI.getInstance().activity!=null)
+                        UI.getInstance().finishGame();
                 }
             });
 
