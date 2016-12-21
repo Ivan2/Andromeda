@@ -51,13 +51,13 @@ public class PanelHUD {
 
         rectangleVertical = new Rectangle((camera.getWidth()- GameActivity.SCREEN_WIDTH)/2,
                 (camera.getHeight()-GameActivity.SCREEN_HEIGHT)/2-1,
-                PxDpConverter.dpToPx(resources.getDimension(R.dimen.vertical_panel_width)),
+                resources.getDimension(R.dimen.vertical_panel_width),
                 GameActivity.SCREEN_HEIGHT, vertexBufferObjectManager);
         rectangleVertical.setColor(Color.TRANSPARENT);
 
         rectangleHorizontal = new Rectangle((camera.getWidth()- GameActivity.SCREEN_WIDTH)/2,
                 (camera.getHeight()-GameActivity.SCREEN_HEIGHT)/2-1, GameActivity.SCREEN_WIDTH,
-                PxDpConverter.dpToPx(resources.getDimension(R.dimen.horizontal_panel_height)),
+                resources.getDimension(R.dimen.horizontal_panel_height),
                 vertexBufferObjectManager);
         rectangleHorizontal.setColor(Color.TRANSPARENT);
 

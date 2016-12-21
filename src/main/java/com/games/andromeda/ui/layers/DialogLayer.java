@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.games.andromeda.GameActivity;
 import com.games.andromeda.Phases;
-import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.R;
 import com.games.andromeda.ui.UI;
 import com.games.andromeda.ui.texture.TextureLoader;
@@ -28,8 +27,8 @@ public abstract class DialogLayer extends Layer {
                        VertexBufferObjectManager vertexBufferObjectManager) {
         super(scene, camera, textureLoader, vertexBufferObjectManager);
 
-        marginLeft = PxDpConverter.dpToPx(resources.getDimension(R.dimen.vertical_panel_width));
-        marginTop = PxDpConverter.dpToPx(resources.getDimension(R.dimen.horizontal_panel_height));
+        marginLeft = resources.getDimension(R.dimen.vertical_panel_width);
+        marginTop = resources.getDimension(R.dimen.horizontal_panel_height);
 
         background = new ButtonSprite(0, 0,
                 textureLoader.loadEmptyTexture(Color.argb(220, 0, 0, 0)),

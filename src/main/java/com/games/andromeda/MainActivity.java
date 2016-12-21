@@ -3,19 +3,14 @@ package com.games.andromeda;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.games.andromeda.dialogs.WaitDialog;
-import com.games.andromeda.logic.Base;
-import com.games.andromeda.logic.Fleet;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.ConnectionCloseServerMessage;
 import com.games.andromeda.multiplayer.Client;
@@ -29,8 +24,6 @@ import org.andengine.util.debug.Debug;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.util.Iterator;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 

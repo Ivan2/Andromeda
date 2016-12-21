@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
-import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.R;
 import com.games.andromeda.graph.Node;
 
@@ -144,19 +143,19 @@ public class TextureLoader {
     }
 
     public Font loadTitleDialogTexture() {
-        return loadTextTexture(PxDpConverter.dpToPx(activity.getResources().getDimension(R.dimen.dialog_title_text_size)));
+        return loadTextTexture(activity.getResources().getDimension(R.dimen.dialog_title_text_size));
     }
 
     public Font loadSubtitleDialogTexture() {
-        return loadTextTexture(PxDpConverter.dpToPx(activity.getResources().getDimension(R.dimen.dialog_subtitle_text_size)));
+        return loadTextTexture(activity.getResources().getDimension(R.dimen.dialog_subtitle_text_size));
     }
 
     public Font loadDialogTexture() {
-        return loadTextTexture(PxDpConverter.dpToPx(activity.getResources().getDimension(R.dimen.text_size)));
+        return loadTextTexture(activity.getResources().getDimension(R.dimen.text_size));
     }
 
     public Font loadPanelTexture() {
-        return loadTextTexture(PxDpConverter.dpToPx(activity.getResources().getDimension(R.dimen.panel_text_size)));
+        return loadTextTexture(activity.getResources().getDimension(R.dimen.panel_text_size));
     }
 
 }

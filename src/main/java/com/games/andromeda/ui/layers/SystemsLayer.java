@@ -3,7 +3,6 @@ package com.games.andromeda.ui.layers;
 import android.graphics.PointF;
 
 import com.games.andromeda.GameActivity;
-import com.games.andromeda.PxDpConverter;
 import com.games.andromeda.R;
 import com.games.andromeda.graph.LevelGraph;
 import com.games.andromeda.graph.Node;
@@ -64,7 +63,7 @@ public class SystemsLayer extends Layer implements BaseObserver{
         sprites = new HashMap<>();
         Collection<Node> nodes = graph.getNodes();
         for (final Node node : nodes) {
-            float size = PxDpConverter.dpToPx(activity.getResources().getDimension(R.dimen.system_size));
+            float size = activity.getResources().getDimension(R.dimen.system_size);
             PointF pos = getPos(node.getX(), node.getY());
             SystemSprite sprite = new SystemSprite(node, pos.x - size / 2, pos.y - size / 2,
                     systemTextures.get(node.getSystemType()), vertexBufferObjectManager) {
