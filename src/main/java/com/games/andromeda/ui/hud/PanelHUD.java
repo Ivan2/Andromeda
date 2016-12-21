@@ -39,10 +39,11 @@ public class PanelHUD {
     private Sprite[] shipEnergySprites;
     private Text[] shipCountTexts;
     private ButtonSprite endPhaseButton;
-    private Text sideText;
+//    private Text sideText;
     private Text moneyText;
     private Text phaseText;
     private Text timerText;
+    private Sprite[] sideLogo;
 
     public PanelHUD(Camera camera, TextureLoader textureLoader,
                     VertexBufferObjectManager vertexBufferObjectManager, Resources resources) {
@@ -74,6 +75,7 @@ public class PanelHUD {
         float top = PxDpConverter.dpToPx(10);
         float left = PxDpConverter.dpToPx(4);
         Font font = textureLoader.loadSubtitleDialogTexture();
+        sideLogo = new Sprite[2];
 
         Sprite moneySprite = new Sprite(left, top,
                 textureLoader.loadMoneyTexture(), vertexBufferObjectManager);
@@ -103,10 +105,12 @@ public class PanelHUD {
             rectangleVertical.attachChild(shipSprites[i]);
         }
 
+        sideLogo[0] = createLogoSprite("empire", left);
+        sideLogo[1] = createLogoSprite("federation", left);
 
-        sideText = new Text(rectangleVertical.getWidth() + PxDpConverter.dpToPx(20),
-                (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
-                font, "Федерация", vertexBufferObjectManager);
+//        sideText = new Text(rectangleVertical.getWidth() + PxDpConverter.dpToPx(20),
+//                (rectangleHorizontal.getHeight()-font.getLineHeight())/2,
+//                font, "Федерация", vertexBufferObjectManager);
 
         endPhaseButton = new ButtonSprite(0, 0,
                 textureLoader.loadEmptyTexture(android.graphics.Color.argb(15, 255, 255, 255)),
@@ -144,21 +148,23 @@ public class PanelHUD {
         phaseText.setX(timerText.getX()-phaseText.getWidth()-margin*4);
 
 
-        rectangleHorizontal.attachChild(sideText);
+//        rectangleHorizontal.attachChild(sideText);
         rectangleHorizontal.attachChild(endPhaseButton);
         rectangleHorizontal.attachChild(timerText);
         rectangleHorizontal.attachChild(phaseText);
     }
 
     public void repaintSide(GameObject.Side side) {
-        switch (side) {
-            case EMPIRE:
-                sideText.setText("Империя");
-                break;
-            case FEDERATION:
-                sideText.setText("Федерация");
-                break;
-        }
+        rectangleVertical.attachChild(sideLogo[(side == GameObject.Side.EMPIRE) ? 0 : 1]);
+//
+//        switch (side) {
+//            case EMPIRE:
+//                sideText.setText("Империя");
+//                break;
+//            case FEDERATION:
+//                sideText.setText("Федерация");
+//                break;
+//        }
     }
 
     public void repaintPhaseName(String phaseName) {
@@ -226,4 +232,10 @@ public class PanelHUD {
         endPhaseButton.setEnabled(enabled);
     }
 
+    private Sprite createLogoSprite(String logo, float margin){
+        Sprite result = new Sprite(0, 0, textureLoader.loadLogoTexture(logo), vertexBufferObjectManager);
+        result.setSize(size*2, size*2);
+        result.setPosition(margin, rectangleVertical.getHeight() - result.getHeight() - margin);
+        return result;
+    }
 }
