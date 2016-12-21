@@ -19,8 +19,11 @@ import com.games.andromeda.logic.phases.FleetPreparationStrategy;
 import com.games.andromeda.logic.phases.LevelPreparationStrategy;
 import com.games.andromeda.logic.phases.MoneySpendingStrategy;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -60,7 +63,11 @@ public class HelpDialog extends DialogFragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.checkShow:
-                writeFile("0");
+                String str = readFile();
+                if (str.charAt(1) == '1')
+                    writeFile("01");
+                else
+                    writeFile("11");
                 break;
         }
         dismiss();
@@ -84,6 +91,21 @@ public class HelpDialog extends DialogFragment implements View.OnClickListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String readFile() {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    context.openFileInput("options")));
+            String str = "";
+            str = br.readLine();
+            return str;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "11";
     }
 
 }
