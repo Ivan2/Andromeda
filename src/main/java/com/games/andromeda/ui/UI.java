@@ -1,6 +1,8 @@
 package com.games.andromeda.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.util.Log;
 import android.widget.Toast;
@@ -75,7 +77,7 @@ public class UI {
 
     public Activity activity;
 
-    private UI(GameActivity activity, final Scene scene, Camera camera, TextureLoader textureLoader,
+    private UI(final GameActivity activity, final Scene scene, Camera camera, TextureLoader textureLoader,
                VertexBufferObjectManager vertexBufferObjectManager,
                ShipsLayer.IOnFleetMove onFleetMove, ShipsLayer.IOnFleetFight onFleetFight) {
         this.activity = activity;
@@ -152,27 +154,55 @@ public class UI {
                 } else if (Phases.getInstance().getPhase() instanceof FleetMovingStrategy) {
                     ShipSprite activeSprite = ShipsLayer.activeSprite;
                     if (activeSprite != null && activeSprite.getFleet().getPosition() != node.getId()) {
-                        Fleet fleet = activeSprite.getFleet();
+                        final Fleet fleet = activeSprite.getFleet();
 
                         pathBuilder.start(fleet);
                         pathBuilder.setTarget(node.getId());
                         try {
-                            float energy = fleet.getEnergy();
-                            PathInfo path = pathBuilder.getPath();
-                            getShipsLayer().moveFleet(path);
-                            ((FleetMovingStrategy)Phases.getInstance().getPhase()).handlePhaseEvent(
-                                    new MoveFleetMessage.Move(fleet.getId(), energy, path));
-
-                        } catch (Fleet.NotEnoughEnergyException e) {
-                            toast("Недостаточно энергии");
-                        } catch (Exception e){
-                            Log.wtf("moving: ", e.toString());
+                            final float energy = fleet.getEnergy();
+                            final PathInfo path = pathBuilder.getPath();
+                            float requiredEnergy =(float) (path.getPathWeight())/fleet.getProperties().getSpeed(fleet.getShipCount()) - 0.0000001f;
+                            String str = "У флота осталось " + energy*100 + "% энергии. Вы хотите истратить " + requiredEnergy*100 + "% для перемещения?";
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                            builder.setTitle("Предупреждение")
+                                    .setMessage(str)
+                                    .setCancelable(false)
+                                    .setPositiveButton("Да",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    try {
+                                                        getShipsLayer().moveFleet(path);
+                                                        ((FleetMovingStrategy) Phases.getInstance().getPhase()).handlePhaseEvent(
+                                                                new MoveFleetMessage.Move(fleet.getId(), energy, path));
+                                                        getShipsLayer().releaseSprite();
+                                                        pathBuilder.reset();
+                                                        getShipsLayer().repaint();
+                                                        panel.repaintShipInfo();
+                                                    } catch (Fleet.NotEnoughEnergyException e) {
+                                                        Log.wtf("errr",e.getMessage());
+                                                    } catch (Fleet.InvalidPositionException e) {
+                                                        Log.wtf("errr",e.getMessage());
+                                                    } catch (Fleet.InvalidPathException e) {
+                                                        Log.wtf("errr",e.getMessage());
+                                                    }
+                                                }
+                                            })
+                                    .setNegativeButton("Нет",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    dialog.cancel();
+                                                }
+                                            });
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    final AlertDialog alert = builder.create();
+                                    alert.show();
+                                }
+                            });
+                        }  catch (Exception e){
+                            Log.wtf("moving: ", e.getMessage());
                         }
-
-                        getShipsLayer().releaseSprite();
-                        pathBuilder.reset();
-                        getShipsLayer().repaint();
-                        panel.repaintShipInfo();
                     }
                 } else {
                     String options = readFile();
