@@ -2,7 +2,7 @@ package com.games.andromeda.ui.layers;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.res.Resources;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.view.View;
 import android.view.Window;
@@ -303,8 +303,8 @@ public abstract class SystemInfoLayer extends DialogLayer {
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
                             final Dialog dialog = new Dialog(activity);
+                            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
                             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                             dialog.setContentView(R.layout.buy_dialog);
 

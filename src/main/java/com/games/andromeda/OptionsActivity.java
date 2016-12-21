@@ -1,10 +1,9 @@
 package com.games.andromeda;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 
 import java.io.BufferedReader;
@@ -28,8 +27,6 @@ public class OptionsActivity extends AppCompatActivity {
         hints = new Switch(this);
         sound = (Switch) findViewById(R.id.soundSwitch);
         hints = (Switch) findViewById(R.id.hintsSwitch);
-        LinearLayout main = (LinearLayout) findViewById(R.id.options_menu);
-        main.setBackground(getResources().getDrawable(R.drawable.background));
         String option = readFile();
         if (option == null) {
             option = "11";

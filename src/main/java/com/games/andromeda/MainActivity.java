@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.games.andromeda.dialogs.WaitDialog;
+import com.games.andromeda.ui.dialogs.WaitDialog;
 import com.games.andromeda.logic.WorldAccessor;
 import com.games.andromeda.message.ConnectionCloseServerMessage;
 import com.games.andromeda.multiplayer.Client;
@@ -35,26 +35,23 @@ public class MainActivity extends AppCompatActivity {
     private Button options;
     private Button exit;
     private static String serverIp = LOCALHOST_IP;
-    public static String type = "";
     private SocketServer<SocketConnectionClientConnector> mSocketServer;
     private GameClient client;
 
     private WaitDialog waitDialog;
 
     private void initServer() {
-        type = "Ожидание клиента...";
         ServerCreator creator = new ServerCreator(this);
         mSocketServer = creator.getServer(SERVER_PORT);
         mSocketServer.start();
         waitDialog = new WaitDialog();
-        waitDialog.show(getFragmentManager(),"");
+        waitDialog.show(this, "Ожидание клиента...");
     }
 
     private void initClient() {
         if (mSocketServer == null) {
-            type = "Поиск сервера...";
             waitDialog = new WaitDialog();
-            waitDialog.show(getFragmentManager(),"");
+            waitDialog.show(this, "Поиск сервера...");
 
             Thread th = new Thread(new Runnable() {
                 @Override
