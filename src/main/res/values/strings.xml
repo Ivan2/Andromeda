@@ -12,4 +12,6 @@
     <string name="ok_string">Ok</string>
     <string name="continue_string">Продолжить</string>
     <string name="quit_string">Сдаться и выйти</string>
+    <string name="sound_off">Звук</string>
+    <string name="hints">Подсказки</string>
 </resources>
