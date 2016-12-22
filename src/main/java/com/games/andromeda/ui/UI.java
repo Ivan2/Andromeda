@@ -133,6 +133,8 @@ public class UI {
             @Override
             public void onUp(Node node) {
                 //TODO handlePhaseEvent
+                Log.wtf("node", node.getId()+"");
+                Log.wtf("phase", Phases.getInstance().getPhase()+"");
                 getSystemsLayer().unhighlightAll();
                 if (!enabled)
                     return;
